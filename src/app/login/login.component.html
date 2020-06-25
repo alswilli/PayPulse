@@ -1,3 +1,27 @@
 <p>
   login works!
 </p>
+<div>
+  <mat-card style="max-width: 500px; margin: auto;">
+    <mat-card-title fxLayoutAlign="center">Log in</mat-card-title>
+    <form style="max-width: 500px" novalidate [formGroup]="loginForm" #loginform="ngForm" (ngSubmit)="onSubmit()" fxLayout="column">
+      <p>
+        <mat-form-field fxLayoutAlign="center">
+          <input matInput formControlName="email" placeholder="Email" type="text" required>
+          <mat-error *ngIf="formErrors.email">{{formErrors.email}}</mat-error>
+        </mat-form-field>
+      </p>
+      <p>
+        <mat-form-field fxLayoutAlign="center">
+          <input matInput formControlName="password" placeholder="Password" type="text" required>
+          <mat-error *ngIf="formErrors.password">{{formErrors.password}}</mat-error>
+        </mat-form-field>
+      </p>
+      <div fxLayoutAlign="center">
+        <button style="background-color:lightgrey; margin: auto;" type="submit"
+         mat-button [disabled]="loginForm.invalid">Log in</button>
+      </div>
+    </form>
+  </mat-card>
+</div>
+

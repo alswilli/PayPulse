@@ -1,3 +1,50 @@
 <p>
   home works!
 </p>
+
+<!-- <table>
+  <tr>
+    <th fxFlex fxLayoutAlign="center center" class="summaryListItem">Transactions</th>
+  </tr>
+  <tr>
+    <td fxFlex fxLayoutAlign="center center" class="summaryListItem">Budgets</td>
+  </tr>
+  <tr>
+    <td fxFlex fxLayoutAlign="center center" class="summaryListItem">Goals</td>
+  </tr>
+  <tr>
+    <td fxFlex fxLayoutAlign="center center" class="summaryListItem">Sharing</td>
+  </tr>
+  <tr>
+    <td fxFlex fxLayoutAlign="center center" class="summaryListItem">Advice</td>
+  </tr>
+</table> -->
+
+<!-- <mat-list fxLayout="column">
+  <mat-list-item fxFlex fxLayoutAlign="center center" class="summaryListItem">Transactions Summary</mat-list-item>
+  <mat-list-item fxFlex fxLayoutAlign="center center" class="summaryListItem">Budgets Summary</mat-list-item>
+  <mat-list-item fxFlex fxLayoutAlign="center center" class="summaryListItem">Goals Summary</mat-list-item>
+  <mat-list-item fxFlex fxLayoutAlign="center center" class="summaryListItem">Sharing Summary</mat-list-item>
+  <mat-list-item fxFlex fxLayoutAlign="center center" class="summaryListItem">Advice Summary</mat-list-item>
+</mat-list> -->
+<div>
+  <mat-card class="card" *ngFor="let component of majorComponents">
+    <mat-card-header>
+      <mat-card-title class="mainCardTitle"> {{component.name}} </mat-card-title>
+      <mat-card-subtitle> {{component.description}} </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content fxLayoutAlign="center">
+      <mat-card fxFlex *ngFor="let card of component.cards">
+        <mat-card-header>
+          <mat-card-title> {{card.name}} </mat-card-title>
+        </mat-card-header>
+        <mat-card-content fxLayoutAlign="center">
+          <p> {{card.data}} </p>
+        </mat-card-content>
+      </mat-card>
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-button class="manageButton">Manage {{component.name}}</button>
+    </mat-card-actions>
+  </mat-card>
+</div>

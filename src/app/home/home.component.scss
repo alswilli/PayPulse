@@ -1,0 +1,25 @@
+$border-main-color: black;
+$manage-button-color: grey;
+$manage-button-text-color: white;
+
+.summaryListItem {
+    border-style: solid;
+    border-color: $border-main-color;
+}
+
+.manageButton {
+    background-color: $manage-button-color;
+    color: $manage-button-text-color;
+    // color: $border-main-color;
+    // text-decoration: none;
+}
+
+.mainCardTitle {
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.card {
+    margin: 10px;
+}
+

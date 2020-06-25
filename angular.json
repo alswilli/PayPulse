@@ -23,7 +23,8 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.scss",
+              "src/customTheme.scss"
             ],
             "scripts": []
           },
@@ -123,5 +124,10 @@
       }
     }
   },
-  "defaultProject": "PayPulse"
+  "defaultProject": "PayPulse",
+  "schematics": {
+    "@schematics/angular:component": {
+      "styleext": "scss"
+    }
+  }
 }

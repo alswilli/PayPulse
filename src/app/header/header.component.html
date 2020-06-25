@@ -1,3 +1,41 @@
-<p>
-  header works!
-</p>
+<div style="height: 100vh;">
+  <mat-sidenav-container class="example-container">
+    <mat-sidenav class="side" fxLayout="column" mode="side" [(opened)]="opened">
+      <a class="sideContent" mat-button routerLink='/home' (click)="onMenuClick()" routerLinkActive='active'> Home </a>
+      <a class="sideContent" mat-button routerLink='/transactions' (click)="onMenuClick()" routerLinkActive='active'> Transactions </a>
+      <a class="sideContent" mat-button routerLink='/budgets' (click)="onMenuClick()" routerLinkActive='active'> Budgets </a>
+      <a class="sideContent" mat-button routerLink='/goals' (click)="onMenuClick()" routerLinkActive='active'> Goals </a>
+      <a class="sideContent" mat-button routerLink='/sharing' (click)="onMenuClick()" routerLinkActive='active'> Sharing </a>
+      <a class="sideContent" mat-button routerLink='/advice' (click)="onMenuClick()" routerLinkActive='active'> Advice </a>
+      <a class="sideContent" mat-button routerLink='/login' (click)="onMenuClick()"> Log Out </a>
+      <a mat-button (click)="onMenuClick()" class="xStyle"> X </a>
+    </mat-sidenav>
+  
+    <mat-sidenav-content style="height: 100vh;">
+      <mat-toolbar color="primary" *ngIf="!loggingIn">
+        <!-- Show the side nav when the screen size is lt-md -->
+        <button class="menuButton" mat-icon-button (click)="onMenuClick()" fxHide="true" fxShow.lt-md="true">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span fxFlex fxLayoutAlign.lt-md="center"><a class="apptitle" routerLink='/home'>PayPulse</a></span>
+        <!-- Show the buttons when the screen size is gt-md -->
+        <div fxFlex="60" fxLayout="row" fxLayoutAlign="center center" fxShow="true" fxHide.lt-md="true">
+          <a mat-button routerLink='/home' routerLinkActive='active'> Home </a>
+          <a mat-button routerLink='/transactions' routerLinkActive='active'> Transactions </a>
+          <a mat-button routerLink='/budgets' routerLinkActive='active'> Budgets </a>
+          <a mat-button routerLink='/goals' routerLinkActive='active'> Goals </a>
+          <a mat-button routerLink='/sharing' routerLinkActive='active'> Sharing </a>
+          <a mat-button routerLink='/advice' routerLinkActive='active'> Advice </a>
+        </div>
+        <div fxFlex="20" fxLayoutAlign="end center" fxShow="true" fxHide.lt-md="true">
+          <a mat-button routerLink='/login'> Log Out </a>
+        </div>
+      </mat-toolbar>
+
+      <router-outlet></router-outlet>
+
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
+
+
