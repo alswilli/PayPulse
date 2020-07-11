@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from "@angular/router";
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -15,7 +16,8 @@ export class LoginComponent implements OnInit {
   errMess: string;
 
   constructor(private fb: FormBuilder,
-    private router: Router) { 
+    private router: Router,
+    private authService: AuthService) { 
     this.createForm();
   }
 
@@ -72,12 +74,25 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     // this.feedback = this.feedbackForm.value;
-    console.log(this.loginForm.value);
-    var credentials = this.loginForm.value;
-    if (credentials.email === "email@email" && credentials.password === "password") {
-      // [routerLink]="['/dishdetail', dish.id]"
-      this.router.navigate(['/home']);
-    }
+    console.log("User logging in: ", this.loginForm.value);
+    var user = this.loginForm.value;
+    this.authService.logIn(user).subscribe(res => {
+      if (res.success) {
+        this.router.navigate(['/home']);
+      }
+      else {
+        console.log(res)
+        console.log("Login method from auth service was not a success")
+      }
+    },
+    error => {
+      console.log(error);
+      this.errMess = error;
+    });
+    // if (credentials.email === "email@email" && credentials.password === "password") {
+    //   // [routerLink]="['/dishdetail', dish.id]"
+    //   this.router.navigate(['/home']);
+    // }
     this.loginFormDirective.resetForm();
     this.loginForm.reset({
       email: '',

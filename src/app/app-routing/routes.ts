@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-
+import { AuthGuardService as AuthGuard } from '../services/auth-guard.service';
 import { LoginComponent } from '../login/login.component';
 import { HomeComponent } from '../home/home.component';
 import { TransactionsComponent } from '../transactions/transactions.component';
@@ -13,7 +13,7 @@ export const routes: Routes = [
   { path: 'home',  component: HomeComponent },
   { path: 'transactions',  component: TransactionsComponent },
   { path: 'budgets',  component: BudgetsComponent },
-  {path: 'goals', component: GoalsComponent},
+  { path: 'goals', component: GoalsComponent},
   { path: 'sharing',  component: SharingComponent },
   { path: 'advice',  component: AdviceComponent },
   { path: '', redirectTo: '/home', pathMatch: 'full' }

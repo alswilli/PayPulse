@@ -26,6 +26,8 @@ import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 
 import { SidebarService } from './services/sidebar.service';
+import { AuthService } from './services/auth.service';
+import { ProcessHTTPMsgService } from './services/process-httpmsg.service';
 
 @NgModule({
   declarations: [
@@ -57,7 +59,9 @@ import { SidebarService } from './services/sidebar.service';
     ReactiveFormsModule
   ],
   providers: [
-    SidebarService
+    SidebarService,
+    AuthService,
+    ProcessHTTPMsgService
   ],
   bootstrap: [AppComponent]
 })

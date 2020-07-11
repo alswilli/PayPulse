@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router, ActivatedRoute, NavigationEnd} from '@angular/router';
+import { Router, ActivatedRoute, NavigationEnd, Event} from '@angular/router';
 import {filter} from 'rxjs/operators';
 
 @Component({
@@ -13,11 +13,26 @@ export class HeaderComponent implements OnInit {
   loggingIn: boolean;
 
   constructor(private router: Router,
-    private activatedRoute: ActivatedRoute) { 
+    private activatedRoute: ActivatedRoute) {} 
+
+  ngOnInit() {
+    this.router.events.subscribe((event:Event) => {
+      if(event instanceof NavigationEnd ){
+        console.log(event.url);
+        if (event.url === '/login') {
+          this.loggingIn = true;
+          console.log("Log in screen opened!");
+        } 
+        else {
+          this.loggingIn = false;
+          console.log("Log in screen closed!");
+        }
+      }
+    });
     // this.router.events.pipe(
-    //   filter((event:Event) => event instanceof NavigationEnd))
+    //   filter(event => event instanceof NavigationEnd))
     //     .subscribe((event:Event) => {
-    //       console.log(event.url);
+    //       console.log(event);
     //       if (event.url === '/login') {
     //         this.loggingIn = true;
     //         console.log("Log in screen opened!");
@@ -27,27 +42,6 @@ export class HeaderComponent implements OnInit {
     //         console.log("Log in screen closed!");
     //       }
     //     });  
-  }
-
-  ngOnInit() {
-    // this.router.events.pipe(
-    //     filter(event => event instanceof NavigationEnd)
-    // ).subscribe(() => {
-    //     console.log(this.activatedRoute);
-    // });
-    this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd))
-        .subscribe(event => {
-          console.log(event.url);
-          if (event.url === '/login') {
-            this.loggingIn = true;
-            console.log("Log in screen opened!");
-          } 
-          else {
-            this.loggingIn = false;
-            console.log("Log in screen closed!");
-          }
-        });  
   }
 
   onMenuClick() {
