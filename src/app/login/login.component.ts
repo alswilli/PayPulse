@@ -16,8 +16,7 @@ export class LoginComponent implements OnInit {
   errMess: string;
 
   constructor(private fb: FormBuilder,
-    private router: Router,
-    private authService: AuthService) { 
+    private router: Router) { 
     this.createForm();
   }
 
@@ -76,23 +75,24 @@ export class LoginComponent implements OnInit {
     // this.feedback = this.feedbackForm.value;
     console.log("User logging in: ", this.loginForm.value);
     var user = this.loginForm.value;
-    this.authService.logIn(user).subscribe(res => {
-      if (res.success) {
-        this.router.navigate(['/home']);
-      }
-      else {
-        console.log(res)
-        console.log("Login method from auth service was not a success")
-      }
-    },
-    error => {
-      console.log(error);
-      this.errMess = error;
-    });
-    // if (credentials.email === "email@email" && credentials.password === "password") {
-    //   // [routerLink]="['/dishdetail', dish.id]"
-    //   this.router.navigate(['/home']);
-    // }
+    // this.authService.logIn(user).subscribe(res => {
+    //   if (res.success) {
+    //     this.router.navigate(['/home']);
+    //   }
+    //   else {
+    //     console.log(res)
+    //     console.log("Login method from auth service was not a success")
+    //   }
+    // },
+    // error => {
+    //   console.log(error);
+    //   this.errMess = error;
+    // });
+
+    if (user.email && user.password) {
+      // [routerLink]="['/dishdetail', dish.id]"
+      this.router.navigate(['/home']);
+    }
     this.loginFormDirective.resetForm();
     this.loginForm.reset({
       email: '',

@@ -2,31 +2,26 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const transactionSchema = new Schema({
-    name: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    image: {
+    accountName: {
         type: String,
         required: true
     },
-    designation: {
+    date: {
         type: String,
         required: true
     },
-    abbr: {
+    transactionName: {
         type: String,
         required: true
     },
-    description: {
+    amount: {
         type: String,
         required: true
     },
-    featured: {
-        type: Boolean,
-        default:false      
-    }
+    category: {
+        type: String,
+        required: true
+    },
 }, {
     timestamps: true
 });

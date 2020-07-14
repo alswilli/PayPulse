@@ -3,11 +3,10 @@
 /**
  * Module dependencies.
  */
-var app = require('../app');
+var app = require('./app');
 var debug = require('debug')('pay-pulse');
 var http = require('http');
 var https = require('https');
-var fs = require('fs');
 
 /**
  * Get port from environment and store in Express.
@@ -36,8 +35,10 @@ server.on('listening', onListening);
  */ 
  
 var options = {
-  key: fs.readFileSync(__dirname+'/private.key'),
-  cert: fs.readFileSync(__dirname+'/certificate.pem')
+//   key: fs.readFileSync(__dirname+'/private.key'),
+//   cert: fs.readFileSync(__dirname+'/certificate.pem')
+    key: process.env.HTTPS_PRIVATE_KEY,
+    cert: process.env.HTTPS_CERTIFICATE
 };
 
 var secureServer = https.createServer(options,app);
