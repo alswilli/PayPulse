@@ -7,14 +7,16 @@ import { BudgetsComponent } from '../budgets/budgets.component';
 import { GoalsComponent } from '../goals/goals.component';
 import { SharingComponent } from '../sharing/sharing.component';
 import { AdviceComponent } from '../advice/advice.component';
+import { CreateAccountComponent } from '../create-account/create-account.component';
 
 export const routes: Routes = [
   { path: 'login',  component: LoginComponent },
-  { path: 'home',  component: HomeComponent },
-  { path: 'transactions',  component: TransactionsComponent },
-  { path: 'budgets',  component: BudgetsComponent },
-  { path: 'goals', component: GoalsComponent},
-  { path: 'sharing',  component: SharingComponent },
-  { path: 'advice',  component: AdviceComponent },
+  { path: 'home',  component: HomeComponent, canActivate: [AuthGuard] },
+  { path: 'transactions',  component: TransactionsComponent, canActivate: [AuthGuard] },
+  { path: 'budgets',  component: BudgetsComponent, canActivate: [AuthGuard] },
+  { path: 'goals', component: GoalsComponent, canActivate: [AuthGuard] },
+  { path: 'sharing',  component: SharingComponent, canActivate: [AuthGuard] },
+  { path: 'advice',  component: AdviceComponent, canActivate: [AuthGuard] },
+  { path: 'createAccount',  component: CreateAccountComponent },
   { path: '', redirectTo: '/home', pathMatch: 'full' }
 ];

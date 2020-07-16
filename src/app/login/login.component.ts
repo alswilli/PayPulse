@@ -1,7 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from "@angular/router";
 import { AuthService } from '../services/auth.service';
+declare var FB: any;
 
 @Component({
   selector: 'app-login',
@@ -16,19 +17,20 @@ export class LoginComponent implements OnInit {
   errMess: string;
 
   constructor(private fb: FormBuilder,
-    private router: Router) { 
+    private router: Router,
+    private authService: AuthService,
+    private _ngZone: NgZone) { 
     this.createForm();
   }
 
   formErrors = {
-    'email': '',
+    'username': '',
     'password': '',
   };
 
   validationMessages = {
-    'email': {
-      'required':      'Email is required.',
-      'email':         'Email not in valid format.'
+    'username': {
+      'required':      'Username is required.',
     },
     'password': {
       'required':      'Password is required.'
@@ -36,11 +38,28 @@ export class LoginComponent implements OnInit {
   };
 
   ngOnInit() {
+    (window as any).fbAsyncInit = function() {
+      FB.init({
+        appId      : '366144767681380',
+        cookies    : true,
+        xfbml      : true,
+        version    : 'v2.10'
+      });
+      FB.AppEvents.logPageView();
+    };
+
+    (function(d, s, id){
+       var js, fjs = d.getElementsByTagName(s)[0];
+       if (d.getElementById(id)) {return;}
+       js = d.createElement(s); js.id = id;
+       js.src = "https://connect.facebook.net/en_US/sdk.js";
+       fjs.parentNode.insertBefore(js, fjs);
+     }(document, 'script', 'facebook-jssdk'));
   }
 
   createForm() {
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email] ],
+      username: ['', [Validators.required] ],
       password: ['', [Validators.required] ]
     });
 
@@ -75,29 +94,62 @@ export class LoginComponent implements OnInit {
     // this.feedback = this.feedbackForm.value;
     console.log("User logging in: ", this.loginForm.value);
     var user = this.loginForm.value;
-    // this.authService.logIn(user).subscribe(res => {
-    //   if (res.success) {
-    //     this.router.navigate(['/home']);
-    //   }
-    //   else {
-    //     console.log(res)
-    //     console.log("Login method from auth service was not a success")
-    //   }
-    // },
-    // error => {
-    //   console.log(error);
-    //   this.errMess = error;
-    // });
+    this.authService.logIn(user).subscribe(res => {
+      if (res.success) {
+        this.router.navigate(['/home']);
+      }
+      else {
+        console.log(res)
+        console.log("Login method from auth service was not a success")
+      }
+    },
+    error => {
+      console.log(error);
+      this.errMess = error;
+    });
 
-    if (user.email && user.password) {
-      // [routerLink]="['/dishdetail', dish.id]"
-      this.router.navigate(['/home']);
-    }
+    // if (user.email && user.password) {
+    //   // [routerLink]="['/dishdetail', dish.id]"
+    //   this.router.navigate(['/home']);
+    // }
     this.loginFormDirective.resetForm();
     this.loginForm.reset({
       email: '',
       password: ''
     });
+  }
+
+  facebookLogin(){
+    console.log("submit login to facebook");
+    // FB.login();
+    FB.login((response)=>
+        {
+          console.log('submitLogin',response);
+          if (response.authResponse)
+          {
+            //login success
+            //login success code here
+            //redirect to home page
+            this.authService.logInFacebook(response.authResponse).subscribe(res => {
+              if (res.success) {
+                this._ngZone.run(() => this.router.navigate(['/home']));
+              }
+              else {
+                console.log(res)
+                console.log("Login method via facebook from auth service was not a success")
+              }
+            },
+            error => {
+              console.log(error);
+              this.errMess = error;
+            });
+           }
+           else
+           {
+           console.log('User login failed');
+         }
+      });
+
   }
 
 }

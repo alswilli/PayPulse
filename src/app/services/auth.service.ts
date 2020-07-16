@@ -12,6 +12,13 @@ interface AuthResponse {
   token: string;
 }
 
+interface FbAuthResponse {
+  status: string;
+  success: string;
+  token: string;
+  username: string;
+}
+
 interface JWTResponse {
   status: string;
   success: string;
@@ -25,7 +32,7 @@ export class AuthService {
 
   tokenKey = 'JWT';
   isAuthenticated: Boolean = false;
-  email: Subject<string> = new Subject<string>();
+  username: Subject<string> = new Subject<string>();
   authToken: string = undefined;
 
    constructor(private http: HttpClient,
@@ -36,7 +43,7 @@ export class AuthService {
      this.http.get<JWTResponse>(baseURL + 'users/checkJWTtoken')
      .subscribe(res => {
        console.log('JWT Token Valid: ', res);
-       this.sendEmail(res.user.email);
+       this.sendUsername(res.user.username);
      },
      err => {
        console.log('JWT Token invalid: ', err);
@@ -44,18 +51,18 @@ export class AuthService {
      });
    }
 
-   sendEmail(name: string) {
-     this.email.next(name);
+   sendUsername(name: string) {
+     this.username.next(name);
    }
 
-   clearEmail() {
-     this.email.next(undefined);
+   clearUsername() {
+     this.username.next(undefined);
    }
 
    loadUserCredentials() {
      const credentials = JSON.parse(localStorage.getItem(this.tokenKey));
      console.log('loadUserCredentials ', credentials);
-     if (credentials && credentials.email !== undefined) {
+     if (credentials && credentials.username !== undefined) {
        this.useCredentials(credentials);
        if (this.authToken) {
         this.checkJWTtoken();
@@ -71,30 +78,45 @@ export class AuthService {
 
    useCredentials(credentials: any) {
      this.isAuthenticated = true;
-     this.sendEmail(credentials.email);
+     this.sendUsername(credentials.username);
      this.authToken = credentials.token;
    }
 
    destroyUserCredentials() {
      this.authToken = undefined;
-     this.clearEmail();
+     this.clearUsername();
      this.isAuthenticated = false;
      localStorage.removeItem(this.tokenKey);
    }
 
-   signUp() {
-
-   }
+   signUp(user: any): Observable<any> {
+     return this.http.post(baseURL + 'users/signup', user)
+       .pipe( map(res => {
+         return {'success': true, 'username': user.username };
+     }),
+       catchError(error => this.processHTTPMsgService.handleError(error)));
+     }
 
    logIn(user: any): Observable<any> {
      return this.http.post<AuthResponse>(baseURL + 'users/login',
-       {'email': user.email, 'password': user.password})
+       {'username': user.username, 'password': user.password})
        .pipe( map(res => {
-           this.storeUserCredentials({email: user.email, token: res.token});
-           return {'success': true, 'email': user.email };
+           this.storeUserCredentials({username: user.username, token: res.token});
+           return {'success': true, 'username': user.username };
        }),
         catchError(error => this.processHTTPMsgService.handleError(error)));
    }
+
+   logInFacebook(fbAuthResponse): Observable<any>{
+    return this.http.post<FbAuthResponse>(baseURL + 'users/facebook/token',
+       {access_token: fbAuthResponse.accessToken})
+       .pipe( map(res => {
+        console.log(res)
+           this.storeUserCredentials({username: res.username, token: res.token});
+           return {'success': true, 'username': res.username };
+       }),
+        catchError(error => this.processHTTPMsgService.handleError(error)));
+  }
 
    logOut() {
      this.destroyUserCredentials();
@@ -104,11 +126,12 @@ export class AuthService {
      return this.isAuthenticated;
    }
 
-   getEmail(): Observable<string> {
-     return this.email.asObservable();
+   getUsername(): Observable<string> {
+     return this.username.asObservable();
    }
 
    getToken(): string {
      return this.authToken;
    }
 }
+

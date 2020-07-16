@@ -1,19 +1,24 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, Event} from '@angular/router';
-import {filter} from 'rxjs/operators';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
 
+  // email: string = undefined;
+  username: string = undefined;
+  subscription: Subscription;
   opened: boolean;
   loggingIn: boolean;
 
   constructor(private router: Router,
-    private activatedRoute: ActivatedRoute) {} 
+    private activatedRoute: ActivatedRoute, 
+    private authService: AuthService) {} 
 
   ngOnInit() {
     this.router.events.subscribe((event:Event) => {
@@ -22,26 +27,26 @@ export class HeaderComponent implements OnInit {
         if (event.url === '/login') {
           this.loggingIn = true;
           console.log("Log in screen opened!");
+        }
+        else if (event.url === '/createAccount') {
+          this.loggingIn = true;
         } 
         else {
           this.loggingIn = false;
-          console.log("Log in screen closed!");
         }
+        // this.loggingIn = false;
       }
-    });
-    // this.router.events.pipe(
-    //   filter(event => event instanceof NavigationEnd))
-    //     .subscribe((event:Event) => {
-    //       console.log(event);
-    //       if (event.url === '/login') {
-    //         this.loggingIn = true;
-    //         console.log("Log in screen opened!");
-    //       } 
-    //       else {
-    //         this.loggingIn = false;
-    //         console.log("Log in screen closed!");
-    //       }
-    //     });  
+    }); 
+
+    this.authService.loadUserCredentials();
+      // this.subscription = this.authService.getEmail()
+        // .subscribe(email => { console.log(email); this.email = email; });
+    this.subscription = this.authService.getUsername()
+      .subscribe(username => { console.log(username); this.username = username; });
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();
   }
 
   onMenuClick() {
@@ -52,6 +57,13 @@ export class HeaderComponent implements OnInit {
     else {
       console.log("Sidebar closed!");
     }
+  }
+
+  logOut() {
+    // this.email = undefined;
+    this.username = undefined;
+    this.authService.logOut();
+    this.router.navigate(['/login']);
   }
 
 }

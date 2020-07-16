@@ -29,6 +29,28 @@ import { SidebarService } from './services/sidebar.service';
 import { AuthService } from './services/auth.service';
 import { ProcessHTTPMsgService } from './services/process-httpmsg.service';
 
+
+import { MatGridListModule } from '@angular/material/grid-list';;
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSliderModule } from '@angular/material/slider';
+
+import 'hammerjs';
+
+import { AuthInterceptor, UnauthorizedInterceptor } from './services/auth.interceptor';
+import { AuthGuardService } from './services/auth-guard.service';
+
+import { HttpClientModule } from '@angular/common/http';
+import { baseURL } from './shared/baseurl';
+import {HTTP_INTERCEPTORS} from '@angular/common/http';
+import { CreateAccountComponent } from './create-account/create-account.component';
+import {MatPaginatorModule} from '@angular/material/paginator';
+import {MatSortModule} from '@angular/material/sort';
+import {MatTableModule } from '@angular/material/table';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -40,7 +62,8 @@ import { ProcessHTTPMsgService } from './services/process-httpmsg.service';
     AdviceComponent,
     HomeComponent,
     HeaderComponent,
-    FooterComponent
+    FooterComponent,
+    CreateAccountComponent
   ],
   imports: [
     BrowserModule,
@@ -56,12 +79,29 @@ import { ProcessHTTPMsgService } from './services/process-httpmsg.service';
     MatFormFieldModule,
     MatInputModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    HttpClientModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatTableModule,
+    MatProgressSpinnerModule
   ],
   providers: [
     SidebarService,
     AuthService,
-    ProcessHTTPMsgService
+    ProcessHTTPMsgService,
+    AuthGuardService,
+    {provide: 'baseURL', useValue: baseURL},
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: UnauthorizedInterceptor,
+      multi: true
+    }
   ],
   bootstrap: [AppComponent]
 })

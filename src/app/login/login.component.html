@@ -1,14 +1,11 @@
-<p>
-  login works!
-</p>
 <div>
-  <mat-card style="max-width: 500px; margin: auto;">
+  <mat-card style="max-width: 500px; margin: auto; margin-top: 50px;">
     <mat-card-title fxLayoutAlign="center">Log in</mat-card-title>
     <form style="max-width: 500px" novalidate [formGroup]="loginForm" #loginform="ngForm" (ngSubmit)="onSubmit()" fxLayout="column">
       <p>
         <mat-form-field fxLayoutAlign="center">
-          <input matInput formControlName="email" placeholder="Email" type="text" required>
-          <mat-error *ngIf="formErrors.email">{{formErrors.email}}</mat-error>
+          <input matInput formControlName="username" placeholder="Username" type="text" required>
+          <mat-error *ngIf="formErrors.username">{{formErrors.username}}</mat-error>
         </mat-form-field>
       </p>
       <p>
@@ -21,7 +18,18 @@
         <button style="background-color:lightgrey; margin: auto;" type="submit"
          mat-button [disabled]="loginForm.invalid">Log in</button>
       </div>
+      <div fxLayoutAlign="center">
+        <button type="button" class="btn" (click)="facebookLogin();">Login with facebook</button>
+      </div>
+      <p>
+        <span fxFlex fxLayoutAlign="center"><a class="createAccountLink" routerLink='/createAccount'>Need to create an account?</a></span>
+      </p>
+      <div id="fb-root"></div>
     </form>
   </mat-card>
 </div>
+
+
+
+
 

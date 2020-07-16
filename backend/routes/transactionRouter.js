@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-// const authenticate = require('../authenticate');
-// const cors = require('./cors');
+const authenticate = require('../authenticate');
+const cors = require('./corsRoutes');
 
 const Transactions = require('../models/transactions');
 
@@ -10,19 +10,33 @@ const transactionRouter = express.Router();
 transactionRouter.use(bodyParser.json());
 
 transactionRouter.route('/')
-// .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
-// .get(cors.cors, (req,res,next) => {
-    .get((req,res,next) => {
-        Transactions.find({})
-        .then((transactions) => {
+    .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
+    .get(cors.cors, (req,res,next) => {
+        const pageSize = +req.query.pageSize;
+        const currentPage = +req.query.page;
+        const transactionQuery = Transactions.find({});
+        let fetchedTransactions;
+        if (pageSize && currentPage) {
+            transactionQuery
+                .skip(pageSize * (currentPage - 1))
+                .limit(pageSize);
+        }
+        transactionQuery
+        .then(transactions => {
+            fetchedTransactions = transactions;
+            return Transactions.count();
+        })
+        .then((count) => {
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
-            res.json(transactions);
+            res.json({
+                transactions: fetchedTransactions,
+                maxTransactions: count
+            });
         }, (err) => next(err))
         .catch((err) => next(err));
     })
-    // .post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
-    .post((req, res, next) => {
+    .post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
         Transactions.create(req.body)
         .then((transaction) => {
             console.log('Transaction Created ', transaction);

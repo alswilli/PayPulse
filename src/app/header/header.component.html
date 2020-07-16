@@ -28,7 +28,7 @@
           <a mat-button routerLink='/advice' routerLinkActive='active'> Advice </a>
         </div>
         <div fxFlex="20" fxLayoutAlign="end center" fxShow="true" fxHide.lt-md="true">
-          <a mat-button routerLink='/login'> Log Out </a>
+          <a mat-button (click)="logOut()"> Log Out </a>
         </div>
       </mat-toolbar>
 

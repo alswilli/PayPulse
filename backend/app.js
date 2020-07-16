@@ -10,23 +10,36 @@ dotenv.config();
 // Routes
 const transactionRouter = require('./routes/transactionRouter');
 const plaidRouter = require("./routes/plaidRouter");
+const userRouter = require('./routes/userRouter');
 
 const mongoUsername = process.env.MONGODB_USERNAME;
 const mongoUserPassword = process.env.MONGODB_USER_PASSWORD;
 const mongoDatabaseName = process.env.MONGODB_DATABASE_NAME;
 
-const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName + "?retryWrites=true&w=majority";
+// const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName + "?retryWrites=true&w=majority";
+const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName;
 const connect = mongoose.connect(url);
 
 connect.then((db) => {
     console.log("Connected correctly to server");
 }, (err) => { console.log(err); });
 
+// Secure traffic only
+app.all('*', (req, res, next) => {
+  if (req.secure) {
+    return next();
+  }
+  else {
+    res.redirect(307, 'https://' + req.hostname + ':' + app.get('secPort') + req.url);
+  }
+});
+
 app.use(passport.initialize());
 
 // Connecting middleware
 app.use('/transactions', transactionRouter);
 app.use('/plaid', plaidRouter);
+app.use('/users', userRouter);
 
 module.exports = app;
 
