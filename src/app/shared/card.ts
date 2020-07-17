@@ -1,5 +1,7 @@
+import { Transaction } from "./transaction";
+
 export class Card {
     id: string;
     name: string;
-    data: string;
+    data: Object[];
 }

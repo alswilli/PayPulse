@@ -33,7 +33,7 @@ export class TransactionsComponent implements OnInit {
   displayedColumns: string[] = ['amount', 'transactionName', 'category', 'date'];
   dataSource: MatTableDataSource<TransactionData>;
   transactions: Transaction[];
-  errMess: string
+  errMess: string;
   totalPosts: number;
   postsPerPage = 5;
   currentPage = 1;

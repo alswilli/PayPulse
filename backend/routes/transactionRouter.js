@@ -15,26 +15,41 @@ transactionRouter.route('/')
         const pageSize = +req.query.pageSize;
         const currentPage = +req.query.page;
         const transactionQuery = Transactions.find({});
+        const N = 3;
         let fetchedTransactions;
+        // Checks for pagination query params
         if (pageSize && currentPage) {
             transactionQuery
                 .skip(pageSize * (currentPage - 1))
                 .limit(pageSize);
+            // General /get for transactions page w/ pagination
+            transactionQuery
+            .then(transactions => {
+                fetchedTransactions = transactions;
+                return Transactions.count();
+            })
+            .then((count) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json({
+                    transactions: fetchedTransactions,
+                    maxTransactions: count
+                });
+            }, (err) => next(err))
+            .catch((err) => next(err));
         }
-        transactionQuery
-        .then(transactions => {
-            fetchedTransactions = transactions;
-            return Transactions.count();
-        })
-        .then((count) => {
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'application/json');
-            res.json({
-                transactions: fetchedTransactions,
-                maxTransactions: count
-            });
-        }, (err) => next(err))
-        .catch((err) => next(err));
+        else if (req.query.recentTransactions) {
+            Transactions.find().sort({ $natural: -1 }).limit(N)
+            .then(transactions => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(transactions);
+            }, (err) => next(err))
+            .catch((err) => next(err));
+        }
+        else if (req.query.topTransactions) {
+            console.log("TO-DO");
+        }
     })
     .post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
         Transactions.create(req.body)

@@ -1,9 +1,9 @@
-<mat-form-field>
+<mat-form-field *ngIf="!errMess">
   <mat-label>Filter</mat-label>
   <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Mia" #input>
 </mat-form-field>
 
-<div class="mat-elevation-z8">
+<div *ngIf="!errMess" class="mat-elevation-z8">
   <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
   <table *ngIf="!isLoading" mat-table [dataSource]="dataSource" matSort>
 
@@ -41,4 +41,9 @@
   </table>
 
   <mat-paginator [length]="totalPosts" [pageSize]="postsPerPage" [pageSizeOptions]="pageSizeOptions" (page)="onChangedPage($event)"></mat-paginator>
+</div>
+
+<div *ngIf="errMess">
+  <h2>Error</h2>
+  <h4>{{errMess}}</h4>
 </div>

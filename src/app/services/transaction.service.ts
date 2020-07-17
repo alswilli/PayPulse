@@ -26,6 +26,11 @@ export class TransactionService {
       .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
+  getRecentTransactions() {
+    return this.http.get<Transaction[]>(baseURL + 'transactions?recentTransactions=true')
+      .pipe(catchError(this.processHTTPMsgService.handleError));
+  }
+
   // getTransactionIds(): Observable<number[] | any> {
   //   return this.getTransactions().pipe(map(transactions => transactions.map(transaction => transaction._id)))
   //     .pipe(catchError(error => error));
