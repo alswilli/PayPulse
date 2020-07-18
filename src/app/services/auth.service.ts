@@ -31,6 +31,7 @@ interface JWTResponse {
 export class AuthService {
 
   tokenKey = 'JWT';
+  accountsKey = 'User Accounts Details';
   isAuthenticated: Boolean = false;
   username: Subject<string> = new Subject<string>();
   authToken: string = undefined;
@@ -89,6 +90,15 @@ export class AuthService {
      localStorage.removeItem(this.tokenKey);
    }
 
+   storeUserAccountsDetails(details: any) {
+     console.log('storeUserAccountsDetails ', details); //need to see how to store array in localStorage
+     localStorage.setItem(this.accountsKey, JSON.stringify(details));
+   }
+
+   destroyUserAccountsDetails() {
+     localStorage.removeItem(this.accountsKey);
+   }
+ 
    signUp(user: any): Observable<any> {
      return this.http.post(baseURL + 'users/signup', user)
        .pipe( map(res => {
@@ -120,6 +130,7 @@ export class AuthService {
 
    logOut() {
      this.destroyUserCredentials();
+     this.destroyUserAccountsDetails();
    }
 
    isLoggedIn(): Boolean {

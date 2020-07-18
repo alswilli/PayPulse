@@ -50,6 +50,8 @@ import { CreateAccountComponent } from './create-account/create-account.componen
 import {MatPaginatorModule} from '@angular/material/paginator';
 import {MatSortModule} from '@angular/material/sort';
 import {MatTableModule } from '@angular/material/table';
+import { NgxPlaidLinkModule } from 'ngx-plaid-link';
+import { LinkAccountComponent } from './link-account/link-account.component';
 
 @NgModule({
   declarations: [
@@ -63,7 +65,8 @@ import {MatTableModule } from '@angular/material/table';
     HomeComponent,
     HeaderComponent,
     FooterComponent,
-    CreateAccountComponent
+    CreateAccountComponent,
+    LinkAccountComponent
   ],
   imports: [
     BrowserModule,
@@ -84,7 +87,8 @@ import {MatTableModule } from '@angular/material/table';
     MatPaginatorModule,
     MatSortModule,
     MatTableModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    NgxPlaidLinkModule
   ],
   providers: [
     SidebarService,

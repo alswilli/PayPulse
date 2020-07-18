@@ -28,7 +28,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.loggingIn = true;
           console.log("Log in screen opened!");
         }
-        else if (event.url === '/createAccount') {
+        else if (event.url === '/createAccount' || event.url === '/linkAccount') {
           this.loggingIn = true;
         } 
         else {

@@ -5,6 +5,8 @@ import {MatTableDataSource} from '@angular/material/table';
 import {TransactionService} from '../services/transaction.service';
 import {Transaction} from '../shared/transaction';
 import { LoginComponent } from '../login/login.component';
+import {AccountService} from '../services/account.service';
+import {Account} from '../shared/account';
 
 export interface TransactionData {
   amount: string;
@@ -12,16 +14,6 @@ export interface TransactionData {
   category: string;
   date: string;
 }
-
-/** Constants used to fill up our data base. */
-const COLORS: string[] = [
-  'maroon', 'red', 'orange', 'yellow', 'olive', 'green', 'purple', 'fuchsia', 'lime', 'teal',
-  'aqua', 'blue', 'navy', 'black', 'gray'
-];
-const NAMES: string[] = [
-  'Maia', 'Asher', 'Olivia', 'Atticus', 'Amelia', 'Jack', 'Charlotte', 'Theodore', 'Isla', 'Oliver',
-  'Isabella', 'Jasper', 'Cora', 'Levi', 'Violet', 'Arthur', 'Mia', 'Thomas', 'Elizabeth'
-];
 
 @Component({
   selector: 'app-transactions',
@@ -33,8 +25,12 @@ export class TransactionsComponent implements OnInit {
   displayedColumns: string[] = ['amount', 'transactionName', 'category', 'date'];
   dataSource: MatTableDataSource<TransactionData>;
   transactions: Transaction[];
+  accounts: Account[];
   errMess: string;
   totalPosts: number;
+  userAccounts: Account[];
+  currentAccount: Account;
+  currentAccountId: string;
   postsPerPage = 5;
   currentPage = 1;
   pageSizeOptions = [5, 10, 25, 100];
@@ -43,7 +39,7 @@ export class TransactionsComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private transactionService: TransactionService) {
+  constructor(private accountService: AccountService) {
     // Create 100 users
     // const users = Array.from({length: 100}, (_, k) => createNewUser(k + 1));
     // const parsedTransactions = [];
@@ -65,33 +61,43 @@ export class TransactionsComponent implements OnInit {
   ngOnInit() {
     this.isLoading = true;
     console.log("ngInit");
-    this.transactionService.getTransactions(this.postsPerPage, this.currentPage)
-      .subscribe(res => {
-        this.isLoading = false;
-        this.transactions = res.transactions;
-        this.totalPosts = res.maxTransactions;
-        for (let entry of this.transactions) {
-          console.log(entry);
-        }
-        const parsedTransactions = [];
-        for (let entry of this.transactions) {
-          const newTransaction = {
-            amount: entry.amount,
-            transactionName: entry.transactionName,
-            category: entry.category,
-            date: entry.date
-          };
-          parsedTransactions.push(newTransaction);
-        }
-        console.log("Parsed transactions: "+ parsedTransactions);
+    // this.accountService.getAccounts()
+    //   .subscribe(res => {
+    //     this.userAccounts = res.accountsData;
+    //     this.currentAccount = this.userAccounts[0]; // will have to change later to get selectedAccount
+    //     console.log(this.currentAccount);
+    var userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
+    console.log(userAccountsDetails)
+    this.currentAccountId = userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
+    console.log(this.currentAccountId);
+    // Now get the currentAccount transactions
+    this.accountService.getTransactions(this.currentAccountId, this.postsPerPage, this.currentPage)
+    .subscribe(res => {
+      this.isLoading = false;
+      this.transactions = res.transactions;
+      this.totalPosts = res.maxTransactions;
+      for (let entry of this.transactions) {
+        console.log(entry);
+      }
+      const parsedTransactions = [];
+      for (let entry of this.transactions) {
+        const newTransaction = {
+          amount: entry.amount,
+          transactionName: entry.transactionName,
+          category: entry.category,
+          date: entry.date
+        };
+        parsedTransactions.push(newTransaction);
+      }
+      console.log("Parsed transactions: "+ parsedTransactions);
 
-        // Assign the data to the data source for the table to render
-        // this.dataSource = new MatTableDataSource(users);
-        this.dataSource = new MatTableDataSource(parsedTransactions);
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
-      },
-        errmess => this.errMess = <any>errmess);
+      // Assign the data to the data source for the table to render
+      // this.dataSource = new MatTableDataSource(users);
+      this.dataSource = new MatTableDataSource(parsedTransactions);
+      this.dataSource.paginator = this.paginator;
+      this.dataSource.sort = this.sort;
+    },
+      errmess => this.errMess = <any>errmess);
   }
 
   applyFilter(event: Event) {
@@ -109,7 +115,7 @@ export class TransactionsComponent implements OnInit {
     this.isLoading = true;
     this.currentPage = pageData.pageIndex+1;
     this.postsPerPage = pageData.pageSize;
-    this.transactionService.getTransactions(this.postsPerPage, this.currentPage)
+    this.accountService.getTransactions(this.currentAccountId, this.postsPerPage, this.currentPage)
       .subscribe(res => {
         this.isLoading = false;
         this.transactions = res.transactions;
@@ -140,14 +146,3 @@ export class TransactionsComponent implements OnInit {
 
 }
 
-function createNewUser(amount: number): TransactionData {
-  const name = NAMES[Math.round(Math.random() * (NAMES.length - 1))] + ' ' +
-      NAMES[Math.round(Math.random() * (NAMES.length - 1))].charAt(0) + '.';
-
-  return {
-    amount: amount.toString(),
-    transactionName: name,
-    category: Math.round(Math.random() * 100).toString(),
-    date: COLORS[Math.round(Math.random() * (COLORS.length - 1))]
-  };
-}

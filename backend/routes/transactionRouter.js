@@ -11,10 +11,10 @@ transactionRouter.use(bodyParser.json());
 
 transactionRouter.route('/')
     .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
-    .get(cors.cors, (req,res,next) => {
+    .get(cors.corsWithOptions, authenticate.verifyUser, (req,res,next) => {
         const pageSize = +req.query.pageSize;
         const currentPage = +req.query.page;
-        const transactionQuery = Transactions.find({});
+        const transactionQuery = Transactions.find({accountId: req.query.accountId});
         const N = 3;
         let fetchedTransactions;
         // Checks for pagination query params
@@ -39,7 +39,7 @@ transactionRouter.route('/')
             .catch((err) => next(err));
         }
         else if (req.query.recentTransactions) {
-            Transactions.find().sort({ $natural: -1 }).limit(N)
+            Transactions.find({accountId: req.query.accountId}).sort({ $natural: -1 }).limit(N)
             .then(transactions => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');

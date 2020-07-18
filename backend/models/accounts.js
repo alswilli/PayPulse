@@ -29,6 +29,10 @@ const AccountSchema = new Schema({
     },
     accountSubtype: {
         type: String
+    },
+    current: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true

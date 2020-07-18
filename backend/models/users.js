@@ -16,6 +16,10 @@ var User = new Schema({
           default: ''
       },
     facebookId: String,
+    // accounts: {
+    //     type: Schema.Types.ObjectId, 
+    //     ref: "accounts"
+    // },
     admin:   {
         type: Boolean,
         default: false

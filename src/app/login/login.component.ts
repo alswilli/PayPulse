@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild, NgZone } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from "@angular/router";
 import { AuthService } from '../services/auth.service';
+import {AccountService} from '../services/account.service';
+import {Account} from '../shared/account';
 declare var FB: any;
 
 @Component({
@@ -19,6 +21,7 @@ export class LoginComponent implements OnInit {
   constructor(private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
+    private accountService: AccountService,
     private _ngZone: NgZone) { 
     this.createForm();
   }
@@ -96,7 +99,40 @@ export class LoginComponent implements OnInit {
     var user = this.loginForm.value;
     this.authService.logIn(user).subscribe(res => {
       if (res.success) {
-        this.router.navigate(['/home']);
+        this.accountService.getAccounts().subscribe(res => {
+          if (res.success) {
+            // this.router.navigate(['/home']);
+            // this._ngZone.run(() => this.router.navigate(['/home']));
+            // Need to check the accounts array on the user object. Can store in localStorage once got
+            if (res.numAccounts == 0) {
+              this.router.navigate(['/linkAccount']);
+            }
+            else {
+              var accountIds = [];
+              for (let account of res.accountsData) {
+                console.log(account);
+                accountIds.push(account._id);
+              }
+              console.log(accountIds)
+              this.accountService.getCurrentAccount().subscribe(currAccount => {
+                this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: res.accountsData, ids: accountIds});
+                this.router.navigate(['/home']);
+              }, 
+              error => {
+                console.log(error);
+                this.errMess = error;
+              });
+            }
+          }
+          else {
+            console.log(res)
+            console.log("Get Accounts method from account service was not a success")
+          }
+        },
+        error => {
+          console.log(error);
+          this.errMess = error;
+        });
       }
       else {
         console.log(res)
@@ -132,7 +168,40 @@ export class LoginComponent implements OnInit {
             //redirect to home page
             this.authService.logInFacebook(response.authResponse).subscribe(res => {
               if (res.success) {
-                this._ngZone.run(() => this.router.navigate(['/home']));
+                this.accountService.getAccounts().subscribe(res => {
+                  if (res.success) {
+                    // this.router.navigate(['/home']);
+                    // this._ngZone.run(() => this.router.navigate(['/home']));
+                    // Need to check the accounts array on the user object. Can store in localStorage once got
+                    if (res.numAccounts == 0) {
+                      this._ngZone.run(() => this.router.navigate(['/linkAccount']));
+                    }
+                    else {
+                      var accountIds = [];
+                      for (let account of res.accountsData) {
+                        console.log(account);
+                        accountIds.push(account._id);
+                      }
+                      console.log(accountIds)
+                      this.accountService.getCurrentAccount().subscribe(currAccount => {
+                        this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: res.accountsData, ids: accountIds});
+                        this._ngZone.run(() => this.router.navigate(['/home']));
+                      }, 
+                      error => {
+                        console.log(error);
+                        this.errMess = error;
+                      });
+                    }
+                  }
+                  else {
+                    console.log(res)
+                    console.log("Get Accounts method from account service was not a success")
+                  }
+                },
+                error => {
+                  console.log(error);
+                  this.errMess = error;
+                });
               }
               else {
                 console.log(res)
@@ -149,7 +218,6 @@ export class LoginComponent implements OnInit {
            console.log('User login failed');
          }
       });
-
   }
 
 }

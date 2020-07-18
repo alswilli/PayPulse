@@ -10,13 +10,18 @@
           <mat-card-title> {{card.name}} </mat-card-title>
         </mat-card-header>
         <mat-card-content fxLayoutAlign="center">
-          <div *ngIf="component.name === 'Transactions' && card.name === 'Recent Transactions'">
+          <div *ngIf="component.name === 'Transactions' && card.name === 'Recent Transactions' && !errMess">
+            <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
             <p *ngFor="let recentData of recentTransactions">
-              <span>Amount: {{recentData.date}} </span>
-              <span>Transaction Name: {{recentData.date}} </span>
-              <span>Category: {{recentData.date}} </span>
-              <span>Date: {{recentData.date}} </span>
+              <span><b>Amount:</b> {{recentData.amount}} </span>
+              <span><b>Transaction Name:</b> {{recentData.transactionName}} </span>
+              <span><b>Category:</b> {{recentData.category}} </span>
+              <span><b>Date:</b> {{recentData.date}} </span>
             </p>
+          </div>
+          <div *ngIf="errMess">
+            <h2>Error</h2>
+            <h4>{{errMess}}</h4>
           </div>
         </mat-card-content>
       </mat-card>
@@ -26,3 +31,4 @@
     </mat-card-actions>
   </mat-card>
 </div>
+
