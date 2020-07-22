@@ -24,5 +24,14 @@ exports.config = {
       project: require('path').join(__dirname, './tsconfig.e2e.json')
     });
     jasmine.getEnv().addReporter(new SpecReporter({ spec: { displayStacktrace: true } }));
+    // let currentCommand = Promise.resolve();
+    // // Serialise all webdriver commands to prevent EPIPE errors
+    // const webdriverSchedule = browser.driver.schedule;
+    // browser.driver.schedule = (command, description) => {
+    //   currentCommand = currentCommand.then(() =>
+    //       webdriverSchedule.call(browser.driver, command, description)
+    //     );
+    //     return currentCommand;
+    // };
   }
 };

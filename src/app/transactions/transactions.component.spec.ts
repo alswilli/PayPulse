@@ -51,9 +51,6 @@ describe('TransactionsComponent', () => {
       ]
     })
     .compileComponents();
-
-    // const accountservice = TestBed.get(AccountService);
-
   }));
 
   beforeEach(() => {
@@ -156,18 +153,5 @@ describe('TransactionsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // describe('setAccessToken', () => {
-  //   it('should store the token in localStorage',
-  //     () => {
-  //       service.setAccessToken('sometoken');
-  //       expect(localStorage.getItem('id_token')).toEqual('sometoken');
-  //   });
-  // });
-  // describe('getAccessToken', () => {
-  //   it('should return stored token from localStorage',
-  //     () => {
-  //       localStorage.setItem('id_token', 'anothertoken');
-  //       expect(service.getAccessToken()).toEqual('anothertoken');
-  //   });
-  // });
+  // Correct text rendered
 });
