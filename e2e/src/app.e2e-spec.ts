@@ -7,9 +7,11 @@ describe('workspace-project App', () => {
     page = new AppPage();
   });
 
-  it('should display message saying Test on home page', () => {
+  it('should display title saying "Log in" on login page', () => {
     page.navigateTo('/login');
-    // const navlink = page.getAllElements('a').get(1);
+    expect(page.getParagraphText('app-root mat-card-title')).toEqual('Log in');
+    // const navlink = page.getAllElements('button').get(1);
+    // console.log("Button: ", navlink);
     // navlink.click();
     // expect(page.getParagraphText('app-root h1')).toEqual('Test');
   });
