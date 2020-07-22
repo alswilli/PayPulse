@@ -2,6 +2,7 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
+import {MatFormFieldModule} from '@angular/material/form-field';
 import {TransactionService} from '../services/transaction.service';
 import {Transaction} from '../shared/transaction';
 import { LoginComponent } from '../login/login.component';
@@ -29,7 +30,7 @@ export class TransactionsComponent implements OnInit {
   errMess: string;
   totalPosts: number;
   userAccounts: Account[];
-  currentAccount: Account;
+  userAccountsDetails;
   currentAccountId: string;
   postsPerPage = 5;
   currentPage = 1;
@@ -39,36 +40,15 @@ export class TransactionsComponent implements OnInit {
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
-  constructor(private accountService: AccountService) {
-    // Create 100 users
-    // const users = Array.from({length: 100}, (_, k) => createNewUser(k + 1));
-    // const parsedTransactions = [];
-    // for (let entry of this.transactions) {
-    //   const newTransaction = {
-    //     amount: entry.amount,
-    //     transactionName: entry.transactionName,
-    //     category: entry.category,
-    //     date: entry.date
-    //   };
-    //   parsedTransactions.push(newTransaction);
-    // }
-
-    // // Assign the data to the data source for the table to render
-    // // this.dataSource = new MatTableDataSource(users);
-    // this.dataSource = new MatTableDataSource(parsedTransactions);
-  }
+  constructor(private accountService: AccountService) {}
 
   ngOnInit() {
     this.isLoading = true;
     console.log("ngInit");
-    // this.accountService.getAccounts()
-    //   .subscribe(res => {
-    //     this.userAccounts = res.accountsData;
-    //     this.currentAccount = this.userAccounts[0]; // will have to change later to get selectedAccount
-    //     console.log(this.currentAccount);
-    var userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
-    console.log(userAccountsDetails)
-    this.currentAccountId = userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
+
+    this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
+    console.log(this.userAccountsDetails)
+    this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id; 
     console.log(this.currentAccountId);
     // Now get the currentAccount transactions
     this.accountService.getTransactions(this.currentAccountId, this.postsPerPage, this.currentPage)

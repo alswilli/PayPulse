@@ -3,5 +3,5 @@ export class Transaction {
     date: string;
     transactionName: string;
     amount: string;
-    category: string;
+    category: string[];
 }

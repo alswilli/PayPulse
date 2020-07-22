@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material/toolbar'; 
@@ -13,6 +13,19 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { MatTableModule } from '@angular/material/table';
+import { NgxPlaidLinkModule } from 'ngx-plaid-link';
+import { HttpClientModule } from '@angular/common/http';
+
+import { MatGridListModule } from '@angular/material/grid-list';;
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSliderModule } from '@angular/material/slider';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -24,34 +37,20 @@ import { AdviceComponent } from './advice/advice.component';
 import { HomeComponent } from './home/home.component';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
+import { LinkAccountComponent } from './link-account/link-account.component';
+import { CreateAccountComponent } from './create-account/create-account.component';
 
 import { SidebarService } from './services/sidebar.service';
 import { AuthService } from './services/auth.service';
 import { ProcessHTTPMsgService } from './services/process-httpmsg.service';
-
-
-import { MatGridListModule } from '@angular/material/grid-list';;
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSliderModule } from '@angular/material/slider';
 
 import 'hammerjs';
 
 import { AuthInterceptor, UnauthorizedInterceptor } from './services/auth.interceptor';
 import { AuthGuardService } from './services/auth-guard.service';
 
-import { HttpClientModule } from '@angular/common/http';
 import { baseURL } from './shared/baseurl';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
-import { CreateAccountComponent } from './create-account/create-account.component';
-import {MatPaginatorModule} from '@angular/material/paginator';
-import {MatSortModule} from '@angular/material/sort';
-import {MatTableModule } from '@angular/material/table';
-import { NgxPlaidLinkModule } from 'ngx-plaid-link';
-import { LinkAccountComponent } from './link-account/link-account.component';
 
 @NgModule({
   declarations: [
@@ -88,8 +87,13 @@ import { LinkAccountComponent } from './link-account/link-account.component';
     MatSortModule,
     MatTableModule,
     MatProgressSpinnerModule,
-    NgxPlaidLinkModule
+    NgxPlaidLinkModule,
+    MatSelectModule
   ],
+  // exports: [
+  //   MatFormFieldModule,
+  //   MatInputModule
+  // ],
   providers: [
     SidebarService,
     AuthService,
@@ -107,6 +111,9 @@ import { LinkAccountComponent } from './link-account/link-account.component';
       multi: true
     }
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  schemas: [
+    CUSTOM_ELEMENTS_SCHEMA,
+  ],
 })
 export class AppModule { }

@@ -18,6 +18,7 @@ export class HomeComponent implements OnInit {
   userAccounts: Account[];
   currentAccount: Account;
   currentAccountId: string;
+  currentAccountName: string;
   userAccountsIds: string[];
   errMess: string;
   isLoading = false;
@@ -46,6 +47,7 @@ export class HomeComponent implements OnInit {
     var userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
     console.log(userAccountsDetails)
     this.currentAccountId = userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
+    this.currentAccountName = userAccountsDetails.currentAccount[0].institutionName;
     console.log(this.currentAccountId); 
     // Now get the currentAccount transactions
     this.accountService.getRecentTransactions(this.currentAccountId)
