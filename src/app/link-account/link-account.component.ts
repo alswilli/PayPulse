@@ -12,7 +12,7 @@ import { Router } from "@angular/router";
 })
 export class LinkAccountComponent implements OnInit {
 
-  accounts: Account[];
+  // accounts: Account[];
   errMess: string;
 
   constructor(private accountService: AccountService,
@@ -28,17 +28,47 @@ export class LinkAccountComponent implements OnInit {
     this.accountService.addAccount(event).subscribe(res => {
       if (res) {
         console.log("Successfully added account!")
-        var accountIds = [];
-        accountIds.push(res._id);
-        console.log(accountIds)
-        this.accountService.getCurrentAccount().subscribe(currAccount => {
-          this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: [res], ids: accountIds});
-          this.router.navigate(['/home']);
-        }, 
+        this.accountService.getAccounts().subscribe(getRes => {
+          if (getRes.success) {
+            // this.router.navigate(['/home']);
+            // this._ngZone.run(() => this.router.navigate(['/home']));
+            // Need to check the accounts array on the user object. Can store in localStorage once got
+            var accountIds = [];
+            for (let account of getRes.accountsData) {
+              console.log(account);
+              accountIds.push(account._id);
+            }
+            console.log(accountIds)
+            this.accountService.getCurrentAccount().subscribe(currAccount => {
+              this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: getRes.accountsData, ids: accountIds});
+              this.router.navigate(['/home']);
+              }, 
+              error => {
+                console.log(error);
+                this.errMess = error;
+              }
+            );
+          }
+          else {
+            console.log(res)
+            console.log("Get Accounts method from account service was not a success")
+          }
+        },
         error => {
           console.log(error);
           this.errMess = error;
         });
+        // var accountIds = [];
+        // accountIds.push(res._id);
+        // console.log(accountIds)
+        // this.accountService.getCurrentAccount().subscribe(currAccount => {
+        //   this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: [res], ids: accountIds});
+        //   this.router.navigate(['/home']);
+        // }, 
+        // error => {
+        //   console.log(error);
+        //   this.errMess = error;
+        // });
       }
       else {
         console.log(res)

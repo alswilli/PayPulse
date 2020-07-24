@@ -23,3 +23,37 @@ $manage-button-text-color: white;
     margin: 10px;
 }
 
+.addAccountDiv {
+    margin: 10px;
+}
+
+.addDeleteButtons {
+    margin: 10px;
+}
+
+// :host {
+//     ::ng-deep.mat-pseudo-checkbox{
+//       display: none !important;
+//     }
+// }
+
+#my-div {
+    background-color: #f00;
+    width: 100%;
+    height: 50px;
+}
+
+a.fill-div {
+    display: block;
+    height: 100%;
+    width: 100%;
+    text-decoration: none;
+}
+
+.mat-icon {
+    color: #eb6834;
+}
+
+.mat-icon:hover {
+    color: green;
+}

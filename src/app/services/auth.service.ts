@@ -124,6 +124,9 @@ export class AuthService {
         console.log(res)
            this.storeUserCredentials({username: res.username, token: res.token});
            return {'success': true, 'username': res.username };
+       }), map(res2 => {
+           console.log("Test: ", res2);
+           return res2; 
        }),
         catchError(error => this.processHTTPMsgService.handleError(error)));
   }

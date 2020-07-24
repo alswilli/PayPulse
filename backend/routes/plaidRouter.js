@@ -56,8 +56,7 @@ plaidRouter.route("/accounts/add")
           } else {
             console.log(account)
             Account.find({
-              userId: req.user.id,
-              institutionId: institution_id
+              userId: req.user.id
             })
             .then(allAccounts => {
               const newAccount = new Account({
@@ -67,7 +66,7 @@ plaidRouter.route("/accounts/add")
                 institutionId: institution_id,
                 institutionName: name
               });
-              if (allAccounts.length == 0) {
+              if (allAccounts.length < 1) {
                 newAccount.current = true;
               }
               newAccount.save().then(account => res.json(account));
@@ -85,14 +84,37 @@ plaidRouter.route("/accounts/add")
 // @route DELETE api/plaid/accounts/:id
 // @desc Delete account with given id
 // @access Private
-plaidRouter.route("/accounts/:id")
+plaidRouter.route("/accounts/:accountId")
 .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
-.delete(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
-  Account.findById(req.params.id).then(account => {
-    // Delete account
-    account.remove().then(() => res.json({ success: true }));
-  });
+.put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+  Account.findByIdAndUpdate(req.params.accountId, {
+      $set: req.body
+  }, { new: true })
+  .then((account) => {
+      console.log("    ");
+      console.log("WE MADE IT");
+      console.log("    ");
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.json(account);
+  }, (err) => next(err))
+  .catch((err) => next(err));
+})
+.delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+  Account.findByIdAndRemove(req.params.accountId)
+  .then((resp) => {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.json(resp);
+  }, (err) => next(err))
+  .catch((err) => next(err));
 });
+// .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
+//   Account.findById(req.params.id).then(account => {
+//     // Delete account
+//     account.remove().then(() => res.json({ success: true }));
+//   });
+// });
 
 // @route GET api/plaid/accounts
 // @desc Get all accounts linked with plaid for a specific user

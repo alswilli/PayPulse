@@ -3,7 +3,7 @@ import { Account } from '../shared/account';
 import { Transaction } from '../shared/transaction';
 
 import { Observable } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { baseURL } from '../shared/baseurl';
 import { ProcessHTTPMsgService } from './process-httpmsg.service';
@@ -37,6 +37,19 @@ export class AccountService {
   getCurrentAccount() {
     return this.http.get(baseURL + 'plaid/accounts?current=true')
       .pipe(catchError(this.processHTTPMsgService.handleError));
+  }
+
+  updateCurrentAccount(cancelId: string, assignId: string) {
+    return this.http.put(baseURL + 'plaid/accounts/' + cancelId, {current: false})
+      // .pipe(catchError(this.processHTTPMsgService.handleError));
+      .pipe( switchMap(res => {
+        console.log("Cancelled account: ", res)
+        return this.http.put(baseURL + 'plaid/accounts/' + assignId, {current: true})
+      }), map(res2 => {
+        console.log("Added account: ", res2);
+        return res2; 
+      }),
+        catchError(this.processHTTPMsgService.handleError));
   }
 
   getTransactions(accountId: string, postsPerPage: number, currentPage: number) {
