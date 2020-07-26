@@ -1,0 +1,19 @@
+<div *ngIf="errMess">
+  <h2>Error</h2>
+  <h4>{{errMess}}</h4>
+</div>
+
+<div>
+  <h3>Delete Account</h3>
+  <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+  <div *ngIf="!isLoading">
+    <mat-dialog-content class="mat-typography">
+      <p>Are you sure you want to delete your <b>{{data.accountName}}</b> account?</p>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-button class="mat-warn" (click)="onDeleteConfirmed(data.accountName);" cdkFocusInitial>Delete Account</button>
+    </mat-dialog-actions>
+  </div>
+</div>
+

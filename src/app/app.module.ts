@@ -39,6 +39,7 @@ import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
 import { LinkAccountComponent } from './link-account/link-account.component';
 import { CreateAccountComponent } from './create-account/create-account.component';
+import { DeleteAccountComponent } from './delete-account/delete-account.component';
 
 import { SidebarService } from './services/sidebar.service';
 import { AuthService } from './services/auth.service';
@@ -65,7 +66,8 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
     HeaderComponent,
     FooterComponent,
     CreateAccountComponent,
-    LinkAccountComponent
+    LinkAccountComponent,
+    DeleteAccountComponent
   ],
   imports: [
     BrowserModule,
@@ -88,7 +90,8 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
     MatTableModule,
     MatProgressSpinnerModule,
     NgxPlaidLinkModule,
-    MatSelectModule
+    MatSelectModule,
+    MatDialogModule
   ],
   // exports: [
   //   MatFormFieldModule,
@@ -112,6 +115,9 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
     }
   ],
   bootstrap: [AppComponent],
+  entryComponents: [
+    DeleteAccountComponent
+  ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,
   ],

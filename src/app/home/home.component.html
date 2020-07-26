@@ -1,20 +1,4 @@
 <div class="addAccountDiv">
-  <!-- <h1>Linked Accounts:</h1> -->
-  <!-- <mat-selection-list #shoes>
-    <mat-list-option *ngFor="let shoe of typesOfShoes" [value]="shoe">
-      {{shoe}}
-    </mat-list-option>
-  </mat-selection-list> -->
-  <!-- <p>
-    Bank Account Selected: {{shoes.selectedOptions.selected[0]?.value}}
-  </p> -->
-  <!-- <div *ngFor="let shoe of typesOfShoes">
-    <div id="my-div">
-      <a href="" class="fill-div">{{shoe}}</a>
-    </div>
-  </div> -->
-
-
   <!-- <form [formGroup]="clientForm"> -->
   <form>
     <h1>Linked Accounts:</h1>
@@ -25,7 +9,8 @@
   
     <!-- <mat-selection-list formControlName="myOtherControl"> -->
     <mat-selection-list>
-      <mat-list-option class="mat-primary" *ngFor="let list of listValue" (click)="onAccountChanged(list);" [selected]="preSelection.indexOf(list) > -1" [value]="list">
+      <mat-list-option class="mat-primary" *ngFor="let list of listValue" (click)="onAccountChanged(list);" 
+      [selected]="preSelection.indexOf(list) > -1" [value]="list" [disabled]="removeAccounts">
         <div fxFlex fxLayout="row">
           <div *ngIf="removeAccounts">
             <mat-icon class="trashIcon" (click)="onDeleteIconClicked(list);">delete</mat-icon> 
@@ -40,10 +25,15 @@
   <!-- <p>Bank Account Selected: {{currentAccountName}}</p> -->
   <div>
     <button mat-raised-button class="addDeleteButtons" routerLink='/linkAccount' color="primary">Add Account</button>
-    <button mat-raised-button id="removeAccountButton" class="addDeleteButtons" color="warn" (click)="onRemoveAccountClicked();">Remove Account</button>
+    <button mat-raised-button id="removeAccountButton" class="addDeleteButtons" color="warn" (click)="onRemoveAccountClicked();">Remove Accounts</button>
   </div>
 </div>
-<div>
+
+<div *ngIf="listValue.length === 0">
+  <p>No accounts added! Please add an account using the 'Add Account' button above</p>
+</div>
+
+<div *ngIf="listValue.length > 0">
   <mat-card class="card" *ngFor="let component of majorComponents">
     <mat-card-header>
       <mat-card-title class="mainCardTitle"> {{component.name}} </mat-card-title>

@@ -27,7 +27,10 @@ export class AccountService {
     .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
-  // deleteAcount()
+  deleteAccount(accountId: string) {
+    return this.http.delete(baseURL + 'plaid/accounts/' + accountId)
+      .pipe(catchError(this.processHTTPMsgService.handleError));
+  }
 
   getAccounts() {
     return this.http.get<GetAccountsResponse>(baseURL + 'plaid/accounts')
@@ -39,17 +42,21 @@ export class AccountService {
       .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
-  updateCurrentAccount(cancelId: string, assignId: string) {
-    return this.http.put(baseURL + 'plaid/accounts/' + cancelId, {current: false})
-      // .pipe(catchError(this.processHTTPMsgService.handleError));
-      .pipe( switchMap(res => {
-        console.log("Cancelled account: ", res)
-        return this.http.put(baseURL + 'plaid/accounts/' + assignId, {current: true})
-      }), map(res2 => {
-        console.log("Added account: ", res2);
-        return res2; 
-      }),
-        catchError(this.processHTTPMsgService.handleError));
+  // updateCurrentAccount(cancelId: string, assignId: string) {
+  //   return this.http.put(baseURL + 'plaid/accounts/' + cancelId, {current: false})
+  //     // .pipe(catchError(this.processHTTPMsgService.handleError));
+  //     .pipe( switchMap(res => {
+  //       console.log("Cancelled account: ", res)
+  //       return this.http.put(baseURL + 'plaid/accounts/' + assignId, {current: true})
+  //     }), map(res2 => {
+  //       console.log("Added account: ", res2);
+  //       return res2; 
+  //     }),
+  //       catchError(this.processHTTPMsgService.handleError));
+  // }
+  updateCurrentAccount(accountId: string, update: object) {
+    return this.http.put(baseURL + 'plaid/accounts/' + accountId, update)
+      .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
   getTransactions(accountId: string, postsPerPage: number, currentPage: number) {
