@@ -34,6 +34,8 @@ export class HomeComponent implements OnInit {
   errMess: string;
   isLoading = false;
   removeAccounts = false;
+  firstLoad = false;
+  fullLoad = false;
   typesOfShoes: string[] = ['Boots', 'Clogs', 'Loafers', 'Moccasins', 'Sneakers'];
 
   clientForm: FormGroup;
@@ -46,12 +48,13 @@ export class HomeComponent implements OnInit {
     public dialog: MatDialog,
     private fb: FormBuilder) { }
 
-  // ngOnChanges(changes: SimpleChanges) {
-  //   console.log("CHANGE: ", changes)
-  // }
+  ngOnChanges(changes: SimpleChanges) {
+    console.log("CHANGE: ", changes)
+  }
 
   ngOnInit() {
     this.isLoading = true;
+    // this.firstLoad = true;
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
     console.log(this.userAccountsDetails)
 
@@ -73,20 +76,20 @@ export class HomeComponent implements OnInit {
       this.accountService.getRecentTransactions(this.currentAccountId)
         .subscribe(transactions => {
           this.isLoading = false;
+          // this.firstLoad = false;
           this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
           this.recentTransactions.forEach(element => {
             console.log(element);
           });
+          this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
+            console.log("yup")
+            this.selectionList.deselectAll();
+            console.log(s);
+            s.option.selected = true;
+          });
         },
           errmess => this.errMess = <any>errmess
       );
-
-      this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
-        console.log("yup")
-        this.selectionList.deselectAll();
-        console.log(s);
-        s.option.selected = true;
-      });
 
       // this.listValue = ["SOMETHING3", "SOMETHING4"];
       
@@ -95,6 +98,17 @@ export class HomeComponent implements OnInit {
       // this.clientForm = this.fb.group({
       //   myOtherControl: new FormControl(this.preSelection),
       // });
+    }
+    else {
+      // May need something here later
+      this.isLoading = false;
+      // this.firstLoad = false;
+      this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
+        console.log("yup")
+        this.selectionList.deselectAll();
+        console.log(s);
+        s.option.selected = true;
+      });
     }
   }
 
@@ -114,29 +128,6 @@ export class HomeComponent implements OnInit {
       // Need to change current attributes on backend 
       var update = {current: false};
       this.accountService.updateCurrentAccount(this.currentAccountId, update)
-        // .pipe(
-        //   // DON'T NEED TO DO THIS -> can just update localStorage
-        //   mergeMap((newCurrentAccount) => {
-        //     return this.accountService.getAccounts(); // gets more info
-        //   }),
-        //   mergeMap((accounts) => {
-        //     this.accounts = accounts;
-        //     this.userAccountsIds = [];
-        //     for (let account of accounts.accountsData) {
-        //       console.log(account);
-        //       this.userAccountsIds.push(account._id);
-        //     }
-        //     console.log(this.userAccountsIds)
-        //     return this.accountService.getCurrentAccount();
-        //   })
-        //   // mergeMap((currAccount) => {
-        //   //   this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: this.accounts.accountsData, ids: this.userAccountsIds});
-        //   // })
-        //   // catchError((error) => {
-        //   //   console.log(error);
-        //   //   // handle the error accordingly.
-        //   // })
-        // )
         .pipe(
           mergeMap((account) => {
             var update = {current: true};
@@ -188,6 +179,54 @@ export class HomeComponent implements OnInit {
         },
           errmess => this.errMess = <any>errmess
       );
+    }
+  }
+
+  onAddedAccount() {
+    this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
+    console.log(this.userAccountsDetails)
+
+    if (this.listValue.length === 0) {
+      this.isLoading = true;
+      this.fullLoad = false;
+
+      for (let account of this.userAccountsDetails.accounts) {
+        this.listValue.push(account.institutionName);
+      }
+  
+      console.log("List Value: ", this.listValue);
+
+      this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
+      this.currentAccountName = this.userAccountsDetails.currentAccount[0].institutionName;
+      this.currentAccount = this.userAccountsDetails.currentAccount[0];
+      this.accounts = this.userAccountsDetails.accounts;
+      this.userAccountsIds = this.userAccountsDetails.ids
+      console.log("Current Account Id: ", this.currentAccountId); 
+      console.log("All Accounts: ", this.accounts);
+      // Now get the currentAccount transactions
+      this.accountService.getRecentTransactions(this.currentAccountId)
+        .subscribe(transactions => {
+          this.isLoading = false;
+          this.firstLoad = false;
+          this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
+          this.recentTransactions.forEach(element => {
+            console.log(element);
+          });
+        },
+          errmess => this.errMess = <any>errmess
+      );
+
+      // this.listValue = ["SOMETHING3", "SOMETHING4"];
+      
+      this.preSelection.push(this.currentAccountName)
+      console.log(this.preSelection);
+      // this.clientForm = this.fb.group({
+      //   myOtherControl: new FormControl(this.preSelection),
+      // });
+    }
+    else {
+      this.listValue.push(this.userAccountsDetails.accounts[this.userAccountsDetails.accounts.length - 1].institutionName);
+      this.firstLoad = false;
     }
   }
 
@@ -303,7 +342,97 @@ export class HomeComponent implements OnInit {
         else if (this.listValue.length === 0) { 
           localStorage.setItem('User Accounts Details', JSON.stringify({currentAccount: [], accounts: [], ids: []}));
           this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
+          // this.onRemoveAccountClicked();
+          this.removeAccounts = !this.removeAccounts;
         }
     });
+  }
+
+
+  // PLAID FUNCTIONS
+  onPlaidSuccess(event) {
+    // Send the public token to your server so you can do the token exchange.
+    console.log("Plaid success event: " + JSON.stringify(event));
+    if (this.listValue.length > 0) {
+      this.firstLoad = true;
+    }
+    else {
+      this.fullLoad = true;
+    }
+    this.accountService.addAccount(event).subscribe(res => {
+      if (res) {
+        console.log("Successfully added account!")
+        if (this.listValue.length === 0) {
+          this.accountService.getAccounts().subscribe(getRes => {
+            if (getRes.success) {
+              // this.router.navigate(['/home']);
+              // this._ngZone.run(() => this.router.navigate(['/home']));
+              // Need to check the accounts array on the user object. Can store in localStorage once got
+              var accountIds = [];
+              for (let account of getRes.accountsData) {
+                console.log(account);
+                accountIds.push(account._id);
+              }
+              console.log(accountIds)
+              this.accountService.getCurrentAccount().subscribe(currAccount => {
+                this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: getRes.accountsData, ids: accountIds});
+                // this.router.navigate(['/home']);
+                this.onAddedAccount();
+                }, 
+                error => {
+                  console.log(error);
+                  this.errMess = error;
+                }
+              );
+            }
+            else {
+              console.log(res)
+              console.log("Get Accounts method from account service was not a success")
+            }
+          },
+          error => {
+            console.log(error);
+            this.errMess = error;
+          });
+        }
+        else { 
+          // Append new account to accounts array
+          this.accounts.push(res)
+          // Append new account to userAccountsIds array 
+          this.userAccountsIds.push(res._id)
+          // Update local storage
+          this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accounts, ids: this.userAccountsIds});
+          this.onAddedAccount();
+        }
+      }
+      else {
+        console.log(res)
+        console.log("addAccount() method from account service was not a success")
+      }
+    },
+    error => {
+      console.log(error);
+      this.errMess = error;
+    });
+  }
+
+  onPlaidExit(event) {
+    // Get errors or exit reason.
+    console.log("Plaid exit event: " + event);
+  }
+
+  onPlaidEvent(event) {
+    // Log events so you can have insight into how your users are using plaid link.
+    console.log("Plaid event: " + event);
+  }
+
+  onPlaidLoad(event) {
+    // Do something when the iframe loads.
+    console.log("Plaid load event: " + event);
+  }
+
+  onPlaidClick(event) {
+    // Do something when the button is clicked.
+    console.log("Plaid click event: " + event);
   }
 }

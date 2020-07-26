@@ -1,6 +1,12 @@
 $border-main-color: black;
 $manage-button-color: grey;
 $manage-button-text-color: white;
+@import '~@angular/material/theming';
+@include mat-core();
+
+
+// $editButtonHeight: 30px;
+// $editButtonWidth: 100px;
 
 .summaryListItem {
     border-style: solid;
@@ -29,6 +35,9 @@ $manage-button-text-color: white;
 
 .addDeleteButtons {
     margin: 10px;
+    background-color: red;
+    color: white;
+    font-family: Arial;
 }
 
 // :host {
@@ -58,3 +67,4 @@ a.fill-div {
     color: green;
     cursor: pointer;
 }
+
