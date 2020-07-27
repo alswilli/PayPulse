@@ -1,13 +1,15 @@
 import {Component, OnInit, ViewChild} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
-import {MatTableDataSource} from '@angular/material/table';
+import {MatTableDataSource, MatTable} from '@angular/material/table';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {TransactionService} from '../services/transaction.service';
 import {Transaction} from '../shared/transaction';
 import { LoginComponent } from '../login/login.component';
 import {AccountService} from '../services/account.service';
 import {Account} from '../shared/account';
+import {merge, Observable, of as observableOf} from 'rxjs';
+import {catchError, map, startWith, switchMap} from 'rxjs/operators';
 
 export interface TransactionData {
   amount: string;
@@ -37,10 +39,49 @@ export class TransactionsComponent implements OnInit {
   pageSizeOptions = [5, 10, 25, 100];
   isLoading = false;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  // actualPaginator: MatPaginator;
+  // @ViewChild(MatPaginator)
+  // set paginator(value: MatPaginator) {
+  //   this.actualPaginator = value;
+  // }
+
+  @ViewChild(MatPaginator, {read: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatTable) table: MatTable<any>;
 
   constructor(private accountService: AccountService) {}
+
+  // ngAfterViewInit() {
+  //   this.exampleDatabase = new ExampleHttpDatabase(this._httpClient);
+
+  //   // If the user changes the sort order, reset back to the first page.
+  //   this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
+
+  //   merge(this.sort.sortChange, this.paginator.page)
+  //     .pipe(
+  //       startWith({}),
+  //       switchMap(() => {
+  //         this.isLoadingResults = true;
+  //         return this.exampleDatabase!.getRepoIssues(
+  //           this.sort.active, this.sort.direction, this.paginator.pageIndex);
+  //       }),
+  //       map(data => {
+  //         // Flip flag to show that loading has finished.
+  //         this.isLoadingResults = false;
+  //         this.isRateLimitReached = false;
+  //         this.resultsLength = data.total_count;
+
+  //         return data.items;
+  //       }),
+  //       catchError(() => {
+  //         this.isLoadingResults = false;
+  //         // Catch if the GitHub API has reached its rate limit. Return empty data.
+  //         this.isRateLimitReached = true;
+  //         return observableOf([]);
+  //       })
+  //     ).subscribe(data => this.data = data);
+  // }
+  // }
 
   ngOnInit() {
     this.isLoading = true;
@@ -73,9 +114,11 @@ export class TransactionsComponent implements OnInit {
 
       // Assign the data to the data source for the table to render
       // this.dataSource = new MatTableDataSource(users);
+      console.log("Paginator: ", this.paginator);
       this.dataSource = new MatTableDataSource(parsedTransactions);
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
+      console.log("Data Source: ", this.dataSource);
     },
       errmess => this.errMess = <any>errmess);
   }
@@ -97,6 +140,7 @@ export class TransactionsComponent implements OnInit {
     this.postsPerPage = pageData.pageSize;
     this.accountService.getTransactions(this.currentAccountId, this.postsPerPage, this.currentPage)
       .subscribe(res => {
+        console.log(res)
         this.isLoading = false;
         this.transactions = res.transactions;
         this.totalPosts = res.maxTransactions;
@@ -117,11 +161,20 @@ export class TransactionsComponent implements OnInit {
 
         // Assign the data to the data source for the table to render
         // this.dataSource = new MatTableDataSource(users);
-        this.dataSource = new MatTableDataSource(parsedTransactions);
-        // this.dataSource.paginator = this.paginator;
+        console.log("Data Source: ", this.dataSource);
+
+        this.dataSource.data = parsedTransactions;
+
+        // this.table.renderRows();
+        // this.dataSource.paginator = this.actualPaginator;
+        console.log("Data Source: ", this.dataSource);
         // this.dataSource.sort = this.sort;
       },
         errmess => this.errMess = <any>errmess);
+  }
+
+  sortData(event) {
+    console.log(event);
   }
 
 }
