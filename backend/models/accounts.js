@@ -33,6 +33,9 @@ const AccountSchema = new Schema({
     current: {
         type: Boolean,
         default: false
+    },
+    subAccounts: {
+        type: Object
     }
 }, {
     timestamps: true

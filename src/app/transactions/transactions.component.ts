@@ -25,7 +25,7 @@ export interface TransactionData {
 })
 export class TransactionsComponent implements OnInit {
 
-  displayedColumns: string[] = ['amount', 'transactionName', 'category', 'date'];
+  displayedColumns: string[] = ['accountName', 'amount', 'transactionName', 'category', 'date'];
   dataSource: MatTableDataSource<TransactionData>;
   transactions: Transaction[];
   accounts: Account[];
@@ -51,38 +51,6 @@ export class TransactionsComponent implements OnInit {
 
   constructor(private accountService: AccountService) {}
 
-  // ngAfterViewInit() {
-  //   this.exampleDatabase = new ExampleHttpDatabase(this._httpClient);
-
-  //   // If the user changes the sort order, reset back to the first page.
-  //   this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-
-  //   merge(this.sort.sortChange, this.paginator.page)
-  //     .pipe(
-  //       startWith({}),
-  //       switchMap(() => {
-  //         this.isLoadingResults = true;
-  //         return this.exampleDatabase!.getRepoIssues(
-  //           this.sort.active, this.sort.direction, this.paginator.pageIndex);
-  //       }),
-  //       map(data => {
-  //         // Flip flag to show that loading has finished.
-  //         this.isLoadingResults = false;
-  //         this.isRateLimitReached = false;
-  //         this.resultsLength = data.total_count;
-
-  //         return data.items;
-  //       }),
-  //       catchError(() => {
-  //         this.isLoadingResults = false;
-  //         // Catch if the GitHub API has reached its rate limit. Return empty data.
-  //         this.isRateLimitReached = true;
-  //         return observableOf([]);
-  //       })
-  //     ).subscribe(data => this.data = data);
-  // }
-  // }
-
   ngOnInit() {
     this.isLoading = true;
     console.log("ngInit");
@@ -101,12 +69,23 @@ export class TransactionsComponent implements OnInit {
         console.log(entry);
       }
       const parsedTransactions = [];
+      var currAccountName;
       for (let entry of this.transactions) {
+        // Translate account_id to account name
+        for (let account of this.userAccountsDetails.currentAccount) {
+          for (let subAcc of account.subAccounts) {
+            if (subAcc.account_id === entry.account_id) {
+              currAccountName = subAcc.name;
+              break;
+            }
+          }
+        }
         const newTransaction = {
           amount: entry.amount,
           transactionName: entry.transactionName,
           category: entry.category,
-          date: entry.date
+          date: entry.date,
+          accountName: currAccountName
         };
         parsedTransactions.push(newTransaction);
       }
@@ -148,12 +127,23 @@ export class TransactionsComponent implements OnInit {
           console.log(entry);
         }
         const parsedTransactions = [];
+        var currAccountName;
         for (let entry of this.transactions) {
+          // Translate account_id to account name
+          for (let account of this.userAccountsDetails.currentAccount) {
+            for (let subAcc of account.subAccounts) {
+              if (subAcc.account_id === entry.account_id) {
+                currAccountName = subAcc.name;
+                break;
+              }
+            }
+          }
           const newTransaction = {
             amount: entry.amount,
             transactionName: entry.transactionName,
             category: entry.category,
-            date: entry.date
+            date: entry.date,
+            accountName: currAccountName
           };
           parsedTransactions.push(newTransaction);
         }

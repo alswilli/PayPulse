@@ -4,4 +4,5 @@ export class Transaction {
     transactionName: string;
     amount: string;
     category: string[];
+    account_id: string;
 }

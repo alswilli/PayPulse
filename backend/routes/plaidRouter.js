@@ -39,6 +39,7 @@ plaidRouter.route("/accounts/add")
   PUBLIC_TOKEN = req.body.token;
   const userId = req.user.id;
   const institution = req.body.metadata.institution;
+  // const subAccounts = req.body.metadata.accounts;
   const { name, institution_id } = institution;
   if (PUBLIC_TOKEN) {
     client.exchangePublicToken(PUBLIC_TOKEN)
@@ -59,17 +60,23 @@ plaidRouter.route("/accounts/add")
               userId: req.user.id
             })
             .then(allAccounts => {
-              const newAccount = new Account({
-                userId: userId,
-                accessToken: ACCESS_TOKEN,
-                itemId: ITEM_ID,
-                institutionId: institution_id,
-                institutionName: name
+              // Pull the accounts associated with the Item
+              client.getAccounts(ACCESS_TOKEN, (err, result) => {
+                // Handle err (TO-DO)
+                const subAccounts = result.accounts;
+                const newAccount = new Account({
+                  userId: userId,
+                  accessToken: ACCESS_TOKEN,
+                  itemId: ITEM_ID,
+                  institutionId: institution_id,
+                  institutionName: name,
+                  subAccounts: subAccounts
+                });
+                if (allAccounts.length < 1) {
+                  newAccount.current = true;
+                }
+                newAccount.save().then(account => res.json(account));
               });
-              if (allAccounts.length < 1) {
-                newAccount.current = true;
-              }
-              newAccount.save().then(account => res.json(account));
             })
             .catch(err => console.log(err)); // All Accounts Error
           }
@@ -137,91 +144,6 @@ plaidRouter.route("/accounts")
   }
 });
 
-// // @route POST api/plaid/accounts/transactions
-// // @desc Fetch transactions from past 30 days from all linked accounts
-// // @access Private
-// plaidRouter.route("/accounts/transactions")
-// .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
-// .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-//   // Variables from customized requests
-//   const pageSize = +req.query.pageSize;
-//   const currentPage = +req.query.page;
-//   const N = 3;
-//   // Variables for Plaid API query
-//   const now = moment();
-//   const today = now.format("YYYY-MM-DD");
-//   const thirtyDaysAgo = now.subtract(30, "days").format("YYYY-MM-DD"); // Change this if you want more transactions
-  
-//   // Account.find({ accountId: req.body.accountId })
-//   Account.findById(req.body.accountId)
-//     .then(account => {
-//       console.log(account);
-//       ACCESS_TOKEN = account.accessToken;
-//       const institutionName = account.institutionName;
-//       var filteredTransactions = []
-//       console.log(ACCESS_TOKEN);
-//       console.log(thirtyDaysAgo);
-//       console.log(today);
-//       client.getTransactions(ACCESS_TOKEN, thirtyDaysAgo, today)
-//         .then(response => {
-//           // Checks for pagination query params
-//           if (pageSize && currentPage) {
-//             startIndex = pageSize * (currentPage - 1)
-//             endIndex = startIndex + pageSize;   
-//             for (startIndex; startIndex < endIndex; startIndex++) {
-//               filteredTransactions.push(response[startIndex]);
-//             }   
-//             res.statusCode = 200;
-//             res.setHeader('Content-Type', 'application/json');
-//             res.json({
-//               transactions: filteredTransactions,
-//               maxTransactions: response.length
-//             });    
-//           }
-//           else if (req.query.recentTransactions) {
-//             var count = 0;
-//             for (let transaction of response) {
-//               if (count == N) { // 1.) May not get most recent so will have to sort AND 2.) '==' could be wrong
-//                 break;
-//               }
-//               filteredTransactions.push(transaction);
-//               count++;
-//             }
-//             res.statusCode = 200;
-//             res.setHeader('Content-Type', 'application/json');
-//             res.json(filteredTransactions);
-//           }
-//           else if (req.query.topTransactions) {
-//             console.log("TO-DO");
-//           }
-//         }, (err) => next(err))
-//         .catch(err => console.log(err));
-//     }, (err) => next(err))
-//     .catch(err => console.log(err));
-
-//   /*THIS CODE IS FOR WHEN YOU WANT ALL TRANSACTIONS FROM ALL ACCOUNTS*/ 
-//   // let transactions = [];
-//   // const accounts = req.body;
-//   // if (accounts) {
-//   //   accounts.forEach(function(account) {
-//   //     ACCESS_TOKEN = account.accessToken;
-//   //     const institutionName = account.institutionName;
-//   //     client.getTransactions(ACCESS_TOKEN, thirtyDaysAgo, today)
-//   //       .then(response => {
-//   //         transactions.push({
-//   //           accountName: institutionName,
-//   //           transactions: response.transactions
-//   //         });
-//   //         // Don't send back response till all transactions have been added
-//   //         if (transactions.length === accounts.length) {
-//   //           res.json(transactions);
-//   //         }
-//   //       })
-//   //       .catch(err => console.log(err));
-//   //   });
-//   // }
-// });
-
 plaidRouter.route("/accounts/transactions/webhooks")
 .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
 .post(cors.corsWithOptions, (req, res, next) => {
@@ -278,7 +200,8 @@ plaidRouter.route("/accounts/transactions/:accountId")
                 date: currentTransaction.date,
                 transactionName: currentTransaction.name,
                 amount: currentTransaction.amount,
-                category: currentTransaction.category
+                category: currentTransaction.category,
+                account_id: currentTransaction.account_id
               }
               filteredTransactions.push(formattedTransaction);
             }   
@@ -300,7 +223,8 @@ plaidRouter.route("/accounts/transactions/:accountId")
                 date: transaction.date,
                 transactionName: transaction.name,
                 amount: transaction.amount,
-                category: transaction.category
+                category: transaction.category,
+                account_id: transaction.account_id
               }
               filteredTransactions.push(formattedTransaction);
               count++;
