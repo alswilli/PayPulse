@@ -43,6 +43,9 @@ export class TransactionsComponent implements OnInit {
   subAccount: string;
   subAccountId: string;
   subAccountsDict: any;
+  balancesAvailableDict: any;
+  balancesCurrentDict: any;
+
 
   listValue: any = [];
   preSelection = [];
@@ -74,6 +77,12 @@ export class TransactionsComponent implements OnInit {
     this.subAccountId = null;
     this.subAccountsDict = {};
     this.subAccountsDict['All'] = null;
+    this.balancesAvailableDict = {};
+    this.balancesAvailableDict['All'] = null;
+    this.balancesCurrentDict = {};
+    this.balancesCurrentDict['All'] = 0;
+    this.preSelection.push('All')
+    console.log(this.preSelection);
     for (let account of this.userAccountsDetails.currentAccount) {
       for (let subAcc of account.subAccounts) {
         this.listValue.push(subAcc.name);
@@ -81,8 +90,24 @@ export class TransactionsComponent implements OnInit {
         // console.log(subAcc.account_id);
         // console.log(this.subAccountsDict);
         this.subAccountsDict[subAcc.name] = subAcc.account_id;
+        this.balancesAvailableDict[subAcc.name] = subAcc.balances.available;
+        this.balancesCurrentDict[subAcc.name] = subAcc.balances.current;
       }
     }
+
+    // var totalAvailable = 0;
+    var totalCurrent = 0;
+    // console.log(this.balancesAvailableDict)
+    // for (let key of this.balancesAvailableDict) {
+    //   totalAvailable = totalAvailable + this.balancesAvailableDict[key];
+    // }
+    for (let key in this.balancesCurrentDict) {
+      // console.log(this.balancesCurrentDict[key])
+      totalCurrent = totalCurrent + this.balancesCurrentDict[key];
+    }
+    // console.log(totalAvailable);
+    console.log(totalCurrent);
+    this.balancesCurrentDict['All'] = totalCurrent;
 
     console.log("List Value: ", this.listValue);
     console.log('Current Page: ', this.currentPage);
@@ -126,9 +151,6 @@ export class TransactionsComponent implements OnInit {
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
       console.log("Data Source: ", this.dataSource);
-
-      this.preSelection.push('All')
-      console.log(this.preSelection);
 
       this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
         console.log("yup")
