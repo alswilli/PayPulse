@@ -160,6 +160,8 @@ plaidRouter.route("/accounts/transactions/:accountId")
   // Variables from customized requests
   const pageSize = +req.query.pageSize;
   const currentPage = +req.query.page;
+  const subAccount = req.query.subAccount;
+  const subAccountId = req.query.subAccountId;
   const N = 3;
   // Variables for Plaid API query
   const now = moment();
@@ -172,14 +174,11 @@ plaidRouter.route("/accounts/transactions/:accountId")
       console.log(account);
       ACCESS_TOKEN = account.accessToken;
       const institutionName = account.institutionName;
-      var filteredTransactions = []
+      var finalTransactions = []
       console.log(ACCESS_TOKEN);
       console.log(thirtyDaysAgo);
       console.log(today);
-      client.getTransactions(ACCESS_TOKEN, thirtyDaysAgo, today, {
-        count: 250,
-        offset: 0,
-      }, function(error, response) {
+      client.getTransactions(ACCESS_TOKEN, thirtyDaysAgo, today, function(error, response) {
         if (error != null) {
           // prettyPrintResponse(error);
           return res.json({
@@ -187,14 +186,34 @@ plaidRouter.route("/accounts/transactions/:accountId")
           });
         } else {
           console.log("here");
-          responseLength = response.transactions.length;
           // Checks for pagination query params
           if (pageSize && currentPage) {
+            // Filter for subAccount
+            filteredTransactions = []
+            // console.log(response.transactions)
+            console.log(subAccount)
+            console.log(subAccountId)
+            if (subAccount === 'All') {
+              console.log('all');
+              for (let transaction of response.transactions) {
+                  filteredTransactions.push(transaction);
+              }
+            }
+            else {
+              for (let transaction of response.transactions) {
+                if (transaction.account_id === subAccountId) {
+                  filteredTransactions.push(transaction);
+                }
+              }
+            } 
+            responseLength = filteredTransactions.length;
             startIndex = pageSize * (currentPage - 1)
-            endIndex = Math.min(startIndex + pageSize, responseLength);   
+            endIndex = Math.min(startIndex + pageSize, responseLength);  
+            console.log(startIndex);
+            console.log(endIndex); 
             console.log(responseLength);
             for (startIndex; startIndex < endIndex; startIndex++) {
-              currentTransaction = response.transactions[startIndex];
+              currentTransaction = filteredTransactions[startIndex];
               formattedTransaction = {
                 _id: currentTransaction.transaction_id,
                 date: currentTransaction.date,
@@ -203,13 +222,13 @@ plaidRouter.route("/accounts/transactions/:accountId")
                 category: currentTransaction.category,
                 account_id: currentTransaction.account_id
               }
-              filteredTransactions.push(formattedTransaction);
+              finalTransactions.push(formattedTransaction);
             }   
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.json({
-              transactions: filteredTransactions,
-              maxTransactions: response.transactions.length
+              transactions: finalTransactions,
+              maxTransactions: responseLength
             });    
           }
           else if (req.query.recentTransactions) {

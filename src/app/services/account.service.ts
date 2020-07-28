@@ -59,8 +59,8 @@ export class AccountService {
       .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
-  getTransactions(accountId: string, postsPerPage: number, currentPage: number) {
-    const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}`;
+  getTransactions(accountId: string, postsPerPage: number, currentPage: number, subAccount: string, subAccountId: string) {
+    const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}&subAccount=${subAccount}&subAccountId=${subAccountId}`;
     return this.http.get<{transactions: Transaction[], maxTransactions: number}>(baseURL + 'plaid/accounts/transactions/' + accountId + queryParams)
       .pipe(catchError(this.processHTTPMsgService.handleError));
   }

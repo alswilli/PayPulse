@@ -10,6 +10,7 @@ import {AccountService} from '../services/account.service';
 import {Account} from '../shared/account';
 import {merge, Observable, of as observableOf} from 'rxjs';
 import {catchError, map, startWith, switchMap} from 'rxjs/operators';
+import { MatSelectionList, MatSelectionListChange } from '@angular/material';
 
 export interface TransactionData {
   amount: string;
@@ -36,8 +37,15 @@ export class TransactionsComponent implements OnInit {
   currentAccountId: string;
   postsPerPage = 5;
   currentPage = 1;
+  adjustedPage: number;
   pageSizeOptions = [5, 10, 25, 100];
   isLoading = false;
+  subAccount: string;
+  subAccountId: string;
+  subAccountsDict: any;
+
+  listValue: any = [];
+  preSelection = [];
 
   // actualPaginator: MatPaginator;
   // @ViewChild(MatPaginator)
@@ -48,6 +56,7 @@ export class TransactionsComponent implements OnInit {
   @ViewChild(MatPaginator, {read: true}) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatTable) table: MatTable<any>;
+  @ViewChild(MatSelectionList) selectionList: MatSelectionList;
 
   constructor(private accountService: AccountService) {}
 
@@ -59,8 +68,27 @@ export class TransactionsComponent implements OnInit {
     console.log(this.userAccountsDetails)
     this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id; 
     console.log(this.currentAccountId);
+
+    this.listValue.push('All');
+    this.subAccount = 'All';
+    this.subAccountId = null;
+    this.subAccountsDict = {};
+    this.subAccountsDict['All'] = null;
+    for (let account of this.userAccountsDetails.currentAccount) {
+      for (let subAcc of account.subAccounts) {
+        this.listValue.push(subAcc.name);
+        // console.log(subAcc.name);
+        // console.log(subAcc.account_id);
+        // console.log(this.subAccountsDict);
+        this.subAccountsDict[subAcc.name] = subAcc.account_id;
+      }
+    }
+
+    console.log("List Value: ", this.listValue);
+    console.log('Current Page: ', this.currentPage);
+    this.adjustedPage = this.currentPage-1;
     // Now get the currentAccount transactions
-    this.accountService.getTransactions(this.currentAccountId, this.postsPerPage, this.currentPage)
+    this.accountService.getTransactions(this.currentAccountId, this.postsPerPage, this.currentPage, this.subAccount, this.subAccountId)
     .subscribe(res => {
       this.isLoading = false;
       this.transactions = res.transactions;
@@ -98,6 +126,16 @@ export class TransactionsComponent implements OnInit {
       this.dataSource.paginator = this.paginator;
       this.dataSource.sort = this.sort;
       console.log("Data Source: ", this.dataSource);
+
+      this.preSelection.push('All')
+      console.log(this.preSelection);
+
+      this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
+        console.log("yup")
+        this.selectionList.deselectAll();
+        console.log(s);
+        s.option.selected = true;
+      });
     },
       errmess => this.errMess = <any>errmess);
   }
@@ -115,12 +153,15 @@ export class TransactionsComponent implements OnInit {
     console.log(pageData);
     console.log("onChangedPage");
     this.isLoading = true;
-    this.currentPage = pageData.pageIndex+1;
-    this.postsPerPage = pageData.pageSize;
-    this.accountService.getTransactions(this.currentAccountId, this.postsPerPage, this.currentPage)
+    if (pageData) {
+      this.currentPage = pageData.pageIndex+1;
+      this.postsPerPage = pageData.pageSize;
+    }
+    this.accountService.getTransactions(this.currentAccountId, this.postsPerPage, this.currentPage, this.subAccount, this.subAccountId)
       .subscribe(res => {
         console.log(res)
         this.isLoading = false;
+        this.adjustedPage = this.currentPage-1;
         this.transactions = res.transactions;
         this.totalPosts = res.maxTransactions;
         for (let entry of this.transactions) {
@@ -161,6 +202,19 @@ export class TransactionsComponent implements OnInit {
         // this.dataSource.sort = this.sort;
       },
         errmess => this.errMess = <any>errmess);
+  }
+
+  onSubAccountChanged(accountName) {
+    console.log("Sub Account: ", accountName);
+    this.subAccount = accountName;
+    console.log(this.subAccountsDict);
+    this.subAccountId = this.subAccountsDict[this.subAccount];
+    console.log(this.subAccount);
+    console.log(this.subAccountId);
+    this.currentPage = 1;
+    // this.dataSource.paginator.firstPage();
+
+    this.onChangedPage(null)
   }
 
   sortData(event) {

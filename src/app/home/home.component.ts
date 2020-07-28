@@ -36,7 +36,6 @@ export class HomeComponent implements OnInit {
   removeAccounts = false;
   firstLoad = false;
   fullLoad = false;
-  typesOfShoes: string[] = ['Boots', 'Clogs', 'Loafers', 'Moccasins', 'Sneakers'];
 
   clientForm: FormGroup;
   listValue: any = [];
