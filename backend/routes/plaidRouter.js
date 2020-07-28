@@ -245,12 +245,12 @@ plaidRouter.route("/accounts/transactions/:accountId")
                 category: transaction.category,
                 account_id: transaction.account_id
               }
-              filteredTransactions.push(formattedTransaction);
+              finalTransactions.push(formattedTransaction);
               count++;
             }
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
-            res.json(filteredTransactions);
+            res.json(finalTransactions);
           }
           else if (req.query.topTransactions) {
             console.log("TO-DO");

@@ -24,6 +24,7 @@ export class HomeComponent implements OnInit {
 
   majorComponents: MajorComponent[] = MAJORS;
   recentTransactions: Transaction[];
+  parsedTransactions: Object[];
   userAccountsDetails: any;
   accounts: any;
   currentAccount: any;
@@ -80,6 +81,28 @@ export class HomeComponent implements OnInit {
           this.recentTransactions.forEach(element => {
             console.log(element);
           });
+          var currAccountName;
+          this.parsedTransactions = [];
+          for (let entry of this.recentTransactions) {
+            // Translate account_id to account name
+            for (let account of this.userAccountsDetails.currentAccount) {
+              for (let subAcc of account.subAccounts) {
+                if (subAcc.account_id === entry.account_id) {
+                  currAccountName = subAcc.name;
+                  break;
+                }
+              }
+            }
+            const newTransaction = {
+              amount: entry.amount,
+              transactionName: entry.transactionName,
+              category: entry.category,
+              date: entry.date,
+              accountName: currAccountName
+            };
+            this.parsedTransactions.push(newTransaction);
+          }
+          console.log("Parsed transactions: "+ this.parsedTransactions);
           this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
             console.log("yup")
             this.selectionList.deselectAll();
@@ -154,11 +177,12 @@ export class HomeComponent implements OnInit {
           }
           console.log("Updated accounts: ", this.accounts)
           this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accounts, ids: this.userAccountsIds});
-          var userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details')); // needs to be setItem instead
-          console.log(userAccountsDetails)
-          this.currentAccountId = userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
-          this.currentAccountName = userAccountsDetails.currentAccount[0].institutionName;
+          this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details')); // needs to be setItem instead
+          console.log(this.userAccountsDetails)
+          this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
+          this.currentAccountName = this.userAccountsDetails.currentAccount[0].institutionName;
           console.log(this.currentAccountId); 
+          console.log(this.currentAccountName);
           // Now get the currentAccount transactions
           this.accountService.getRecentTransactions(this.currentAccountId)
             .subscribe(transactions => {
@@ -167,6 +191,32 @@ export class HomeComponent implements OnInit {
               this.recentTransactions.forEach(element => {
                 console.log(element);
               });
+              var currAccountName;
+              this.parsedTransactions = [];
+              console.log("AHH: ", this.currentAccount)
+              for (let entry of this.recentTransactions) {
+                // Translate account_id to account name
+                console.log(entry.account_id)
+                for (let account of this.userAccountsDetails.currentAccount) { // this part needs to be different
+                  console.log(account)
+                  for (let subAcc of account.subAccounts) {
+                    if (subAcc.account_id === entry.account_id) {
+                      console.log("FOUND A MATCH")
+                      currAccountName = subAcc.name;
+                      break;
+                    }
+                  }
+                }
+                const newTransaction = {
+                  amount: entry.amount,
+                  transactionName: entry.transactionName,
+                  category: entry.category,
+                  date: entry.date,
+                  accountName: currAccountName
+                };
+                this.parsedTransactions.push(newTransaction);
+              }
+              console.log("Parsed transactions: "+ this.parsedTransactions);
             },
               errmess => this.errMess = <any>errmess
           );
@@ -211,6 +261,28 @@ export class HomeComponent implements OnInit {
           this.recentTransactions.forEach(element => {
             console.log(element);
           });
+          var currAccountName;
+          this.parsedTransactions = [];
+          for (let entry of this.recentTransactions) {
+            // Translate account_id to account name
+            for (let account of this.userAccountsDetails.currentAccount) {
+              for (let subAcc of account.subAccounts) {
+                if (subAcc.account_id === entry.account_id) {
+                  currAccountName = subAcc.name;
+                  break;
+                }
+              }
+            }
+            const newTransaction = {
+              amount: entry.amount,
+              transactionName: entry.transactionName,
+              category: entry.category,
+              date: entry.date,
+              accountName: currAccountName
+            };
+            this.parsedTransactions.push(newTransaction);
+          }
+          console.log("Parsed transactions: "+ this.parsedTransactions);
         },
           errmess => this.errMess = <any>errmess
       );
@@ -291,10 +363,10 @@ export class HomeComponent implements OnInit {
             }
             console.log("Updated accounts: ", this.accounts)
             this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accounts, ids: this.userAccountsIds});
-            var userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details')); // needs to be setItem instead
-            console.log(userAccountsDetails)
-            this.currentAccountId = userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
-            this.currentAccountName = userAccountsDetails.currentAccount[0].institutionName;
+            this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details')); // needs to be setItem instead
+            console.log(this.userAccountsDetails)
+            this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
+            this.currentAccountName = this.userAccountsDetails.currentAccount[0].institutionName;
             console.log(this.currentAccountId); 
             this.preSelection = [];// need to delete and then add
             this.preSelection.push(this.currentAccountName)  
@@ -306,6 +378,28 @@ export class HomeComponent implements OnInit {
                 this.recentTransactions.forEach(element => {
                   console.log(element);
                 });
+                var currAccountName;
+                this.parsedTransactions = [];
+                for (let entry of this.recentTransactions) {
+                  // Translate account_id to account name
+                  for (let account of this.userAccountsDetails.currentAccount) {
+                    for (let subAcc of account.subAccounts) {
+                      if (subAcc.account_id === entry.account_id) {
+                        currAccountName = subAcc.name;
+                        break;
+                      }
+                    }
+                  }
+                  const newTransaction = {
+                    amount: entry.amount,
+                    transactionName: entry.transactionName,
+                    category: entry.category,
+                    date: entry.date,
+                    accountName: currAccountName
+                  };
+                  this.parsedTransactions.push(newTransaction);
+                }
+                console.log("Parsed transactions: "+ this.parsedTransactions);
               },
                 errmess => this.errMess = <any>errmess
               );

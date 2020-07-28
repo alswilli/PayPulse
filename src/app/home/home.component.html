@@ -72,7 +72,8 @@
             <div *ngIf="component.name === 'Transactions' && card.name === 'Recent Transactions' && !errMess">
               <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
               <div *ngIf="!isLoading"> 
-                <p *ngFor="let recentData of recentTransactions">
+                <p *ngFor="let recentData of parsedTransactions">
+                  <span><b>Account Name:</b> {{recentData.accountName}} </span>
                   <span><b>Amount:</b> {{recentData.amount}} </span>
                   <span><b>Transaction Name:</b> {{recentData.transactionName}} </span>
                   <span><b>Category:</b> {{recentData.category}} </span>
