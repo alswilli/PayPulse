@@ -104,7 +104,8 @@ export class AuthService {
        .pipe( map(res => {
          return {'success': true, 'username': user.username };
      }),
-       catchError(error => this.processHTTPMsgService.handleError(error)));
+      //  catchError(error => this.processHTTPMsgService.handleError(error))
+       );
      }
 
    logIn(user: any): Observable<any> {
@@ -114,7 +115,8 @@ export class AuthService {
            this.storeUserCredentials({username: user.username, token: res.token});
            return {'success': true, 'username': user.username };
        }),
-        catchError(error => this.processHTTPMsgService.handleError(error)));
+        // catchError(error => this.processHTTPMsgService.handleError(error))
+        );
    }
 
    logInFacebook(fbAuthResponse): Observable<any>{
@@ -128,7 +130,8 @@ export class AuthService {
            console.log("Test: ", res2);
            return res2; 
        }),
-        catchError(error => this.processHTTPMsgService.handleError(error)));
+        // catchError(error => this.processHTTPMsgService.handleError(error))
+        );
   }
 
    logOut() {

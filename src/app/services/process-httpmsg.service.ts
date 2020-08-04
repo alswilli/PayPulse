@@ -2,13 +2,18 @@ import { Injectable } from '@angular/core';
 
 import { throwError } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { MatDialog } from '@angular/material';
+import { ErrorComponent } from '../error/error.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProcessHTTPMsgService {
 
-  constructor() { }
+  // public dialog: MatDialog
+  constructor() { 
+    // console.log("HERE: ", this.dialog)
+  }
 
   public handleError(error: HttpErrorResponse | any) {
     let errMsg: string;
@@ -24,6 +29,8 @@ export class ProcessHTTPMsgService {
         errMsg = `${error.status} - ${error.statusText || ''}: ${error.message}`;
       }
     }
+    // console.log("sdasasdHERE: ", this.dialog)
+    // this.dialog.open(ErrorComponent, {data: {message: errMsg}});
 
     return throwError(errMsg);
   }

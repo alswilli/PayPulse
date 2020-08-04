@@ -53,6 +53,7 @@ import { AuthGuardService } from './services/auth-guard.service';
 
 import { baseURL } from './shared/baseurl';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
+import { ErrorInterceptor } from './error-interceptor';
 
 @NgModule({
   declarations: [
@@ -113,6 +114,11 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: UnauthorizedInterceptor,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
       multi: true
     }
   ],

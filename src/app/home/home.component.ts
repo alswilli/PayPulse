@@ -509,7 +509,7 @@ export class HomeComponent implements OnInit {
       this.errMess = error;
       this.firstLoad = false;
       this.fullLoad = false;
-      this.dialog.open(ErrorComponent, {data: {message: error}});
+      // this.dialog.open(ErrorComponent, {data: {message: error}});
     });
   }
 
