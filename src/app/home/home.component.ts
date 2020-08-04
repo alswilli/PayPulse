@@ -110,9 +110,7 @@ export class HomeComponent implements OnInit {
             console.log(s);
             s.option.selected = true;
           });
-        },
-          errmess => this.errMess = <any>errmess
-      );
+        });
 
       // this.listValue = ["SOMETHING3", "SOMETHING4"];
       
@@ -218,17 +216,13 @@ export class HomeComponent implements OnInit {
                 this.parsedTransactions.push(newTransaction);
               }
               console.log("Parsed transactions: "+ this.parsedTransactions);
-            },
-              errmess => this.errMess = <any>errmess
-          );
+            });
 
           this.preSelection = [];// need to delete and then add
           this.preSelection.push(this.currentAccountName)  
           console.log(this.listValue);
           console.log(this.preSelection);
-        },
-          errmess => this.errMess = <any>errmess
-      );
+        });
     }
   }
 
@@ -284,9 +278,7 @@ export class HomeComponent implements OnInit {
             this.parsedTransactions.push(newTransaction);
           }
           console.log("Parsed transactions: "+ this.parsedTransactions);
-        },
-          errmess => this.errMess = <any>errmess
-      );
+        });
 
       // this.listValue = ["SOMETHING3", "SOMETHING4"];
       
@@ -401,12 +393,8 @@ export class HomeComponent implements OnInit {
                   this.parsedTransactions.push(newTransaction);
                 }
                 console.log("Parsed transactions: "+ this.parsedTransactions);
-              },
-                errmess => this.errMess = <any>errmess
-              );
-            },
-            errmess => this.errMess = <any>errmess
-            );
+              });
+            });
         }
         else if (this.listValue.length > 0) {
           // Delete account from accounts array
@@ -472,21 +460,12 @@ export class HomeComponent implements OnInit {
                 this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: getRes.accountsData, ids: accountIds});
                 // this.router.navigate(['/home']);
                 this.onAddedAccount();
-                }, 
-                error => {
-                  console.log(error);
-                  this.errMess = error;
-                }
-              );
+                });
             }
             else {
               console.log(res)
               console.log("Get Accounts method from account service was not a success")
             }
-          },
-          error => {
-            console.log(error);
-            this.errMess = error;
           });
         }
         else { 
@@ -502,14 +481,9 @@ export class HomeComponent implements OnInit {
       else {
         console.log(res)
         console.log("addAccount() method from account service was not a success")
+        this.firstLoad = false;
+        this.fullLoad = false;
       }
-    },
-    error => {
-      console.log(error);
-      this.errMess = error;
-      this.firstLoad = false;
-      this.fullLoad = false;
-      // this.dialog.open(ErrorComponent, {data: {message: error}});
     });
   }
 
