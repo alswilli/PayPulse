@@ -35,7 +35,7 @@ plaidRouter.use(bodyParser.json());
 // @access Private
 plaidRouter.route("/accounts/add")
 .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
-.post(cors.corsWithOptions, authenticate.verifyUser, (req, res) => {
+.post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
   PUBLIC_TOKEN = req.body.token;
   const userId = req.user.id;
   const institution = req.body.metadata.institution;
@@ -47,46 +47,88 @@ plaidRouter.route("/accounts/add")
         ACCESS_TOKEN = exchangeResponse.access_token;
         ITEM_ID = exchangeResponse.item_id;
         // Check if account already exists for specific user
-        Account.findOne({
+        return Account.findOne({
           userId: req.user.id,
           institutionId: institution_id
         })
-        .then(account => {
-          if (account) {
-            console.log("Account already exists");
-          } else {
-            console.log(account)
-            Account.find({
-              userId: req.user.id
-            })
-            .then(allAccounts => {
-              // Pull the accounts associated with the Item
-              client.getAccounts(ACCESS_TOKEN, (err, result) => {
-                // Handle err (TO-DO)
-                const subAccounts = result.accounts;
-                const newAccount = new Account({
-                  userId: userId,
-                  accessToken: ACCESS_TOKEN,
-                  itemId: ITEM_ID,
-                  institutionId: institution_id,
-                  institutionName: name,
-                  subAccounts: subAccounts
-                });
-                if (allAccounts.length < 1) {
-                  newAccount.current = true;
-                }
-                newAccount.save().then(account => res.json(account));
-              });
-            })
-            .catch(err => console.log(err)); // All Accounts Error
+      })
+      .catch(err => {
+        console.log("client.exchangePublicToken() error")
+        console.log("Error: ", err);
+        res.status(500).json({
+          message: "client.exchangePublicToken() error"
+        });
+      }) // client.exchangePublicToken() error
+      .then(account => {
+        if (account) {
+          console.log("Account already exists");
+          next(err);
+          // Need to throw error here
+        } 
+        else {
+          console.log(account)
+          return Account.find({
+            userId: req.user.id
+          })
+        }
+      })
+      .catch(err => {
+        console.log("Account.findOne() error");
+        // err = new Error("Account.findOne() error");
+        return res.status(500).json({
+          message: "Account.findOne() error"
+        }).end();
+      }) // Account.findOne() error
+      .then(allAccounts => {
+        // Pull the accounts associated with the Item
+        client.getAccounts(ACCESS_TOKEN, (err, result) => {
+          console.log("Made it into the next block")
+          // Handle err (TO-DO)
+          if (err) {
+            // Need to throw error
+            next(err);
+          }
+          else {
+            const subAccounts = result.accounts;
+            const newAccount = new Account({
+              userId: userId,
+              accessToken: ACCESS_TOKEN,
+              itemId: ITEM_ID,
+              institutionId: institution_id,
+              institutionName: name,
+              subAccounts: subAccounts
+            });
+            if (allAccounts.length < 1) {
+              newAccount.current = true;
+            }
+            return newAccount.save()
           }
         })
-        .catch(err => console.log(err)); // Mongo Error
+        .catch(err => {
+          console.log("client.getAccounts() error");
+          console.log("Error: ", err);
+          res.status(500).json({
+            message: "client.getAccounts() error"
+          });
+        }) // client.getAccounts() error
+        .then(account => res.json(account))
+        .catch(err => {
+          console.log("newAccount.save() error");
+          console.log("Error: ", err);
+          res.status(500).json({
+            message: "newAccount.save() error"
+          });
+        }); // newAccount.save() error
       })
-      .catch(err => console.log(err)); // Plaid Error
-    }
+      .catch(err => {
+        console.log("Account.find() error");
+        console.log("Error: ", err);
+        res.status(500).json({
+          message: "Account.find() error"
+        });
+      }); // Account.find() error
   }
-);
+});
 
 // @route DELETE api/plaid/accounts/:id
 // @desc Delete account with given id
