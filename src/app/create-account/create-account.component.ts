@@ -95,14 +95,6 @@ export class CreateAccountComponent implements OnInit {
       if (res.success) {
         this.router.navigate(['/login']);
       }
-      else {
-        console.log(res)
-        console.log("Sign up method from auth service was not a success")
-      }
-    },
-    error => {
-      console.log(error);
-      this.errMess = error;
     });
 
     this.createAccountFormDirective.resetForm();

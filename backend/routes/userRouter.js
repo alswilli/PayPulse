@@ -16,7 +16,7 @@ router.get('/', cors.corsWithOptions, authenticate.verifyUser, authenticate.veri
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.json(users);
-    }, (err) => next(err))
+    })
     .catch((err) => next(err));
 });
 router.post('/signup', cors.corsWithOptions, (req, res, next) => {
@@ -25,7 +25,8 @@ router.post('/signup', cors.corsWithOptions, (req, res, next) => {
     if(err) {
       res.statusCode = 500;
       res.setHeader('Content-Type', 'application/json');
-      res.json({err: err});
+      res.json(err);
+      // res.json({message: "Registering a new user failed! Try a different username"});
     }
     else {
       if (req.body.firstname)
@@ -38,13 +39,14 @@ router.post('/signup', cors.corsWithOptions, (req, res, next) => {
         if (err) {
           res.statusCode = 500;
           res.setHeader('Content-Type', 'application/json');
-          res.json({err: err});
+          // res.json({err: err});
+          res.json({message: "Saving user credentials failed! Make sure your credentials are valid."});
           return;
         }
         passport.authenticate('local')(req, res, () => {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
-          res.json({success: true, status: 'Registration Successful!'});
+          res.json({success: true, status: 'User Registration Successful!'});
         });
       });
     }
