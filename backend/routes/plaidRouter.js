@@ -52,18 +52,12 @@ plaidRouter.route("/accounts/add")
           institutionId: institution_id
         })
       })
-      .catch(err => {
-        console.log("client.exchangePublicToken() error")
-        console.log("Error: ", err);
-        res.status(500).json({
-          message: "client.exchangePublicToken() error"
-        });
-      }) // client.exchangePublicToken() error
       .then(account => {
         if (account) {
           console.log("Account already exists");
-          next(err);
-          // Need to throw error here
+          var err = new Error("Account already exists");
+          err.status = 500;
+          throw err;
         } 
         else {
           console.log(account)
@@ -72,21 +66,15 @@ plaidRouter.route("/accounts/add")
           })
         }
       })
-      .catch(err => {
-        console.log("Account.findOne() error");
-        // err = new Error("Account.findOne() error");
-        return res.status(500).json({
-          message: "Account.findOne() error"
-        }).end();
-      }) // Account.findOne() error
       .then(allAccounts => {
         // Pull the accounts associated with the Item
         client.getAccounts(ACCESS_TOKEN, (err, result) => {
           console.log("Made it into the next block")
           // Handle err (TO-DO)
           if (err) {
-            // Need to throw error
-            next(err);
+            var err = new Error("Get Accounts failed");
+            err.status = 400;
+            throw err;
           }
           else {
             const subAccounts = result.accounts;
@@ -101,32 +89,23 @@ plaidRouter.route("/accounts/add")
             if (allAccounts.length < 1) {
               newAccount.current = true;
             }
-            return newAccount.save()
+            newAccount.save().then(account => res.json(account))
           }
         })
-        .catch(err => {
-          console.log("client.getAccounts() error");
-          console.log("Error: ", err);
-          res.status(500).json({
-            message: "client.getAccounts() error"
-          });
-        }) // client.getAccounts() error
-        .then(account => res.json(account))
-        .catch(err => {
-          console.log("newAccount.save() error");
-          console.log("Error: ", err);
-          res.status(500).json({
-            message: "newAccount.save() error"
-          });
-        }); // newAccount.save() error
       })
+      // .then(account => res.json(account))
       .catch(err => {
-        console.log("Account.find() error");
-        console.log("Error: ", err);
-        res.status(500).json({
-          message: "Account.find() error"
-        });
-      }); // Account.find() error
+        if (err.message === 'Account already exists') {
+          res.status(400).json({ message: "Account already exists" });
+        }
+        else if (err.message === 'Get Accounts failed') {
+          res.status(500).json({ message: "Get Accounts failed" });
+        }
+        else {
+          console.log(err.message);
+          res.status(500).json({ message: "An unknown error occured when adding account! Please try again" });
+        }
+      }); 
   }
 });
 

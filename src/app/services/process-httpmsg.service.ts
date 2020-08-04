@@ -12,14 +12,18 @@ export class ProcessHTTPMsgService {
 
   public handleError(error: HttpErrorResponse | any) {
     let errMsg: string;
-    console.log("Error was firedadad: ", error);
+    console.log("Error was fired: ", error);
 
     if (error.error instanceof ErrorEvent) {
       errMsg = error.error.message;
     } else {
-      errMsg = `${error.status} - ${error.statusText || ''} ${error.message}`;
+      if (error.error.message) {
+        errMsg = `${error.status} - ${error.statusText || ''}: ${error.error.message}`;
+      }
+      else {
+        errMsg = `${error.status} - ${error.statusText || ''}: ${error.message}`;
+      }
     }
-    console.log("Error was firedd: ", errMsg);
 
     return throwError(errMsg);
   }

@@ -11,6 +11,7 @@ import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { switchMap, flatMap, mergeMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { DeleteAccountComponent } from '../delete-account/delete-account.component';
+import { ErrorComponent } from '../error/error.component';
 // import 'rxjs/add/operator/switchMap';
 
 @Component({
@@ -506,6 +507,9 @@ export class HomeComponent implements OnInit {
     error => {
       console.log(error);
       this.errMess = error;
+      this.firstLoad = false;
+      this.fullLoad = false;
+      this.dialog.open(ErrorComponent, {data: {message: error}});
     });
   }
 
