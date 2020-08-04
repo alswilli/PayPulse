@@ -69,7 +69,7 @@
             <mat-card-title> {{card.name}} </mat-card-title>
           </mat-card-header>
           <mat-card-content fxLayoutAlign="center">
-            <div *ngIf="component.name === 'Transactions' && card.name === 'Recent Transactions' && !errMess">
+            <div *ngIf="component.name === 'Transactions' && card.name === 'Recent Transactions'">
               <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
               <div *ngIf="!isLoading"> 
                 <p *ngFor="let recentData of parsedTransactions">
@@ -81,10 +81,10 @@
                 </p>
               </div>
             </div>
-            <div *ngIf="errMess">
+            <!-- <div *ngIf="errMess">
               <h2>Error</h2>
               <h4>{{errMess}}</h4>
-            </div>
+            </div> -->
           </mat-card-content>
         </mat-card>
       </mat-card-content>

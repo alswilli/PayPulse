@@ -40,6 +40,7 @@ import { FooterComponent } from './footer/footer.component';
 import { LinkAccountComponent } from './link-account/link-account.component';
 import { CreateAccountComponent } from './create-account/create-account.component';
 import { DeleteAccountComponent } from './delete-account/delete-account.component';
+import { ErrorComponent } from './error/error.component';
 
 import { SidebarService } from './services/sidebar.service';
 import { AuthService } from './services/auth.service';
@@ -67,7 +68,8 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
     FooterComponent,
     CreateAccountComponent,
     LinkAccountComponent,
-    DeleteAccountComponent
+    DeleteAccountComponent,
+    ErrorComponent
   ],
   imports: [
     BrowserModule,
@@ -116,7 +118,8 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
   ],
   bootstrap: [AppComponent],
   entryComponents: [
-    DeleteAccountComponent
+    DeleteAccountComponent,
+    ErrorComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,
