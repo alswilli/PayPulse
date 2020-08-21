@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatAccordion } from '@angular/material';
 
 @Component({
   selector: 'app-budgets',
@@ -6,10 +7,15 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./budgets.component.scss']
 })
 export class BudgetsComponent implements OnInit {
+  @ViewChild(MatAccordion) accordion: MatAccordion;
+
+  tests: string[];
 
   constructor() { }
 
   ngOnInit() {
+    this.tests = ["1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1",
+                  "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1", "1"]
   }
 
 }

@@ -18,6 +18,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { NgxPlaidLinkModule } from 'ngx-plaid-link';
 import { HttpClientModule } from '@angular/common/http';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 import { MatGridListModule } from '@angular/material/grid-list';;
 import { MatDialogModule } from '@angular/material/dialog';
@@ -34,6 +35,7 @@ import { BudgetsComponent } from './budgets/budgets.component';
 import { GoalsComponent } from './goals/goals.component';
 import { SharingComponent } from './sharing/sharing.component';
 import { AdviceComponent } from './advice/advice.component';
+
 import { HomeComponent } from './home/home.component';
 import { HeaderComponent } from './header/header.component';
 import { FooterComponent } from './footer/footer.component';
@@ -94,7 +96,8 @@ import { ErrorInterceptor } from './error-interceptor';
     MatProgressSpinnerModule,
     NgxPlaidLinkModule,
     MatSelectModule,
-    MatDialogModule
+    MatDialogModule,
+    MatExpansionModule
   ],
   // exports: [
   //   MatFormFieldModule,
