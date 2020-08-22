@@ -17,14 +17,17 @@
     <p>Budgets go here</p>
     <div class="example-action-buttons">
       <div fxFlex='70'>
-        <button mat-raised-button color="primary" (click)="accordion.openAll()">Add new budget</button>
+        <button mat-raised-button color="primary" (click)="onAddBudgetClicked();">Add New Budget</button>
       </div>
       <button mat-button (click)="accordion.openAll()">Expand All</button>
       <button mat-button (click)="accordion.closeAll()">Collapse All</button>
     </div> 
+    <div *ngIf="budgets.length === 0">
+      <p>No budgets added! Please add a budget using the 'Add New Budget' button above</p>
+    </div>
       <mat-accordion class="example-headers-align" multi>
         <div class="budgetList">
-          <mat-expansion-panel *ngFor="let test of tests">
+          <mat-expansion-panel *ngFor="let budget of budgets">
             <mat-expansion-panel-header>
               <mat-panel-title>
                 Personal data

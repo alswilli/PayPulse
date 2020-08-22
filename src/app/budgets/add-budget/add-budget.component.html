@@ -1,0 +1,52 @@
+<div>
+  <h3>Add Budget</h3>
+  <div>
+    <mat-dialog-content class="mat-typography">
+      <!-- <h4>Select a Budget Category:</h4> -->
+      <form novalidate [formGroup]="addBudgetForm" #addbudgetform="ngForm" (ngSubmit)="onAddConfirmed()" fxLayout="column">
+        <p>
+          <mat-form-field style="margin-left: 10px;">
+            <mat-label>Budget Category</mat-label>
+            <mat-select formControlName="category" [errorStateMatcher]="matcher" required> 
+              <mat-option *ngFor="let category of categories" [value]="category">
+                {{category}}
+              </mat-option>
+            </mat-select>
+            <!-- <mat-error *ngIf="formErrors.category">{{formErrors.category}}</mat-error> -->
+            <mat-error *ngIf="addBudgetForm.get('category').hasError('required')">Category is required.</mat-error>
+          </mat-form-field>
+        </p>
+        <p>
+          $ 
+          <mat-form-field>
+            <mat-label>Budget Amount</mat-label>
+            <input matInput formControlName="amount" type="number" required>
+            <!-- <mat-error *ngIf="formErrors.amount">{{formErrors.amount}}</mat-error> -->
+            <mat-error *ngIf="addBudgetForm.get('amount').hasError('required')">Amount is required.</mat-error>
+            <mat-error *ngIf="addBudgetForm.get('amount').hasError('min')">Amount must be greater than 0.</mat-error>
+          </mat-form-field>
+        </p>
+        <button mat-button [disabled]="addBudgetForm.invalid" type="submit" class="mat-primary" cdkFocusInitial>Add Budget</button>
+        <button mat-button mat-dialog-close>Cancel</button>
+      </form>
+      <!-- <mat-form-field style="margin-left: 10px;">
+        <mat-label>Budget Category</mat-label>
+        <mat-select>
+          <mat-option *ngFor="let category of categories" [value]="category">
+            {{category}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <p></p>
+      <span>$ </span>
+      <mat-form-field>
+        <mat-label>Budget Amount</mat-label>
+        <input matInput>
+      </mat-form-field> -->
+    </mat-dialog-content>
+    <!-- <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-button [disabled]="addBudgetForm.invalid" type="submit" class="mat-primary" cdkFocusInitial>Add Budget</button>
+    </mat-dialog-actions> -->
+  </div>
+</div>

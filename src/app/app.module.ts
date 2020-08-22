@@ -57,6 +57,7 @@ import { baseURL } from './shared/baseurl';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import { ErrorInterceptor } from './error-interceptor';
 import { PieChartComponent } from './budgets/pie-chart/pie-chart.component';
+import { AddBudgetComponent } from './budgets/add-budget/add-budget.component';
 
 @NgModule({
   declarations: [
@@ -74,7 +75,8 @@ import { PieChartComponent } from './budgets/pie-chart/pie-chart.component';
     LinkAccountComponent,
     DeleteAccountComponent,
     ErrorComponent,
-    PieChartComponent
+    PieChartComponent,
+    AddBudgetComponent
   ],
   imports: [
     BrowserModule,
@@ -130,7 +132,8 @@ import { PieChartComponent } from './budgets/pie-chart/pie-chart.component';
   bootstrap: [AppComponent],
   entryComponents: [
     DeleteAccountComponent,
-    ErrorComponent
+    ErrorComponent,
+    AddBudgetComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,
