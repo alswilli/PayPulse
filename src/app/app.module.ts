@@ -56,6 +56,7 @@ import { AuthGuardService } from './services/auth-guard.service';
 import { baseURL } from './shared/baseurl';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import { ErrorInterceptor } from './error-interceptor';
+import { PieChartComponent } from './budgets/pie-chart/pie-chart.component';
 
 @NgModule({
   declarations: [
@@ -72,7 +73,8 @@ import { ErrorInterceptor } from './error-interceptor';
     CreateAccountComponent,
     LinkAccountComponent,
     DeleteAccountComponent,
-    ErrorComponent
+    ErrorComponent,
+    PieChartComponent
   ],
   imports: [
     BrowserModule,
