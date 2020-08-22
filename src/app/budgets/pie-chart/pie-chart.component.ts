@@ -35,7 +35,7 @@ export class PieChartComponent implements OnInit {
     .append("svg")
     // .attr("width", this.width)
     // .attr("height", this.height)
-    .attr("viewBox", `0 0 562 750`)
+    .attr("viewBox", `0 0 562 480`)
     .append("g")
     .attr(
       "transform",

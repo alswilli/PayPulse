@@ -16,6 +16,9 @@
   <div fxFlex='50' class="mainPanels">
     <p>Budgets go here</p>
     <div class="example-action-buttons">
+      <div fxFlex='70'>
+        <button mat-raised-button color="primary" (click)="accordion.openAll()">Add new budget</button>
+      </div>
       <button mat-button (click)="accordion.openAll()">Expand All</button>
       <button mat-button (click)="accordion.closeAll()">Collapse All</button>
     </div> 
