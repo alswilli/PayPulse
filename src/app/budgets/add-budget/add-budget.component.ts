@@ -4,6 +4,8 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AccountService } from 'src/app/services/account.service';
 import { ThrowStmt } from '@angular/compiler';
 import { Subscription } from 'rxjs';
+import { BudgetService } from 'src/app/services/budget.service';
+import { error } from 'protractor';
 
 @Component({
   selector: 'app-add-budget',
@@ -17,7 +19,7 @@ export class AddBudgetComponent implements OnInit {
   categories: any;
   categories2: any;
   categories3: any;
-  categoriesLoading: boolean;
+  isLoading: boolean;
   firstSelected = false;
   secondSelected = false;
   // subscription: Subscription;
@@ -25,14 +27,15 @@ export class AddBudgetComponent implements OnInit {
   constructor(public dialogRef: MatDialogRef<AddBudgetComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
     private fb: FormBuilder,
-    private accountService: AccountService) { }
+    private accountService: AccountService,
+    private budgetService: BudgetService) { }
   
   ngOnInit() {
     this.createForm();
     // this.categories = ["Gas", "Food", "Rent"]
-    this.categoriesLoading = true;
+    this.isLoading = true;
     this.categories = this.data.categories;
-    this.categoriesLoading = false;
+    this.isLoading = false;
     // this.subscription = this.accountService.getCategoriesSub()
     //     .subscribe(categories => { console.log(categories); this.categories = categories; this.categoriesLoading = false;});
     // this.accountService.getTransactionCategories()
@@ -121,14 +124,6 @@ export class AddBudgetComponent implements OnInit {
   }
 
   onAddConfirmed() {
-    // // this.feedback = this.feedbackForm.value;
-    // console.log("User account getting created: ", this.createAccountForm.value);
-    // var user = this.createAccountForm.value;
-    // this.authService.signUp(user).subscribe(res => {
-    //   if (res.success) {
-    //     this.router.navigate(['/login']);
-    //   }
-    // });
     console.log("New Budget getting created: ", this.addBudgetForm.value);
     var returnFormValues = {};
     if (this.addBudgetForm.value.category3 !== "") {
@@ -149,15 +144,20 @@ export class AddBudgetComponent implements OnInit {
         'amount' : this.addBudgetForm.value.amount,
       };
     }
-    this.onAdd.emit(returnFormValues);
+    this.isLoading = true;
+    this.budgetService.addBudget(returnFormValues).subscribe(res => {
+      this.onAdd.emit(res);
+      // this.isLoading = false;
 
-    this.addBudgetFormDirective.resetForm();
-    this.addBudgetForm.reset({
-      category: '',
-      category2: '',
-      category3: '',
-      amount: ''
-    });
+      // this.addBudgetFormDirective.resetForm();
+      // this.addBudgetForm.reset({
+      //   category: '',
+      //   category2: '',
+      //   category3: '',
+      //   amount: ''
+      // });
+    }, errmess => this.isLoading = false
+    );
   }
 
   firstOpSelected(select) {

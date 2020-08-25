@@ -11,6 +11,7 @@ dotenv.config();
 const transactionRouter = require('./routes/transactionRouter');
 const plaidRouter = require("./routes/plaidRouter");
 const userRouter = require('./routes/userRouter');
+const budgetRouter = require('./routes/budgetRouter');
 
 const mongoUsername = process.env.MONGODB_USERNAME;
 const mongoUserPassword = process.env.MONGODB_USER_PASSWORD;
@@ -40,6 +41,7 @@ app.use(passport.initialize());
 app.use('/transactions', transactionRouter);
 app.use('/plaid', plaidRouter);
 app.use('/users', userRouter);
+app.use('/budgets', budgetRouter);
 
 module.exports = app;
 

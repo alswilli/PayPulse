@@ -2,6 +2,9 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatAccordion, MatDialog } from '@angular/material';
 import { AddBudgetComponent } from './add-budget/add-budget.component';
 import { AccountService } from '../services/account.service';
+import { mergeMap } from 'rxjs/operators';
+import { BudgetService } from '../services/budget.service';
+import { Budget } from '../shared/budget';
 
 @Component({
   selector: 'app-budgets',
@@ -12,18 +15,20 @@ export class BudgetsComponent implements OnInit {
   @ViewChild(MatAccordion) accordion: MatAccordion;
   @ViewChild('addbudgetform') createAccountFormDirective;
 
-  budgets: string[];
+  budgets: Budget[];
   categories: any;
   isLoading = true;
 
   constructor(public dialog: MatDialog,
-    private accountService: AccountService) {
+    private accountService: AccountService,
+    private budgetService: BudgetService) {
   }
 
   ngOnInit() {
     this.budgets = [];
     this.accountService.getTransactionCategories()
-        .subscribe(categories => {
+      .pipe(
+        mergeMap((categories) => {
           console.log(categories);
           this.categories = {};
           for (let row of categories) {
@@ -49,9 +54,14 @@ export class BudgetsComponent implements OnInit {
             }
           }
           console.log(this.categories);
-          this.isLoading = false;
-          // this.categoriesLoading = false;
-        });
+          return this.budgetService.getBudgets()
+      })
+    )
+    .subscribe(budgets => {
+      this.budgets = budgets;
+      this.isLoading = false;
+      // this.categoriesLoading = false;
+    });
   }
 
   onAddBudgetClicked() {
@@ -63,5 +73,29 @@ export class BudgetsComponent implements OnInit {
         // Close dialogue ref
         addBudgetRef.close();
       });
-    }
   }
+
+  onEditBudgetClicked() {
+    // const addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories}});
+    // addBudgetRef.componentInstance.onAdd
+    //   .subscribe(result => {
+    //     console.log(result);
+    //     this.budgets.push(result);
+    //     // Close dialogue ref
+    //     addBudgetRef.close();
+    //   });
+    // }
+  }
+
+  onDelteBudgetClicked() {
+    // const addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories}});
+    // addBudgetRef.componentInstance.onAdd
+    //   .subscribe(result => {
+    //     console.log(result);
+    //     this.budgets.push(result);
+    //     // Close dialogue ref
+    //     addBudgetRef.close();
+    //   });
+    // }
+  }
+}

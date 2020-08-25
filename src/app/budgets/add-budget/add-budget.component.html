@@ -1,7 +1,7 @@
 <div>
-  <mat-spinner *ngIf="categoriesLoading" style="margin: auto"></mat-spinner>
+  <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
   <div>
-    <mat-dialog-content *ngIf="!categoriesLoading" class="mat-typography">
+    <mat-dialog-content *ngIf="!isLoading" class="mat-typography">
       <!-- <h4>Select a Budget Category:</h4> -->
       <h3>Add Budget</h3>
       <form novalidate [formGroup]="addBudgetForm" #addbudgetform="ngForm" (ngSubmit)="onAddConfirmed()" fxLayout="column">
