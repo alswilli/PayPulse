@@ -20,7 +20,8 @@ interface GetAccountsResponse {
 export class AccountService {
 
   constructor(private http: HttpClient,
-    private processHTTPMsgService: ProcessHTTPMsgService) { }
+    private processHTTPMsgService: ProcessHTTPMsgService) { 
+    }
 
   addAccount(plaidEventData: Object) {
     return this.http.post<Account>(baseURL + 'plaid/accounts/add', plaidEventData);
@@ -67,6 +68,12 @@ export class AccountService {
 
   getRecentTransactions(accountId: string) {
     return this.http.get<Transaction[]>(baseURL + 'plaid/accounts/transactions/'  + accountId + '?recentTransactions=true');
+      // .pipe(catchError(this.processHTTPMsgService.handleError));
+  }
+
+  getTransactionCategories() {
+    console.log("getting here");
+    return this.http.get<any[]>(baseURL + 'plaid/accounts/categories');
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 }

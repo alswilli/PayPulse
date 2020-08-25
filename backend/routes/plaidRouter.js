@@ -304,5 +304,28 @@ plaidRouter.route("/accounts/transactions/:accountId")
   // }
 });
 
+// @route GET api/plaid/accounts/transactions/categories
+// @desc Fetch transaction categories from Plaid API
+// @access Public
+plaidRouter.route("/accounts/categories")
+.options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
+.get(cors.corsWithOptions, (req, res) => {
+  client.getCategories(function(err, response) {
+    // Handle err
+    if (err != null) {
+      // prettyPrintResponse(error);
+      return res.json({
+        error: err
+      });
+    }
+    // console.log(err)
+    // console.log(response)
+    var categories = response.categories;
+    // console.log(categories);
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.json(categories);
+  });
+});
 
 module.exports = plaidRouter;

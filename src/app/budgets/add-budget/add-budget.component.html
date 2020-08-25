@@ -1,19 +1,40 @@
 <div>
-  <h3>Add Budget</h3>
+  <mat-spinner *ngIf="categoriesLoading" style="margin: auto"></mat-spinner>
   <div>
-    <mat-dialog-content class="mat-typography">
+    <mat-dialog-content *ngIf="!categoriesLoading" class="mat-typography">
       <!-- <h4>Select a Budget Category:</h4> -->
+      <h3>Add Budget</h3>
       <form novalidate [formGroup]="addBudgetForm" #addbudgetform="ngForm" (ngSubmit)="onAddConfirmed()" fxLayout="column">
         <p>
           <mat-form-field style="margin-left: 10px;">
             <mat-label>Budget Category</mat-label>
             <mat-select formControlName="category" [errorStateMatcher]="matcher" required> 
-              <mat-option *ngFor="let category of categories" [value]="category">
-                {{category}}
+              <mat-option *ngFor="let category of categories | keyvalue" (click)="firstOpSelected($event.target.innerHTML)" [value]="category.key">
+                {{category.key}}
               </mat-option>
             </mat-select>
             <!-- <mat-error *ngIf="formErrors.category">{{formErrors.category}}</mat-error> -->
             <mat-error *ngIf="addBudgetForm.get('category').hasError('required')">Category is required.</mat-error>
+          </mat-form-field>
+        </p>
+        <p>
+          <mat-form-field *ngIf="firstSelected" style="margin-left: 10px;">
+            <mat-label>Budget Subcategory</mat-label>
+            <mat-select formControlName="category2"> 
+              <mat-option *ngFor="let category of categories2 | keyvalue" (click)="secondOpSelected($event.target.innerHTML)" [value]="category.key">
+                {{category.key}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </p>
+        <p>
+          <mat-form-field *ngIf="secondSelected" style="margin-left: 10px;">
+            <mat-label>Budget Subcategory</mat-label>
+            <mat-select formControlName="category3"> 
+              <mat-option *ngFor="let category of categories3 | keyvalue" [value]="category.key">
+                {{category.key}}
+              </mat-option>
+            </mat-select>
           </mat-form-field>
         </p>
         <p>

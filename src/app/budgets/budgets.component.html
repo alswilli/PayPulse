@@ -30,11 +30,10 @@
           <mat-expansion-panel *ngFor="let budget of budgets">
             <mat-expansion-panel-header>
               <mat-panel-title>
-                Personal data
+                {{ budget.category }} 
               </mat-panel-title>
               <mat-panel-description>
-                Type your name and age
-                <mat-icon>account_circle</mat-icon>
+                {{ budget.amount }}
               </mat-panel-description>
             </mat-expansion-panel-header>
         
