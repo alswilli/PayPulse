@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Account } from '../shared/account';
 import { Transaction } from '../shared/transaction';
 
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { baseURL } from '../shared/baseurl';
@@ -19,9 +19,44 @@ interface GetAccountsResponse {
 })
 export class AccountService {
 
+  // categoriesSub: Subject<{}> = new Subject<{}>();
+
   constructor(private http: HttpClient,
     private processHTTPMsgService: ProcessHTTPMsgService) { 
+      // this.getTransactionCategories()
+      //   .subscribe(categories => {
+      //     console.log(categories);
+      //     var categs = {};
+      //     for (let row of categories) {
+      //       var i = 0;
+      //       var currStr = "";
+      //       var curr = categs;
+      //       while (i < row.hierarchy.length) {
+      //         currStr = row.hierarchy[i];
+      //         // if (currStr !== "") {
+      //         //   currStr = currStr + "." + row.hierarchy[i];
+      //         // }
+      //         // else {
+      //         //   currStr = row.hierarchy[i];
+      //         // }
+      //         if (currStr in curr) {
+      //           curr = curr[currStr];
+      //         }
+      //         else {
+      //           curr[currStr] = {};
+      //           curr = curr[currStr];
+      //         }
+      //         i += 1;
+      //       }
+      //     }
+      //     console.log(categs)
+      //     this.categoriesSub.next(categs);
+      //   });
     }
+
+  // getCategoriesSub(): Observable<{}> {
+  //   return this.categoriesSub.asObservable();
+  // }
 
   addAccount(plaidEventData: Object) {
     return this.http.post<Account>(baseURL + 'plaid/accounts/add', plaidEventData);

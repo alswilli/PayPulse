@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { AccountService } from 'src/app/services/account.service';
 import { ThrowStmt } from '@angular/compiler';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-add-budget',
@@ -19,6 +20,7 @@ export class AddBudgetComponent implements OnInit {
   categoriesLoading: boolean;
   firstSelected = false;
   secondSelected = false;
+  // subscription: Subscription;
 
   constructor(public dialogRef: MatDialogRef<AddBudgetComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
@@ -29,36 +31,44 @@ export class AddBudgetComponent implements OnInit {
     this.createForm();
     // this.categories = ["Gas", "Food", "Rent"]
     this.categoriesLoading = true;
-    this.accountService.getTransactionCategories()
-        .subscribe(categories => {
-          console.log(categories);
-          this.categories = {};
-          for (let row of categories) {
-            var i = 0;
-            var currStr = "";
-            var curr = this.categories;
-            while (i < row.hierarchy.length) {
-              currStr = row.hierarchy[i];
-              // if (currStr !== "") {
-              //   currStr = currStr + "." + row.hierarchy[i];
-              // }
-              // else {
-              //   currStr = row.hierarchy[i];
-              // }
-              if (currStr in curr) {
-                curr = curr[currStr];
-              }
-              else {
-                curr[currStr] = {};
-                curr = curr[currStr];
-              }
-              i += 1;
-            }
-          }
-          console.log(this.categories);
-          this.categoriesLoading = false;
-        });
+    this.categories = this.data.categories;
+    this.categoriesLoading = false;
+    // this.subscription = this.accountService.getCategoriesSub()
+    //     .subscribe(categories => { console.log(categories); this.categories = categories; this.categoriesLoading = false;});
+    // this.accountService.getTransactionCategories()
+    //     .subscribe(categories => {
+    //       console.log(categories);
+    //       this.categories = {};
+    //       for (let row of categories) {
+    //         var i = 0;
+    //         var currStr = "";
+    //         var curr = this.categories;
+    //         while (i < row.hierarchy.length) {
+    //           currStr = row.hierarchy[i];
+    //           // if (currStr !== "") {
+    //           //   currStr = currStr + "." + row.hierarchy[i];
+    //           // }
+    //           // else {
+    //           //   currStr = row.hierarchy[i];
+    //           // }
+    //           if (currStr in curr) {
+    //             curr = curr[currStr];
+    //           }
+    //           else {
+    //             curr[currStr] = {};
+    //             curr = curr[currStr];
+    //           }
+    //           i += 1;
+    //         }
+    //       }
+    //       console.log(this.categories);
+    //       this.categoriesLoading = false;
+    //     });
   }
+
+  // ngOnDestroy() {
+  //   this.subscription.unsubscribe();
+  // }
 
   formErrors = {
     'category': '',

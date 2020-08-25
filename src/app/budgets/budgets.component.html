@@ -1,55 +1,59 @@
-<div>
-  <p>Header stuff goes here</p>
-</div>
-<div fxLayout.lt-md="column">
-  <!-- <div fxFlex='1'></div> -->
-  <div fxFlex='50' class="mainPanels">
-    <p>Graph goes here</p>
-    <div>
-      <app-pie-chart></app-pie-chart>
-      <!-- <div class="visBox"> 
+<mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+<div *ngIf="!isLoading">
+  <div>
+    <p>Header stuff goes here</p>
+  </div>
+  <div fxLayout.lt-md="column">
+    <!-- <div fxFlex='1'></div> -->
+    <div fxFlex='50' class="mainPanels">
+      <p>Graph goes here</p>
+      <div>
         <app-pie-chart></app-pie-chart>
-      </div> -->
-    </div>
-  </div>
-  <!-- <div fxFlex='1'></div> -->
-  <div fxFlex='50' class="mainPanels">
-    <p>Budgets go here</p>
-    <div class="example-action-buttons">
-      <div fxFlex='70'>
-        <button mat-raised-button color="primary" (click)="onAddBudgetClicked();">Add New Budget</button>
+        <!-- <div class="visBox"> 
+          <app-pie-chart></app-pie-chart>
+        </div> -->
       </div>
-      <button mat-button (click)="accordion.openAll()">Expand All</button>
-      <button mat-button (click)="accordion.closeAll()">Collapse All</button>
-    </div> 
-    <div *ngIf="budgets.length === 0">
-      <p>No budgets added! Please add a budget using the 'Add New Budget' button above</p>
     </div>
-      <mat-accordion class="example-headers-align" multi>
-        <div class="budgetList">
-          <mat-expansion-panel *ngFor="let budget of budgets">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                {{ budget.category }} 
-              </mat-panel-title>
-              <mat-panel-description>
-                {{ budget.amount }}
-              </mat-panel-description>
-            </mat-expansion-panel-header>
-        
-            <mat-form-field>
-              <mat-label>First name</mat-label>
-              <input matInput>
-            </mat-form-field>
-        
-            <mat-form-field>
-              <mat-label>Age</mat-label>
-              <input matInput type="number" min="1">
-            </mat-form-field>
-        
-          </mat-expansion-panel>
+    <!-- <div fxFlex='1'></div> -->
+    <div fxFlex='50' class="mainPanels">
+      <p>Budgets go here</p>
+      <div class="example-action-buttons">
+        <div fxFlex='70'>
+          <button mat-raised-button color="primary" (click)="onAddBudgetClicked();">Add New Budget</button>
         </div>
-      </mat-accordion>
+        <button mat-button (click)="accordion.openAll()">Expand All</button>
+        <button mat-button (click)="accordion.closeAll()">Collapse All</button>
+      </div> 
+      <div *ngIf="budgets.length === 0">
+        <p>No budgets added! Please add a budget using the 'Add New Budget' button above</p>
+      </div>
+        <mat-accordion class="example-headers-align" multi>
+          <div class="budgetList">
+            <mat-expansion-panel *ngFor="let budget of budgets">
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ budget.category }} 
+                </mat-panel-title>
+                <mat-panel-description>
+                  {{ budget.amount }}
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+          
+              <mat-form-field>
+                <mat-label>First name</mat-label>
+                <input matInput>
+              </mat-form-field>
+          
+              <mat-form-field>
+                <mat-label>Age</mat-label>
+                <input matInput type="number" min="1">
+              </mat-form-field>
+          
+            </mat-expansion-panel>
+          </div>
+        </mat-accordion>
+    </div>
+    <!-- <div fxFlex='1'></div> -->
   </div>
-  <!-- <div fxFlex='1'></div> -->
 </div>
+
