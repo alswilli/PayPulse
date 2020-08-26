@@ -22,6 +22,11 @@ export class BudgetService {
     // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
+  updateBudget(budgetId: string, update: object) {
+    return this.http.put(baseURL + 'budgets/' + budgetId, update);
+      // .pipe(catchError(this.processHTTPMsgService.handleError));
+  }
+
   deleteBudget(budgetId: string) {
     return this.http.delete(baseURL + 'budgets/' + budgetId);
       // .pipe(catchError(this.processHTTPMsgService.handleError));

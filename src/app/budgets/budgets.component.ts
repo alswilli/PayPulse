@@ -5,6 +5,7 @@ import { AccountService } from '../services/account.service';
 import { mergeMap } from 'rxjs/operators';
 import { BudgetService } from '../services/budget.service';
 import { Budget } from '../shared/budget';
+import { DeleteBudgetComponent } from './delete-budget/delete-budget.component';
 
 @Component({
   selector: 'app-budgets',
@@ -65,7 +66,7 @@ export class BudgetsComponent implements OnInit {
   }
 
   onAddBudgetClicked() {
-    const addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories}});
+    const addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, edit: false}});
     addBudgetRef.componentInstance.onAdd
       .subscribe(result => {
         console.log(result);
@@ -75,27 +76,39 @@ export class BudgetsComponent implements OnInit {
       });
   }
 
-  onEditBudgetClicked() {
-    // const addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories}});
-    // addBudgetRef.componentInstance.onAdd
-    //   .subscribe(result => {
-    //     console.log(result);
-    //     this.budgets.push(result);
-    //     // Close dialogue ref
-    //     addBudgetRef.close();
-    //   });
-    // }
+  onDeleteBudgetClicked(currBudget) {
+    console.log(currBudget);
+    const deleteBudgetRef = this.dialog.open(DeleteBudgetComponent, {data: {budget: currBudget}});
+    deleteBudgetRef.componentInstance.onDelete
+      .subscribe(result => {
+        console.log(result);
+        const index = this.budgets.indexOf(currBudget, 0);
+        if (index > -1) {
+          this.budgets.splice(index, 1);
+        }
+        // Close dialogue ref
+        deleteBudgetRef.close();
+      });
   }
 
-  onDelteBudgetClicked() {
-    // const addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories}});
-    // addBudgetRef.componentInstance.onAdd
-    //   .subscribe(result => {
-    //     console.log(result);
-    //     this.budgets.push(result);
-    //     // Close dialogue ref
-    //     addBudgetRef.close();
-    //   });
-    // }
+  onEditBudgetClicked(currBudget) {
+    console.log(currBudget);
+    const editBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, edit: true, budget: currBudget}});
+    editBudgetRef.componentInstance.onEdit
+      .subscribe(result => {
+        console.log(result);
+        for (let budget of this.budgets) {
+          if (budget._id === currBudget._id) {
+            budget.mainCategory = result.mainCategory;
+            budget.category = result.category;
+            budget.category2 = result.category2;
+            budget.category3 = result.category3;
+            budget.amount = result.amount;
+            break;
+          }
+        }
+        // Close dialogue ref
+        editBudgetRef.close();
+      });
   }
 }

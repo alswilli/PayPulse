@@ -6,9 +6,19 @@ const budgetSchema = new Schema({
         type: Schema.Types.ObjectId, 
         ref: "users"
     },
+    mainCategory: {
+        type: String,
+        required: true
+    },
     category: {
         type: String,
         required: true
+    },
+    category2: {
+        type: String
+    },
+    category3: {
+        type: String
     },
     amount: {
         type: String,

@@ -58,6 +58,7 @@ import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import { ErrorInterceptor } from './error-interceptor';
 import { PieChartComponent } from './budgets/pie-chart/pie-chart.component';
 import { AddBudgetComponent } from './budgets/add-budget/add-budget.component';
+import { DeleteBudgetComponent } from './budgets/delete-budget/delete-budget.component';
 
 @NgModule({
   declarations: [
@@ -76,7 +77,8 @@ import { AddBudgetComponent } from './budgets/add-budget/add-budget.component';
     DeleteAccountComponent,
     ErrorComponent,
     PieChartComponent,
-    AddBudgetComponent
+    AddBudgetComponent,
+    DeleteBudgetComponent
   ],
   imports: [
     BrowserModule,
@@ -133,7 +135,8 @@ import { AddBudgetComponent } from './budgets/add-budget/add-budget.component';
   entryComponents: [
     DeleteAccountComponent,
     ErrorComponent,
-    AddBudgetComponent
+    AddBudgetComponent,
+    DeleteBudgetComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

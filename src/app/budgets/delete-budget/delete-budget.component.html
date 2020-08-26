@@ -1,0 +1,13 @@
+<div>
+  <h3>Delete Budget</h3>
+  <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+  <div *ngIf="!isLoading">
+    <mat-dialog-content class="mat-typography">
+      <p>Are you sure you want to delete your <b>{{data.budget.mainCategory}}</b> budget?</p>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-button class="mat-warn" (click)="onDeleteConfirmed(data.budget._id);" cdkFocusInitial>Delete Budget</button>
+    </mat-dialog-actions>
+  </div>
+</div>

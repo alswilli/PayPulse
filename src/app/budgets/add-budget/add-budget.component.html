@@ -4,7 +4,7 @@
     <mat-dialog-content *ngIf="!isLoading" class="mat-typography">
       <!-- <h4>Select a Budget Category:</h4> -->
       <h3>Add Budget</h3>
-      <form novalidate [formGroup]="addBudgetForm" #addbudgetform="ngForm" (ngSubmit)="onAddConfirmed()" fxLayout="column">
+      <form novalidate [formGroup]="addBudgetForm" #addbudgetform="ngForm" (ngSubmit)="onFormConfirmed()" fxLayout="column">
         <p>
           <mat-form-field style="margin-left: 10px;">
             <mat-label>Budget Category</mat-label>
@@ -47,7 +47,8 @@
             <mat-error *ngIf="addBudgetForm.get('amount').hasError('min')">Amount must be greater than 0.</mat-error>
           </mat-form-field>
         </p>
-        <button mat-button [disabled]="addBudgetForm.invalid" type="submit" class="mat-primary" cdkFocusInitial>Add Budget</button>
+        <button mat-button *ngIf="!edit" [disabled]="addBudgetForm.invalid" type="submit" class="mat-primary" cdkFocusInitial>Add Budget</button>
+        <button mat-button *ngIf="edit" [disabled]="addBudgetForm.invalid" type="submit" class="mat-primary" cdkFocusInitial>Edit Budget</button>
         <button mat-button mat-dialog-close>Cancel</button>
       </form>
       <!-- <mat-form-field style="margin-left: 10px;">

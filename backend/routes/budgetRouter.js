@@ -20,7 +20,7 @@ budgetRouter.route("/")
     // Check if budget already exists for specific user
     Budget.findOne ({
         userId: req.user.id,
-        category: req.body.category
+        mainCategory: req.body.mainCategory
     })
     .then(budget => {
         if (budget) {
@@ -32,7 +32,10 @@ budgetRouter.route("/")
         else {
             const newBudget = new Budget({
                 userId: req.user.id,
+                mainCategory: req.body.mainCategory,
                 category: req.body.category,
+                category2: req.body.category2,
+                category3: req.body.category3,
                 amount: req.body.amount
             });
             newBudget.save().then(budget => res.json(budget))
@@ -51,6 +54,41 @@ budgetRouter.route("/")
 
 budgetRouter.route("/:budgetId")
 .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
+.put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    Budget.findOne ({
+        userId: req.user.id,
+        mainCategory: req.body.mainCategory
+    })
+    .then(budget => {
+        console.log(budget._id)
+        console.log(req.params.budgetId)
+        if (budget && budget._id != req.params.budgetId) {
+            console.log("Budget already exists");
+            var err = new Error("Budget already exists");
+            err.status = 500;
+            throw err;
+        } 
+        else {
+            Budget.findByIdAndUpdate(req.params.budgetId, {
+                $set: req.body
+            }, { new: true })
+            .then((budget) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(budget);
+            })
+        }
+    })
+    .catch(err => {
+        if (err.message === 'Budget already exists') {
+            res.status(400).json({ message: "Budget already exists" });
+        }
+        else {
+            console.log(err.message);
+            res.status(500).json({ message: "An unknown error occured when editing budget! Please try again" });
+        }
+    }); 
+  })
 .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
   Budget.findByIdAndRemove(req.params.budgetId)
   .then((resp) => {

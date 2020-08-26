@@ -16,12 +16,14 @@ export class AddBudgetComponent implements OnInit {
   @ViewChild('addbudgetform') addBudgetFormDirective;
   addBudgetForm: FormGroup;
   onAdd = new EventEmitter();
+  onEdit = new EventEmitter();
   categories: any;
   categories2: any;
   categories3: any;
   isLoading: boolean;
   firstSelected = false;
   secondSelected = false;
+  edit: boolean;
   // subscription: Subscription;
 
   constructor(public dialogRef: MatDialogRef<AddBudgetComponent>,
@@ -35,6 +37,19 @@ export class AddBudgetComponent implements OnInit {
     // this.categories = ["Gas", "Food", "Rent"]
     this.isLoading = true;
     this.categories = this.data.categories;
+    this.edit = this.data.edit
+    if (this.edit === true) {
+      console.log(this.addBudgetForm);
+      if (this.data.budget.category3 !== '') {
+        this.firstOpSelected(this.data.budget.category);
+        this.secondOpSelected(this.data.budget.category2);
+      }
+      else if (this.data.budget.category2 !== '') {
+        this.firstOpSelected(this.data.budget.category);
+      }
+      this.addBudgetForm.setValue({category: this.data.budget.category, category2: this.data.budget.category2, 
+        category3: this.data.budget.category3, amount: this.data.budget.amount});
+    }
     this.isLoading = false;
     // this.subscription = this.accountService.getCategoriesSub()
     //     .subscribe(categories => { console.log(categories); this.categories = categories; this.categoriesLoading = false;});
@@ -123,41 +138,58 @@ export class AddBudgetComponent implements OnInit {
     }
   }
 
-  onAddConfirmed() {
-    console.log("New Budget getting created: ", this.addBudgetForm.value);
+  onFormConfirmed() {
+    console.log("Budget: ", this.addBudgetForm.value);
     var returnFormValues = {};
     if (this.addBudgetForm.value.category3 !== "") {
       returnFormValues = {
-        'category' : this.addBudgetForm.value.category3,
+        'mainCategory' : this.addBudgetForm.value.category3,
+        'category' : this.addBudgetForm.value.category,
+        'category2' : this.addBudgetForm.value.category2,
+        'category3' : this.addBudgetForm.value.category3,
         'amount' : this.addBudgetForm.value.amount,
       };
     }
     else if (this.addBudgetForm.value.category2 !== "") {
       returnFormValues = {
-        'category' : this.addBudgetForm.value.category2,
+        'mainCategory' : this.addBudgetForm.value.category2,
+        'category' : this.addBudgetForm.value.category,
+        'category2' : this.addBudgetForm.value.category2,
+        'category3' : "",
         'amount' : this.addBudgetForm.value.amount,
       };
     }
     else {
       returnFormValues = {
+        'mainCategory' : this.addBudgetForm.value.category,
         'category' : this.addBudgetForm.value.category,
+        'category2' : "",
+        'category3' : "",
         'amount' : this.addBudgetForm.value.amount,
       };
     }
     this.isLoading = true;
-    this.budgetService.addBudget(returnFormValues).subscribe(res => {
-      this.onAdd.emit(res);
-      // this.isLoading = false;
-
-      // this.addBudgetFormDirective.resetForm();
-      // this.addBudgetForm.reset({
-      //   category: '',
-      //   category2: '',
-      //   category3: '',
-      //   amount: ''
-      // });
-    }, errmess => this.isLoading = false
-    );
+    if (this.edit) {
+      this.budgetService.updateBudget(this.data.budget._id, returnFormValues).subscribe(res => {
+        this.onEdit.emit(res);
+      }, errmess => this.isLoading = false
+      );
+    }
+    else {
+      this.budgetService.addBudget(returnFormValues).subscribe(res => {
+        this.onAdd.emit(res);
+        // this.isLoading = false;
+  
+        // this.addBudgetFormDirective.resetForm();
+        // this.addBudgetForm.reset({
+        //   category: '',
+        //   category2: '',
+        //   category3: '',
+        //   amount: ''
+        // });
+      }, errmess => this.isLoading = false
+      );
+    }
   }
 
   firstOpSelected(select) {
@@ -165,7 +197,13 @@ export class AddBudgetComponent implements OnInit {
     console.log(this.categories);
     this.firstSelected = false;
     this.secondSelected = false;
-    select = select.substring(1, select.length-1)
+    if (this.edit) {
+      this.addBudgetForm.setValue({category: this.addBudgetForm.value.category, category2: '', 
+        category3: '', amount: this.addBudgetForm.value.amount});
+    }
+    if (select[0] == " ") {
+      select = select.substring(1, select.length-1)
+    }
     if (select in this.categories) {
       this.categories2 = this.categories[select];
       if (Object.keys(this.categories2).length > 0) {
@@ -178,7 +216,13 @@ export class AddBudgetComponent implements OnInit {
     console.log(select);
     console.log(this.categories2);
     this.secondSelected = false;
-    select = select.substring(1, select.length-1)
+    if (this.edit) {
+      this.addBudgetForm.setValue({category: this.addBudgetForm.value.category, category2: this.addBudgetForm.value.category2, 
+        category3: '', amount: this.addBudgetForm.value.amount});
+    }
+    if (select[0] == " ") {
+      select = select.substring(1, select.length-1)
+    }
     if (select in this.categories2) {
       this.categories3 = this.categories2[select];
       if (Object.keys(this.categories3).length > 0) {

@@ -32,7 +32,7 @@
             <mat-expansion-panel *ngFor="let budget of budgets">
               <mat-expansion-panel-header>
                 <mat-panel-title>
-                  {{ budget.category }} 
+                  {{ budget.mainCategory }} 
                 </mat-panel-title>
                 <mat-panel-description>
                   {{ budget.amount }}
@@ -49,8 +49,8 @@
                 <input matInput type="number" min="1">
               </mat-form-field>
               <p></p>
-              <button mat-raised-button style="background-color: grey; color: white;" (click)="onEditBudgetClicked();">Edit Budget</button>
-              <button mat-raised-button color="warn" style="margin: 10px;"(click)="onDeleteBudgetClicked();">Delete Budget</button>
+              <button mat-raised-button style="background-color: grey; color: white;" (click)="onEditBudgetClicked(budget);">Edit Budget</button>
+              <button mat-raised-button color="warn" style="margin: 10px;"(click)="onDeleteBudgetClicked(budget);">Delete Budget</button>
           
             </mat-expansion-panel>
           </div>
