@@ -6,6 +6,7 @@ import { mergeMap } from 'rxjs/operators';
 import { BudgetService } from '../services/budget.service';
 import { Budget } from '../shared/budget';
 import { DeleteBudgetComponent } from './delete-budget/delete-budget.component';
+import { Transaction } from '../shared/transaction';
 
 @Component({
   selector: 'app-budgets',
@@ -19,6 +20,10 @@ export class BudgetsComponent implements OnInit {
   budgets: Budget[];
   categories: any;
   isLoading = true;
+  userAccountsDetails: any;
+  currentAccountId: string;
+  days = 30;
+  transactions: any[];
 
   constructor(public dialog: MatDialog,
     private accountService: AccountService,
@@ -27,6 +32,8 @@ export class BudgetsComponent implements OnInit {
 
   ngOnInit() {
     this.budgets = [];
+    this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
+    this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id;
     this.accountService.getTransactionCategories()
       .pipe(
         mergeMap((categories) => {
@@ -56,10 +63,31 @@ export class BudgetsComponent implements OnInit {
           }
           console.log(this.categories);
           return this.budgetService.getBudgets()
+      }),
+      mergeMap(budgets => {
+        console.log("made it");
+        this.budgets = budgets;
+        return this.accountService.getBudgetTransactions(this.currentAccountId, this.days);
       })
     )
-    .subscribe(budgets => {
-      this.budgets = budgets;
+    .subscribe(transactions => {
+      this.transactions = transactions;
+      console.log(this.transactions);
+
+      for (let budget of this.budgets) {
+        var mainCategory = budget.mainCategory;
+        var total = 0;
+        for (let transaction of this.transactions) {
+          for (let category of transaction.category) {
+            if (category === mainCategory) {
+              total += transaction.amount;
+              break;
+            }
+          }
+        }
+        budget.total = total;
+      }
+      console.log(this.budgets)
       this.isLoading = false;
       // this.categoriesLoading = false;
     });

@@ -276,6 +276,12 @@ plaidRouter.route("/accounts/transactions/:accountId")
           else if (req.query.topTransactions) {
             console.log("TO-DO");
           }
+          else if (req.query.budgetTransactions) {
+            console.log("In budget area");
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(response.transactions);    
+          }
         }
       });
     }, (err) => next(err))

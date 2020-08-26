@@ -6,4 +6,5 @@ export class Budget {
     category2: string;
     category3: string;
     amount: string;
+    total: number;
 }

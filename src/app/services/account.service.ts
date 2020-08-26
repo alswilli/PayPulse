@@ -106,6 +106,12 @@ export class AccountService {
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
+  getBudgetTransactions(accountId: string, days: number) {
+    const queryParams = `&days=${days}`;
+    return this.http.get<Transaction[]>(baseURL + 'plaid/accounts/transactions/'  + accountId + '?budgetTransactions=true' + queryParams);
+      // .pipe(catchError(this.processHTTPMsgService.handleError));
+  }
+
   getTransactionCategories() {
     console.log("getting here");
     return this.http.get<any[]>(baseURL + 'plaid/accounts/categories');

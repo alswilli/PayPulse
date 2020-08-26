@@ -197,10 +197,12 @@ export class AddBudgetComponent implements OnInit {
     console.log(this.categories);
     this.firstSelected = false;
     this.secondSelected = false;
-    if (this.edit) {
-      this.addBudgetForm.setValue({category: this.addBudgetForm.value.category, category2: '', 
+    // if (this.edit) {
+    //   this.addBudgetForm.setValue({category: this.addBudgetForm.value.category, category2: '', 
+    //     category3: '', amount: this.addBudgetForm.value.amount});
+    // }
+    this.addBudgetForm.setValue({category: this.addBudgetForm.value.category, category2: '', 
         category3: '', amount: this.addBudgetForm.value.amount});
-    }
     if (select[0] == " ") {
       select = select.substring(1, select.length-1)
     }
@@ -216,10 +218,12 @@ export class AddBudgetComponent implements OnInit {
     console.log(select);
     console.log(this.categories2);
     this.secondSelected = false;
-    if (this.edit) {
-      this.addBudgetForm.setValue({category: this.addBudgetForm.value.category, category2: this.addBudgetForm.value.category2, 
-        category3: '', amount: this.addBudgetForm.value.amount});
-    }
+    // if (this.edit) {
+    //   this.addBudgetForm.setValue({category: this.addBudgetForm.value.category, category2: this.addBudgetForm.value.category2, 
+    //     category3: '', amount: this.addBudgetForm.value.amount});
+    // }
+    this.addBudgetForm.setValue({category: this.addBudgetForm.value.category, category2: this.addBudgetForm.value.category2, 
+      category3: '', amount: this.addBudgetForm.value.amount});
     if (select[0] == " ") {
       select = select.substring(1, select.length-1)
     }

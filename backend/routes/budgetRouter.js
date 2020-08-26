@@ -36,7 +36,8 @@ budgetRouter.route("/")
                 category: req.body.category,
                 category2: req.body.category2,
                 category3: req.body.category3,
-                amount: req.body.amount
+                amount: req.body.amount,
+                total: null
             });
             newBudget.save().then(budget => res.json(budget))
         }
@@ -60,8 +61,6 @@ budgetRouter.route("/:budgetId")
         mainCategory: req.body.mainCategory
     })
     .then(budget => {
-        console.log(budget._id)
-        console.log(req.params.budgetId)
         if (budget && budget._id != req.params.budgetId) {
             console.log("Budget already exists");
             var err = new Error("Budget already exists");
