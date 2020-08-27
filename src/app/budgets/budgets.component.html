@@ -41,7 +41,15 @@
                   <b>{{ budget.category }}</b> 
                 </p>
                 <p fxLayoutAlign="end center" style="margin-right: 10px;">
-                  {{ budget.total }} / {{ budget.amount }}
+                  <span *ngIf="(budget.total / budget.amount) >= 1" style="color: red;">
+                    {{ budget.total }} / {{ budget.amount }}
+                  </span>
+                  <span *ngIf="!((budget.total / budget.amount) >= 1) && (budget.total / budget.amount) >= 0.75" style="color: orange;">
+                    {{ budget.total }} / {{ budget.amount }}
+                  </span>
+                  <span *ngIf="!((budget.total / budget.amount) >= 0.75) && (budget.total / budget.amount) >= 0" style="color: green;">
+                    {{ budget.total }} / {{ budget.amount }}
+                  </span>
                 </p>
               </mat-expansion-panel-header>
           
