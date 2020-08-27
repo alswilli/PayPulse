@@ -141,12 +141,21 @@ export class BudgetsComponent implements OnInit {
         var currPieBudget = {mainCategory: currBudget.mainCategory, total: currBudget.total}
         console.log(currPieBudget)
         console.log(this.pieData)
-        const indexPie = this.pieData.indexOf(currPieBudget, 0);
-        if (index > -1) {
-          console.log("Found pie data")
-          this.pieData.splice(indexPie, 1);
+        for (let dataVal of this.pieData) {
+          if (dataVal.mainCategory === currPieBudget.mainCategory) {
+            console.log("Found pie data")
+            const indexPie = this.pieData.indexOf(dataVal, 0);
+            this.pieData.splice(indexPie, 1);
+            this.pieChartService.sendNewPieDataEvent(this.pieData);
+            break;
+          }
         }
-        this.pieChartService.sendNewPieDataEvent(this.pieData);
+        // const indexPie = this.pieData.indexOf(currPieBudget, 0);
+        // if (indexPie > -1) {
+        //   console.log("Found pie data")
+        //   this.pieData.splice(indexPie, 1);
+        //   this.pieChartService.sendNewPieDataEvent(this.pieData);
+        // }
         // Close dialogue ref
         deleteBudgetRef.close();
       });
@@ -158,6 +167,28 @@ export class BudgetsComponent implements OnInit {
     editBudgetRef.componentInstance.onEdit
       .subscribe(result => {
         console.log(result);
+        var total = 0;
+        for (let transaction of this.transactions) {
+          for (let category of transaction.category) {
+            if (category === result.mainCategory) {
+              total += transaction.amount;
+              break;
+            }
+          }
+        }
+        result.total = total;
+
+        var currPieBudget = {mainCategory: currBudget.mainCategory, total: currBudget.total}
+        for (let dataVal of this.pieData) {
+          if (dataVal.mainCategory === currPieBudget.mainCategory) {
+            console.log("Editing pie data")
+            dataVal.mainCategory = result.mainCategory;
+            dataVal.total = result.total;
+            this.pieChartService.sendNewPieDataEvent(this.pieData);
+            break;
+          }
+        }
+
         for (let budget of this.budgets) {
           if (budget._id === currBudget._id) {
             budget.mainCategory = result.mainCategory;
@@ -165,9 +196,11 @@ export class BudgetsComponent implements OnInit {
             budget.category2 = result.category2;
             budget.category3 = result.category3;
             budget.amount = result.amount;
+            budget.total = result.total
             break;
           }
         }
+      
         // Close dialogue ref
         editBudgetRef.close();
       });

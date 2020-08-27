@@ -90,7 +90,7 @@ export class PieChartComponent implements OnInit {
   private drawChart(): void {
 
     var arc = d3.arc()
-    .innerRadius(0)
+    .innerRadius(this.radius / 3)
     .outerRadius(this.radius);
 
     // Build the pie chart
@@ -125,7 +125,7 @@ export class PieChartComponent implements OnInit {
 
     // Add labels
     const labelLocation = d3.arc()
-    .innerRadius(100)
+    .innerRadius(this.radius / 3)
     .outerRadius(this.radius);
 
     this.svg
