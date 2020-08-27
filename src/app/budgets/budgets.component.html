@@ -31,12 +31,18 @@
           <div class="budgetList">
             <mat-expansion-panel *ngFor="let budget of budgets">
               <mat-expansion-panel-header>
-                <mat-panel-title>
-                  {{ budget.mainCategory }} 
-                </mat-panel-title>
-                <mat-panel-description>
+                <p fxFlex *ngIf="budget.mainCategory === budget.category3">
+                  {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
+                </p>
+                <p fxFlex *ngIf="budget.mainCategory === budget.category2">
+                  {{ budget.category }}: <b>{{ budget.category2 }}</b> 
+                </p>
+                <p fxFlex *ngIf="budget.mainCategory === budget.category">
+                  <b>{{ budget.category }}</b> 
+                </p>
+                <p fxLayoutAlign="end center" style="margin-right: 10px;">
                   {{ budget.total }} / {{ budget.amount }}
-                </mat-panel-description>
+                </p>
               </mat-expansion-panel-header>
           
               <mat-form-field>
