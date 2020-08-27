@@ -91,8 +91,30 @@ export class BudgetsComponent implements OnInit {
           }
         }
         budget.total = total;
+        // If (new budget is parent OR parent not on graph yet) OR parent is present but lesser value
+        var parentPresent = false;
+        var parentTotal = 0;
+        var parentIndex = null;
+        for (let pieBudget of this.pieData) {
+          if (pieBudget.mainCategory === budget.category) {
+            parentPresent = true;
+            parentTotal = pieBudget.total;
+            parentIndex = this.pieData.indexOf(pieBudget, 0);
+            break;
+          }
+        }
+        // Add to graph
         if (total > 0) {
-          this.pieData.push({mainCategory: budget.mainCategory, total: budget.total});
+          if (parentPresent){
+            // Update current value
+            if (parentTotal < budget.total) {
+              this.pieData[parentIndex].total = budget.total;
+            }
+          }
+          else if (budget.category === budget.mainCategory || !parentPresent) {
+            this.pieData.push({mainCategory: budget.category, total: budget.total});
+          }
+          this.pieChartService.sendNewPieDataEvent(this.pieData);
         }
       }
       console.log(this.budgets)
@@ -116,12 +138,36 @@ export class BudgetsComponent implements OnInit {
           }
         }
         result.total = total;
+        // If new budget is parent (and not already present) OR parent not on graph yet
+        var parentPresent = false;
+        var parentTotal = 0;
+        var parentIndex = null;
+        console.log(result.category)
+        for (let pieBudget of this.pieData) {
+          if (pieBudget.mainCategory === result.category) {
+            parentPresent = true;
+            parentTotal = pieBudget.total;
+            parentIndex = this.pieData.indexOf(pieBudget, 0);
+            break;
+          }
+        }
+        console.log(parentPresent)
+        console.log(parentTotal)
+        console.log(parentIndex)
+        // Add to graph
         if (total > 0) {
-          this.pieData.push({mainCategory: result.mainCategory, total: result.total});
-          console.log("PIE DATA UPDATED");
-          console.log(this.pieData);
+          if (parentPresent){
+            // Update current value
+            if (parentTotal < result.total) {
+              this.pieData[parentIndex].total = result.total;
+            }
+          }
+          else if (result.category === result.mainCategory || !parentPresent) {
+            this.pieData.push({mainCategory: result.category, total: result.total});
+          }
           this.pieChartService.sendNewPieDataEvent(this.pieData);
         }
+        // Add to list
         this.budgets.push(result);
         // Close dialogue ref
         addBudgetRef.close();
