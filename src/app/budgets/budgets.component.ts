@@ -160,12 +160,13 @@ export class BudgetsComponent implements OnInit {
             // Update current value
             if (parentTotal < result.total) {
               this.pieData[parentIndex].total = result.total;
+              this.pieChartService.sendNewPieDataEvent(this.pieData);
             }
           }
           else if (result.category === result.mainCategory || !parentPresent) {
             this.pieData.push({mainCategory: result.category, total: result.total});
+            this.pieChartService.sendNewPieDataEvent(this.pieData);
           }
-          this.pieChartService.sendNewPieDataEvent(this.pieData);
         }
         // Add to list
         this.budgets.push(result);
@@ -187,12 +188,36 @@ export class BudgetsComponent implements OnInit {
         var currPieBudget = {mainCategory: currBudget.mainCategory, total: currBudget.total}
         console.log(currPieBudget)
         console.log(this.pieData)
+        // Only delete from graph if no other budgets with same parent present
+        var parentPresent = false;
+        var parentTotal = 0;
+        var parentIndex = null;
+        console.log(result.category)
+        for (let budget of this.budgets) {
+          if (budget.category === currBudget.category) {
+            parentPresent = true;
+            if (parentTotal < budget.total) {
+              parentTotal = budget.total;
+              parentIndex = this.budgets.indexOf(budget, 0);
+            }
+          }
+        }
         for (let dataVal of this.pieData) {
-          if (dataVal.mainCategory === currPieBudget.mainCategory) {
+          if (dataVal.mainCategory === currBudget.category) {
             console.log("Found pie data")
-            const indexPie = this.pieData.indexOf(dataVal, 0);
-            this.pieData.splice(indexPie, 1);
-            this.pieChartService.sendNewPieDataEvent(this.pieData);
+            if (parentPresent) {
+              // const indexPie = this.pieData.indexOf(dataVal, 0);
+              // this.pieData.splice(indexPie, 1);
+              if (dataVal.total !== parentTotal) {
+                dataVal.total = parentTotal;
+                this.pieChartService.sendNewPieDataEvent(this.pieData);
+              }
+            }
+            else {
+              const indexPie = this.pieData.indexOf(dataVal, 0);
+              this.pieData.splice(indexPie, 1);
+              this.pieChartService.sendNewPieDataEvent(this.pieData);
+            }
             break;
           }
         }
