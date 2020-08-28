@@ -139,6 +139,50 @@ export class BudgetsComponent implements OnInit {
           }
         }
         result.total = total;
+
+        var parents = []
+        var bestIndex = 3;
+        for (let budget of this.budgets) {
+          if (budget.category === result.category) {
+            if (budget.category3 !== "") {
+              if (bestIndex == 3) {
+                parents.push(budget);
+              }
+            }
+            else if (budget.category2 !== "" && budget.category3 === "") {
+              if (bestIndex == 3) {
+                parents = [];
+              }
+              if (bestIndex == 2) {
+                parents.push(budget);
+              }
+            }
+            else {
+              if (bestIndex >= 2) {
+                parents = [];
+              }
+              parents.push(budget);
+            }
+          }
+        }
+
+        var newBudgetIndex = 3
+        if (result.mainCategory === result.category2) {
+          newBudgetIndex = 2;
+        }
+        else if (result.mainCategory === result.category) {
+          newBudgetIndex = 1;
+        }
+
+        var sameLevel = false;
+        var sameLevelTotal = 0;
+        if (newBudgetIndex === bestIndex) {
+          sameLevel = true;
+          for (let budget of parents) {
+            sameLevelTotal += budget.total;
+          }
+        }
+
         // If new budget is parent (and not already present) OR parent not on graph yet
         var parentPresent = false;
         var parentTotal = 0;
@@ -159,12 +203,18 @@ export class BudgetsComponent implements OnInit {
         if (total > 0) {
           if (parentPresent){
             // Update current value
-            if (parentTotal < result.total) {
-              this.pieData[parentIndex].total = result.total;
+            if (sameLevel) {
+              this.pieData[parentIndex].total += result.total;
               this.pieChartService.sendNewPieDataEvent(this.pieData);
             }
+            else {
+              if (parentTotal < result.total) {
+                this.pieData[parentIndex].total = result.total;
+                this.pieChartService.sendNewPieDataEvent(this.pieData);
+              }
+            }
           }
-          else if (result.category === result.mainCategory || !parentPresent) {
+          else {
             this.pieData.push({mainCategory: result.category, total: result.total});
             this.pieChartService.sendNewPieDataEvent(this.pieData);
           }

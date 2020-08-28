@@ -137,7 +137,7 @@ export class PieChartComponent implements OnInit {
     .delay(function(d, i) {
       return 1000
     })
-    .text(d => d.data.mainCategory)
+    .text(d => d.data.mainCategory + ", " +  d.data.total)
     .attr("transform", d => "translate(" + labelLocation.centroid(d) + ")")
     .style("text-anchor", "middle")
     .style("font-size", 15)
