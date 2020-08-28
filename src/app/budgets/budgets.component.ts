@@ -9,6 +9,7 @@ import { DeleteBudgetComponent } from './delete-budget/delete-budget.component';
 import { Transaction } from '../shared/transaction';
 import { PieChartService } from '../services/pie-chart.service';
 import { CodegenComponentFactoryResolver } from '@angular/core/src/linker/component_factory_resolver';
+import { basename } from 'path';
 
 @Component({
   selector: 'app-budgets',
@@ -249,19 +250,26 @@ export class BudgetsComponent implements OnInit {
         }
         result.total = total;
 
-        var currPieBudget = {mainCategory: currBudget.mainCategory, total: currBudget.total}
-        for (let dataVal of this.pieData) {
-          if (dataVal.mainCategory === currPieBudget.mainCategory) {
-            console.log("Editing pie data")
-            dataVal.mainCategory = result.mainCategory;
-            dataVal.total = result.total;
-            this.pieChartService.sendNewPieDataEvent(this.pieData);
+        var newParentPresent = false;
+        console.log(result.category)
+        for (let budget of this.budgets) {
+          if (budget.category === result.category) {
+            if (budget.total > 0) {
+              newParentPresent = true;
+            }
             break;
           }
         }
 
+        var newCategory = true;
+        var oldCategory = null;
+
         for (let budget of this.budgets) {
           if (budget._id === currBudget._id) {
+            oldCategory = budget.category;
+            if (budget.category === result.category) {
+              newCategory = false;
+            }
             budget.mainCategory = result.mainCategory;
             budget.category = result.category;
             budget.category2 = result.category2;
@@ -271,6 +279,122 @@ export class BudgetsComponent implements OnInit {
             break;
           }
         }
+
+        // Only delete from graph if no other budgets with same parent present in list
+        var parentPresent = false;
+        var parentTotal = 0;
+        var parentIndex = null;
+        console.log(result.category)
+        for (let budget of this.budgets) {
+          if (budget.category === oldCategory) {
+            parentPresent = true;
+            if (parentTotal < budget.total) {
+              parentTotal = budget.total;
+              parentIndex = this.budgets.indexOf(budget, 0);
+            }
+          }
+        }
+
+        // Simply delete and push if it's a brand new category. Otherwise, handle cases of overwriting
+        if (newCategory) {
+          console.log("New Category")
+          console.log(this.pieData)
+          console.log(oldCategory)
+          var dataChanged = true;
+          // Handle deletion first
+          for (let dataVal of this.pieData) {
+            if (dataVal.mainCategory === oldCategory) {
+              console.log("Found pie data")
+              // Check if old category is still present in list
+              if (parentPresent) {
+                if (dataVal.total !== parentTotal) {
+                  if (parentTotal > 0) {
+                    console.log("A");
+                    dataVal.total = parentTotal;
+                    // this.pieChartService.sendNewPieDataEvent(this.pieData);
+                  }  
+                  else {
+                    console.log("B");
+                    const indexPie = this.pieData.indexOf(dataVal, 0);
+                    this.pieData.splice(indexPie, 1);
+                    // this.pieChartService.sendNewPieDataEvent(this.pieData);
+                  }
+                }
+                else {
+                  console.log("C");
+                  dataChanged = false;
+                }
+              }
+              else { 
+                console.log("D");
+                const indexPie = this.pieData.indexOf(dataVal, 0);
+                this.pieData.splice(indexPie, 1);
+                // this.pieChartService.sendNewPieDataEvent(this.pieData);
+              }
+              break;
+            }
+          }
+          console.log(newParentPresent);
+          console.log(result)
+          console.log(result.total)
+          console.log(this.pieData)
+          // Now handle push
+          if (newParentPresent) { // Parent already was present for new category
+            for (let dataVal of this.pieData) {
+              if (dataVal.mainCategory === result.category) {
+                if (dataVal.total < result.total) { //parentTotal is best for new category, including changed
+                  console.log("E");
+                  dataVal.total = result.total;
+                  console.log(this.pieData)
+                  dataChanged = true;
+                  // this.pieChartService.sendNewPieDataEvent(this.pieData);
+                }
+                break;
+              } 
+            }
+          }
+          else {
+            if (result.total > 0) {
+              console.log("F");
+              dataChanged = true;
+              this.pieData.push({mainCategory: result.category, total: result.total})
+              // this.pieChartService.sendNewPieDataEvent(this.pieData);
+            }
+          }
+          if (dataChanged) {
+            console.log("G");
+            this.pieChartService.sendNewPieDataEvent(this.pieData);
+          }
+        }
+        // If not a new category 
+        else {
+          console.log("Same Category")
+          var notPresent = true;
+          for (let dataVal of this.pieData) {
+            if (dataVal.mainCategory === oldCategory) {
+              notPresent = false;
+              console.log("Found pie data")
+              if (dataVal.total !== parentTotal) {
+                if (parentTotal > 0) {
+                  dataVal.total = parentTotal;
+                  this.pieChartService.sendNewPieDataEvent(this.pieData);
+                }  
+                else {
+                  const indexPie = this.pieData.indexOf(dataVal, 0);
+                  this.pieData.splice(indexPie, 1);
+                  this.pieChartService.sendNewPieDataEvent(this.pieData);
+                }
+              }
+              break;
+            }
+          }
+          if (notPresent) {
+            if (result.total > 0) {
+              this.pieData.push({mainCategory: result.category, total: result.total})
+              this.pieChartService.sendNewPieDataEvent(this.pieData);
+            }
+          }
+        } 
       
         // Close dialogue ref
         editBudgetRef.close();
