@@ -317,12 +317,72 @@ export class BudgetsComponent implements OnInit {
           this.budgets.splice(index, 1);
         }
 
+        var total = 0;
+        for (let transaction of this.transactions) {
+          for (let category of transaction.category) {
+            if (category === result.mainCategory) {
+              total += transaction.amount;
+              break;
+            }
+          }
+        }
+        result.total = total;
+
+        var parents = []
+        var bestIndex = 4;
+        for (let budget of this.budgets) {
+          if (budget.category === result.category) {
+            if (budget.category3 !== "") {
+              if (bestIndex == 4) {
+                bestIndex = 3;
+              }
+              if (bestIndex == 3) {
+                parents.push(budget);
+              }
+            }
+            else if (budget.category2 !== "" && budget.category3 === "" && budget.total > 0) {
+              if (bestIndex >= 3) {
+                parents = [];
+                bestIndex = 2;
+              }
+              if (bestIndex == 2) {
+                parents.push(budget);
+              }
+            }
+            else if (budget.category !== "" && budget.category2 === "" && budget.total > 0) {
+              if (bestIndex >= 2) {
+                parents = [];
+                bestIndex = 1;
+              }
+              parents.push(budget);
+            }
+          }
+        }
+
+        var newBudgetIndex = 3
+        if (result.mainCategory === result.category2) {
+          newBudgetIndex = 2;
+        }
+        else if (result.mainCategory === result.category) {
+          newBudgetIndex = 1;
+        }
+
+        var sameLevel = false;
+        var sameLevelTotal = 0;
+        if (newBudgetIndex === bestIndex) {
+          sameLevel = true;
+        }
+        for (let pbudget of parents) {
+          sameLevelTotal += pbudget.total;
+        }
+
         console.log(this.pieData)
         // Only delete from graph if no other budgets with same parent present
         var parentPresent = false;
         var parentTotal = 0;
         var parentIndex = null;
         console.log(result.category)
+        console.log("Budgets: ", this.budgets)
         for (let budget of this.budgets) {
           if (budget.category === currBudget.category) {
             parentPresent = true;
@@ -336,10 +396,56 @@ export class BudgetsComponent implements OnInit {
           if (dataVal.mainCategory === currBudget.category) {
             console.log("Found pie data")
             if (parentPresent) {
-              // const indexPie = this.pieData.indexOf(dataVal, 0);
-              // this.pieData.splice(indexPie, 1);
-              if (dataVal.total !== parentTotal) {
-                dataVal.total = parentTotal;
+              console.log("PARENT PRESENT")
+              if (sameLevel) {
+                console.log("SAME LEVEL");
+                console.log(bestIndex)
+                console.log(dataVal, result.total)
+                // dataVal.total -= result.total;
+                dataVal.total -= result.total //Math.ceil(num * 100) / 100; 
+                var strTotal = dataVal.total.toString();
+                var containsDecimal = false;
+                for (let num of strTotal) {
+                  if (num === ".") {
+                    containsDecimal = true;
+                    break;
+                  }
+                }
+                var count = 0; 
+                if (containsDecimal) {
+                  while (strTotal[count] !== ".") {
+                    count += 1;
+                  }
+                  count += 3;
+                  dataVal.total = Number(strTotal.substring(0, count));
+                }
+                if (dataVal.total === 0) {
+                  const indexPie = this.pieData.indexOf(dataVal, 0);
+                  this.pieData.splice(indexPie, 1);
+                  this.pieChartService.sendNewPieDataEvent(this.pieData);
+                }
+                else {
+                  this.pieChartService.sendNewPieDataEvent(this.pieData);
+                }
+              }
+              else {
+                // if (dataVal.total !== parentTotal) {
+                //   dataVal.total = parentTotal;
+                //   this.pieChartService.sendNewPieDataEvent(this.pieData);
+                // }
+                if (dataVal.total !== sameLevelTotal) {
+                  console.log(parents)
+                  console.log(bestIndex, newBudgetIndex);
+                  if (sameLevelTotal > 0) {
+                    console.log("A")
+                    dataVal.total = sameLevelTotal;
+                  }
+                  else {
+                    console.log("B")
+                    const indexPie = this.pieData.indexOf(dataVal, 0);
+                    this.pieData.splice(indexPie, 1);
+                  }
+                }
                 this.pieChartService.sendNewPieDataEvent(this.pieData);
               }
             }
@@ -351,12 +457,6 @@ export class BudgetsComponent implements OnInit {
             break;
           }
         }
-        // const indexPie = this.pieData.indexOf(currPieBudget, 0);
-        // if (indexPie > -1) {
-        //   console.log("Found pie data")
-        //   this.pieData.splice(indexPie, 1);
-        //   this.pieChartService.sendNewPieDataEvent(this.pieData);
-        // }
         // Close dialogue ref
         deleteBudgetRef.close();
       });
