@@ -92,6 +92,55 @@ export class BudgetsComponent implements OnInit {
           }
         }
         budget.total = total;
+
+        var parents = []
+        var bestIndex = 3;
+        for (let pieBudget of this.pieData) {
+          console.log(pieBudget)
+          if (pieBudget.category === budget.category) {
+            if (pieBudget.category3 !== "") {
+              if (bestIndex == 3) {
+                parents.push(pieBudget);
+              }
+            }
+            else if (pieBudget.category2 !== "" && pieBudget.category3 === "" && pieBudget.total > 0) {
+              if (bestIndex == 3) {
+                parents = [];
+                bestIndex = 2;
+              }
+              if (bestIndex == 2) {
+                parents.push(pieBudget);
+              }
+            }
+            else if (budget.category !== "" && budget.category2 === "" && budget.total > 0) {
+              if (bestIndex >= 2) {
+                parents = [];
+                bestIndex = 1;
+              }
+              parents.push(pieBudget);
+            }
+          }
+        }
+
+        var newBudgetIndex = 3
+        if (budget.mainCategory === budget.category2) {
+          newBudgetIndex = 2;
+        }
+        else if (budget.mainCategory === budget.category) {
+          newBudgetIndex = 1;
+        }
+
+        var sameLevel = false;
+        var sameLevelTotal = 0;
+        console.log(bestIndex, newBudgetIndex)
+        if (newBudgetIndex === bestIndex) {
+          sameLevel = true;
+          for (let pbudget of parents) {
+            sameLevelTotal += pbudget.total;
+          }
+        }
+
+
         // If (new budget is parent OR parent not on graph yet) OR parent is present but lesser value
         var parentPresent = false;
         var parentTotal = 0;
@@ -104,19 +153,45 @@ export class BudgetsComponent implements OnInit {
             break;
           }
         }
-        // Add to graph
+
         if (total > 0) {
           if (parentPresent){
             // Update current value
-            if (parentTotal < budget.total) {
-              this.pieData[parentIndex].total = budget.total;
+            if (sameLevel) {
+              console.log("SAME LEVEL");
+              this.pieData[parentIndex].total += budget.total;
+              this.pieChartService.sendNewPieDataEvent(this.pieData);
+            }
+            else {
+              if (parentTotal < budget.total) {
+                this.pieData[parentIndex].total = budget.total;
+                this.pieChartService.sendNewPieDataEvent(this.pieData);
+              }
             }
           }
-          else if (budget.category === budget.mainCategory || !parentPresent) {
-            this.pieData.push({mainCategory: budget.category, total: budget.total});
+          else {
+            this.pieData.push({mainCategory: budget.category, category: budget.category, 
+              category2: budget.category2, category3: budget.category3, total: budget.total});
+            this.pieChartService.sendNewPieDataEvent(this.pieData);
           }
-          this.pieChartService.sendNewPieDataEvent(this.pieData);
         }
+
+  
+
+
+        // // Add to graph
+        // if (total > 0) {
+        //   if (parentPresent){
+        //     // Update current value
+        //     if (parentTotal < budget.total) {
+        //       this.pieData[parentIndex].total = budget.total;
+        //     }
+        //   }
+        //   else if (budget.category === budget.mainCategory || !parentPresent) {
+        //     this.pieData.push({mainCategory: budget.category, total: budget.total});
+        //   }
+        //   this.pieChartService.sendNewPieDataEvent(this.pieData);
+        // }
       }
       console.log(this.budgets)
       this.isLoading = false;
@@ -149,17 +224,19 @@ export class BudgetsComponent implements OnInit {
                 parents.push(budget);
               }
             }
-            else if (budget.category2 !== "" && budget.category3 === "") {
+            else if (budget.category2 !== "" && budget.category3 === "" && budget.total > 0) {
               if (bestIndex == 3) {
                 parents = [];
+                bestIndex = 2;
               }
               if (bestIndex == 2) {
                 parents.push(budget);
               }
             }
-            else {
+            else if (budget.category !== "" && budget.category2 === "" && budget.total > 0) {
               if (bestIndex >= 2) {
                 parents = [];
+                bestIndex = 1;
               }
               parents.push(budget);
             }
@@ -178,8 +255,8 @@ export class BudgetsComponent implements OnInit {
         var sameLevelTotal = 0;
         if (newBudgetIndex === bestIndex) {
           sameLevel = true;
-          for (let budget of parents) {
-            sameLevelTotal += budget.total;
+          for (let pbudget of parents) {
+            sameLevelTotal += pbudget.total;
           }
         }
 
@@ -204,6 +281,8 @@ export class BudgetsComponent implements OnInit {
           if (parentPresent){
             // Update current value
             if (sameLevel) {
+              console.log("SAME LEVEL");
+              console.log(bestIndex)
               this.pieData[parentIndex].total += result.total;
               this.pieChartService.sendNewPieDataEvent(this.pieData);
             }
@@ -215,7 +294,8 @@ export class BudgetsComponent implements OnInit {
             }
           }
           else {
-            this.pieData.push({mainCategory: result.category, total: result.total});
+            this.pieData.push({mainCategory: result.category, category: result.category, 
+              category2: result.category2, category3: result.category3, total: result.total});
             this.pieChartService.sendNewPieDataEvent(this.pieData);
           }
         }
@@ -236,8 +316,7 @@ export class BudgetsComponent implements OnInit {
         if (index > -1) {
           this.budgets.splice(index, 1);
         }
-        var currPieBudget = {mainCategory: currBudget.mainCategory, total: currBudget.total}
-        console.log(currPieBudget)
+
         console.log(this.pieData)
         // Only delete from graph if no other budgets with same parent present
         var parentPresent = false;
@@ -407,7 +486,8 @@ export class BudgetsComponent implements OnInit {
             if (result.total > 0) {
               console.log("F");
               dataChanged = true;
-              this.pieData.push({mainCategory: result.category, total: result.total})
+              this.pieData.push({mainCategory: result.category, category: result.category, 
+                category2: result.category2, category3: result.category3, total: result.total})
               // this.pieChartService.sendNewPieDataEvent(this.pieData);
             }
           }
@@ -440,7 +520,8 @@ export class BudgetsComponent implements OnInit {
           }
           if (notPresent) {
             if (result.total > 0) {
-              this.pieData.push({mainCategory: result.category, total: result.total})
+              this.pieData.push({mainCategory: result.category, category: result.category, 
+                category2: result.category2, category3: result.category3, total: result.total})
               this.pieChartService.sendNewPieDataEvent(this.pieData);
             }
           }
