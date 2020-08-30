@@ -6,7 +6,17 @@
   <div fxLayout.lt-md="column">
     <!-- <div fxFlex='1'></div> -->
     <div fxFlex='50' class="mainPanels">
-      <p>Graph goes here (HOW MUCH I'VE SPENT) </p>
+      <h2>Trends</h2>
+      <h3 *ngIf="(totalBudgetedExpenses / totalBudget) >= 1" style="color: red;">
+        <span style="color: black;">Budgeted Expenses: </span>{{totalBudgetedExpenses}} / {{totalBudget}}
+      </h3>
+      <h3 *ngIf="!((totalBudgetedExpenses / totalBudget) >= 1) && (totalBudgetedExpenses / totalBudget) >= 0.75" style="color: orange;">
+        <span style="color: black;">Budgeted Expenses: </span>{{totalBudgetedExpenses}} / {{totalBudget}}
+      </h3>
+      <h3 *ngIf="!((totalBudgetedExpenses / totalBudget) >= 0.75) && (totalBudgetedExpenses / totalBudget) >= 0" style="color: green;">
+        <span style="color: black;">Budgeted Expenses: </span>{{totalBudgetedExpenses}} / {{totalBudget}}
+      </h3>
+      <!-- <h3>Budgeted Expenses: {{totalBudgetedExpenses}} / {{totalBudget}}</h3> -->
       <div>
         <app-pie-chart [data]="pieData"></app-pie-chart>
         <!-- <div class="visBox"> 
@@ -16,7 +26,7 @@
     </div>
     <!-- <div fxFlex='1'></div> -->
     <div fxFlex='50' class="mainPanels">
-      <p>Budgets go here (NO CHILD = TRANSACTIONS, ELSE = BUDGETS)</p>
+      <h2>Budgets</h2>
       <div class="example-action-buttons">
         <div fxFlex='70'>
           <button mat-raised-button color="primary" (click)="onAddBudgetClicked();">Add New Budget</button>

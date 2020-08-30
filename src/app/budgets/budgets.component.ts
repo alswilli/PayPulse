@@ -28,6 +28,9 @@ export class BudgetsComponent implements OnInit {
   days = 30;
   transactions: any[];
   pieData: any[];
+  totalBudget = 0;
+  totalBudgetedExpenses = 0;
+  budgetSets = new Object();
 
   constructor(public dialog: MatDialog,
     private accountService: AccountService,
@@ -160,11 +163,13 @@ export class BudgetsComponent implements OnInit {
             if (sameLevel) {
               console.log("SAME LEVEL");
               this.pieData[parentIndex].total += budget.total;
+              // this.pieData[parentIndex].amount += Number(budget.amount);
               this.pieChartService.sendNewPieDataEvent(this.pieData);
             }
             else {
               if (parentTotal < budget.total) {
                 this.pieData[parentIndex].total = budget.total;
+                // this.pieData[parentIndex].total = Number(budget.amount);
                 this.pieChartService.sendNewPieDataEvent(this.pieData);
               }
             }
@@ -172,6 +177,7 @@ export class BudgetsComponent implements OnInit {
           else {
             this.pieData.push({mainCategory: budget.category, category: budget.category, 
               category2: budget.category2, category3: budget.category3, total: budget.total});
+              // amount: Number(budget.amount)});
             this.pieChartService.sendNewPieDataEvent(this.pieData);
           }
         }
@@ -196,6 +202,51 @@ export class BudgetsComponent implements OnInit {
       console.log(this.budgets)
       this.isLoading = false;
       // this.categoriesLoading = false;
+      for (let dataVal of this.pieData) {
+        this.totalBudgetedExpenses += dataVal.total;
+        // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
+      }
+
+      this.budgetSets = new Object();
+      for (let budget of this.budgets) {
+        var currIndex = 4;
+        if (budget.category3 !== "") {
+          if (currIndex == 4) {
+            currIndex = 3;
+          }
+        }
+        else if (budget.category2 !== "" && budget.category3 === "") {
+          if (currIndex >= 3) {
+            currIndex = 2;
+          }
+        }
+        else if (budget.category !== "" && budget.category2 === "") {
+          if (currIndex >= 2) {
+            currIndex = 1;
+          }
+        }
+        // Now figure out what to do with it
+        if (budget.category in this.budgetSets) {
+          if (currIndex === this.budgetSets[budget.category][1]) {
+            this.budgetSets[budget.category][0] += Number(budget.amount);
+          }
+          else if (currIndex < this.budgetSets[budget.category][1]) {
+            this.budgetSets[budget.category] = [Number(budget.amount), currIndex];
+          }
+        }
+        else {
+          this.budgetSets[budget.category] = [Number(budget.amount), currIndex];
+        }
+      }
+
+      // var i = 0;
+      // while (i < budgetSets.keys().length) {
+
+      // }
+      for (let key in this.budgetSets) {
+        this.totalBudget += this.budgetSets[key][0];
+      }
+      console.log(this.budgetSets)
     });
   }
 
