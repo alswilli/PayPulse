@@ -26,7 +26,8 @@ export class BudgetsComponent implements OnInit {
   isLoading = true;
   userAccountsDetails: any;
   currentAccountId: string;
-  days = 30;
+  days: number;
+  subdays: number;
   transactions: any[];
   pieData: any[];
   totalBudget = 0;
@@ -37,18 +38,32 @@ export class BudgetsComponent implements OnInit {
   currentFromMonth: string;
   currentToMonth: string;
   dates = {
-    "01":"January",
-    "02":"February",
-    "03":"March",
-    "04":"April",
-    "05":"May",
-    "06":"June",
-    "07":"July",
-    "08":"August",
-    "09":"September",
-    "10":"October",
-    "11":"November",
-    "12":"December",
+    "01":["January", 31],
+    "02":["February", 28],
+    "03":["March", 31],
+    "04":["April", 30],
+    "05":["May", 31],
+    "06":["June", 30],
+    "07":["July", 31],
+    "08":["August", 31],
+    "09":["September", 30],
+    "10":["October", 31],
+    "11":["November", 30],
+    "12":["December", 31]
+  }
+  datesAlt = {
+    "January":["01", 31],
+    "February":["02", 28],
+    "March":["03", 31],
+    "April":["04", 30],
+    "May":["05", 31],
+    "June":["06", 30],
+    "July":["07", 31],
+    "August":["08", 31],
+    "September":["09", 30],
+    "October":["10", 31],
+    "November":["11", 30],
+    "December":["12", 31]
   }
 
   constructor(public dialog: MatDialog,
@@ -94,14 +109,195 @@ export class BudgetsComponent implements OnInit {
       mergeMap(budgets => {
         console.log("made it");
         this.budgets = budgets;
-        return this.accountService.getBudgetTransactions(this.currentAccountId, this.days);
+        var today = new Date();
+
+        this.days = today.getDate()-1;
+        this.subdays = 0;
+        // var currDay = today.getDate();
+        // var currMonth = today.getMonth() + 1;
+        // var currYear = today.getFullYear();
+        // currDay = 1;
+
+        // var dd = String(currDay).padStart(2, '0');
+        // var mm = String(currMonth).padStart(2, '0'); 
+        // var yyyy = String(currYear);
+        // this.days = yyyy + '-' + mm + '-' + dd;
+        console.log("Days: ", this.days);
+        return this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays);
       })
     )
     .subscribe(transactions => {
       this.transactions = transactions;
-      console.log(this.transactions);
+      this.onGetTransactions();
+      
+      var today = new Date();
+      var currMonth = today.getMonth() + 1;
+      var currYear = today.getFullYear();
+      this.currentFromMonth = this.dates[String(currMonth).padStart(2, '0')][0] + " " + String(currYear);
+      this.currentToMonth = "Present"
+
+      this.toMonths = [this.currentToMonth];
+      this.fromMonths.push(this.currentFromMonth);
+
+      var i = 0;
+      while (i < 23) {
+        currMonth -= 1;
+        if (currMonth === 0) {
+          currMonth = 12;
+        }
+        if (currMonth === 12) {
+          currYear -= 1;
+        }
+        this.fromMonths.push(this.dates[String(currMonth).padStart(2, '0')][0] + " " + String(currYear));
+        i += 1
+      }
+
+      this.matSelectFrom.value = this.currentFromMonth;
+      this.matSelectTo.value = this.currentToMonth;
+
+      // FROM SIDE
+      this.matSelectFrom.selectionChange.subscribe((s: MatSelectChange) => {   
+        console.log(s); 
+        var i = 0;
+        while (this.fromMonths[i] !== s.value) {
+          i += 1
+        } 
+        console.log(this.fromMonths.slice(0, i))
+        var j = 0;
+        this.toMonths = ["Present"];
+        while (j < i) {
+          this.toMonths.push(this.fromMonths[j]);
+          j += 1;
+        }
+        var monthPresent = false;
+        for (let month of this.toMonths) {
+          if (month === this.currentToMonth) {
+            monthPresent = true;
+            break;
+          }
+        }
+        if (!monthPresent) {
+          this.currentToMonth = "Present";
+          this.matSelectTo.value = this.currentToMonth;
+          this.subdays = 0;
+        }
+        this.currentFromMonth = s.value;
+        
+        // this.fromMonths = this.fromMonths.slice(i, this.fromMonths.length);
+
+        this.days = 0;
+        var i = 0;
+        while (this.toMonths[i] !== this.currentToMonth) {
+          i += 1
+        }
+        if (this.currentToMonth === "Present") {
+          var today = new Date();
+          this.days += today.getDate()-1;
+        }
+        i += 1
+        console.log(this.days)
+
+        var today = new Date();
+        var currMonth = today.getMonth() + 1;
+        while (i < this.toMonths.length) {
+          if (this.dates[String(currMonth).padStart(2, '0')][0] !== this.toMonths[i].split(" ")[0]) {
+            this.days += this.datesAlt[this.toMonths[i].split(" ")[0]][1];
+          }
+          // this.days += this.datesAlt[this.toMonths[i].split(" ")[0]][1];
+          console.log(this.days)
+          i += 1
+        }
+        if (this.dates[String(currMonth).padStart(2, '0')][0] !== this.currentFromMonth.split(" ")[0]) {
+          console.log("Added current fromMonth (not real)")
+          this.days += this.datesAlt[this.currentFromMonth.split(" ")[0]][1];
+        }
+
+        console.log("NUM DAYS: ", this.days)
+
+        this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays)
+          .subscribe(transactions => {
+            this.transactions = transactions;
+            this.onGetTransactions();
+        });
+      });
+      // TO SIDE
+      this.matSelectTo.selectionChange.subscribe((s: MatSelectChange) => {   
+        console.log(s); 
+        this.currentToMonth = s.value; 
+
+        this.days = 0;
+        this.subdays = 0;
+        var today = new Date();
+        var currMonth = today.getMonth() + 1;
+        var i = 0;
+        while (this.toMonths[i] !== this.currentToMonth) {
+          if (this.toMonths[i] === "Present") {
+            var today = new Date();
+            this.subdays += today.getDate()-1;
+          }
+          else {
+            if (this.dates[String(currMonth).padStart(2, '0')][0] !== this.toMonths[i].split(" ")[0]) {
+              this.subdays += this.datesAlt[this.toMonths[i].split(" ")[0]][1];
+            }
+          }
+          i += 1
+        }
+        if (this.currentToMonth === "Present") {
+          var today = new Date();
+          this.days += today.getDate()-1;
+        }
+        else if (this.dates[String(currMonth).padStart(2, '0')][0] !== this.currentToMonth.split(" ")[0]) {
+          this.subdays += this.datesAlt[this.currentToMonth.split(" ")[0]][1];
+        }
+        i += 1
+        console.log(this.days)
+
+        while (i < this.toMonths.length) {
+          if (this.dates[String(currMonth).padStart(2, '0')][0] !== this.toMonths[i].split(" ")[0]) {
+            this.days += this.datesAlt[this.toMonths[i].split(" ")[0]][1];
+          }
+          // this.days += this.datesAlt[this.toMonths[i].split(" ")[0]][1];
+          console.log(this.days)
+          i += 1
+        }
+        if (this.dates[String(currMonth).padStart(2, '0')][0] !== this.currentFromMonth.split(" ")[0]) {
+          console.log("Added current fromMonth (not real)")
+          this.days += this.datesAlt[this.currentFromMonth.split(" ")[0]][1];
+        }
+
+        console.log("NUM DAYS: ", this.days)
+
+        this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays)
+          .subscribe(transactions => {
+            this.transactions = transactions;
+            this.onGetTransactions();
+        });
+      });
+    });
+  }
+
+  // ngAfterViewInit() {
+  //   this.matSelectTo.selectionChange.subscribe((s: MatSelectChange) => {   
+  //     console.log(s);  
+  //     // console.log("yup")
+  //     // this.selectionList.deselectAll();
+  //     // console.log(s);
+  //     // s.option.selected = true;
+  //   });
+  //   this.matSelectFrom.selectionChange.subscribe((s: MatSelectChange) => {   
+  //     console.log(s);  
+  //     // console.log("yup")
+  //     // this.selectionList.deselectAll();
+  //     // console.log(s);
+  //     // s.option.selected = true;
+  //   });
+  // }
+
+  onGetTransactions() {
+    console.log(this.transactions);
       this.pieData = [];
 
+      var dataEmpty = true;
       for (let budget of this.budgets) {
         var mainCategory = budget.mainCategory;
         var total = 0;
@@ -177,6 +373,7 @@ export class BudgetsComponent implements OnInit {
         }
 
         if (total > 0) {
+          dataEmpty = false;
           if (parentPresent){
             // Update current value
             if (sameLevel) {
@@ -200,27 +397,15 @@ export class BudgetsComponent implements OnInit {
             this.pieChartService.sendNewPieDataEvent(this.pieData);
           }
         }
+      }
 
-  
-
-
-        // // Add to graph
-        // if (total > 0) {
-        //   if (parentPresent){
-        //     // Update current value
-        //     if (parentTotal < budget.total) {
-        //       this.pieData[parentIndex].total = budget.total;
-        //     }
-        //   }
-        //   else if (budget.category === budget.mainCategory || !parentPresent) {
-        //     this.pieData.push({mainCategory: budget.category, total: budget.total});
-        //   }
-        //   this.pieChartService.sendNewPieDataEvent(this.pieData);
-        // }
+      if (dataEmpty) {
+        this.pieChartService.sendNewPieDataEvent(this.pieData);
       }
       console.log(this.budgets)
       this.isLoading = false;
       // this.categoriesLoading = false;
+      this.totalBudgetedExpenses = 0
       for (let dataVal of this.pieData) {
         this.totalBudgetedExpenses += dataVal.total;
         // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
@@ -262,91 +447,12 @@ export class BudgetsComponent implements OnInit {
       // while (i < budgetSets.keys().length) {
 
       // }
+      this.totalBudget = 0;
       for (let key in this.budgetSets) {
         this.totalBudget += this.budgetSets[key][0];
       }
       console.log(this.budgetSets)
-      
-      var today = new Date();
-      var currMonth = today.getMonth() + 1;
-      var currYear = today.getFullYear();
-      this.currentFromMonth = this.dates[String(currMonth).padStart(2, '0')] + " " + String(currYear);
-      this.currentToMonth = "Present"
-
-      this.toMonths = [this.currentToMonth];
-      this.fromMonths.push(this.currentFromMonth);
-
-      var i = 0;
-      while (i < 23) {
-        currMonth -= 1;
-        if (currMonth === 0) {
-          currMonth = 12;
-        }
-        if (currMonth === 12) {
-          currYear -= 1;
-        }
-        this.fromMonths.push(this.dates[String(currMonth).padStart(2, '0')] + " " + String(currYear));
-        i += 1
-      }
-
-      this.matSelectFrom.value = this.currentFromMonth;
-      this.matSelectTo.value = this.currentToMonth;
-      this.matSelectFrom.selectionChange.subscribe((s: MatSelectChange) => {   
-        console.log(s); 
-        var i = 0;
-        while (this.fromMonths[i] !== s.value) {
-          i += 1
-        } 
-        console.log(this.fromMonths.slice(0, i))
-        var j = 0;
-        this.toMonths = ["Present"];
-        while (j < i) {
-          this.toMonths.push(this.fromMonths[j]);
-          j += 1;
-        }
-        var monthPresent = false;
-        for (let month of this.toMonths) {
-          if (month === this.currentToMonth) {
-            monthPresent = true;
-            break;
-          }
-        }
-        if (!monthPresent) {
-          this.currentToMonth = "Present";
-          this.matSelectTo.value = this.currentToMonth;
-        }
-        // if (!(this.currentToMonth in this.toMonths)) {
-        //   this.currentToMonth = "Present";
-        //   this.matSelectTo.value = this.currentToMonth;
-        // }
-
-        this.currentFromMonth = s.value;
-        
-        // this.fromMonths = this.fromMonths.slice(i, this.fromMonths.length);
-      });
-      this.matSelectTo.selectionChange.subscribe((s: MatSelectChange) => {   
-        console.log(s); 
-        this.currentToMonth = s.value; 
-      });
-    });
   }
-
-  // ngAfterViewInit() {
-  //   this.matSelectTo.selectionChange.subscribe((s: MatSelectChange) => {   
-  //     console.log(s);  
-  //     // console.log("yup")
-  //     // this.selectionList.deselectAll();
-  //     // console.log(s);
-  //     // s.option.selected = true;
-  //   });
-  //   this.matSelectFrom.selectionChange.subscribe((s: MatSelectChange) => {   
-  //     console.log(s);  
-  //     // console.log("yup")
-  //     // this.selectionList.deselectAll();
-  //     // console.log(s);
-  //     // s.option.selected = true;
-  //   });
-  // }
 
   onAddBudgetClicked() {
     const addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, edit: false}});

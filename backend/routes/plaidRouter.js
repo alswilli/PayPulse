@@ -186,8 +186,22 @@ plaidRouter.route("/accounts/transactions/:accountId")
   const N = 3;
   // Variables for Plaid API query
   const now = moment();
-  const today = now.format("YYYY-MM-DD");
-  const thirtyDaysAgo = now.subtract(30, "days").format("YYYY-MM-DD"); // Change this if you want more transactions
+  var today = "";
+  var numDaysAgo = "";
+  if (req.query.days != null) {
+    today = now.subtract(req.query.subdays, "days").format("YYYY-MM-DD");
+    numDaysAgo = now.subtract(req.query.days, "days").format("YYYY-MM-DD");
+  }
+  else {
+    today = now.format("YYYY-MM-DD");
+    numDaysAgo = now.subtract(30, "days").format("YYYY-MM-DD"); // Change this if you want more transactions
+  }
+  // const thirtyDaysAgo = now.subtract(30, "days").format("YYYY-MM-DD"); // Change this if you want more transactions
+  // console.log("30 DAY AGO: ", thirtyDaysAgo);
+  console.log("START: ", numDaysAgo);
+  console.log("END: ", today);
+  console.log(req.query.days)
+  console.log(req.query.subdays)
   
   // Account.find({ accountId: req.body.accountId })
   Account.findById(req.params.accountId)
@@ -197,9 +211,9 @@ plaidRouter.route("/accounts/transactions/:accountId")
       const institutionName = account.institutionName;
       var finalTransactions = []
       console.log(ACCESS_TOKEN);
-      console.log(thirtyDaysAgo);
+      // console.log(thirtyDaysAgo);
       console.log(today);
-      client.getTransactions(ACCESS_TOKEN, thirtyDaysAgo, today, function(error, response) {
+      client.getTransactions(ACCESS_TOKEN, numDaysAgo, today, function(error, response) {
         if (error != null) {
           // prettyPrintResponse(error);
           return res.json({

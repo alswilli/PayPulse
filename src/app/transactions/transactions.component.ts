@@ -115,6 +115,7 @@ export class TransactionsComponent implements OnInit {
     // Now get the currentAccount transactions
     this.accountService.getTransactions(this.currentAccountId, this.postsPerPage, this.currentPage, this.subAccount, this.subAccountId)
     .subscribe(res => {
+      console.log(res);
       this.isLoading = false;
       this.transactions = res.transactions;
       this.totalPosts = res.maxTransactions;
