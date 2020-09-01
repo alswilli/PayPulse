@@ -355,6 +355,48 @@ export class BudgetsComponent implements OnInit {
         }
         // Add to list
         this.budgets.push(result);
+
+        var currIndex = 4;
+        if (result.category3 !== "") {
+          if (currIndex == 4) {
+            currIndex = 3;
+          }
+        }
+        else if (result.category2 !== "" && result.category3 === "") {
+          if (currIndex >= 3) {
+            currIndex = 2;
+          }
+        }
+        else if (result.category !== "" && result.category2 === "") {
+          if (currIndex >= 2) {
+            currIndex = 1;
+          }
+        }
+        // Now figure out what to do with it
+        if (result.category in this.budgetSets) {
+          if (currIndex === this.budgetSets[result.category][1]) {
+            this.budgetSets[result.category][0] += Number(result.amount);
+          }
+          else if (currIndex < this.budgetSets[result.category][1]) {
+            this.budgetSets[result.category] = [Number(result.amount), currIndex];
+          }
+        }
+        else {
+          this.budgetSets[result.category] = [Number(result.amount), currIndex];
+        }
+
+        this.totalBudget = 0;
+        for (let key in this.budgetSets) {
+          this.totalBudget += this.budgetSets[key][0];
+        }
+        console.log(this.budgetSets)
+
+        this.totalBudgetedExpenses = 0;
+        for (let dataVal of this.pieData) {
+          this.totalBudgetedExpenses += dataVal.total;
+          // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
+        }
+
         // Close dialogue ref
         addBudgetRef.close();
       });
@@ -423,11 +465,13 @@ export class BudgetsComponent implements OnInit {
 
         var sameLevel = false;
         var sameLevelTotal = 0;
+        var sameLevelAmount = 0;
         if (newBudgetIndex === bestIndex) {
           sameLevel = true;
         }
         for (let pbudget of parents) {
           sameLevelTotal += pbudget.total;
+          sameLevelAmount += Number(pbudget.amount);
         }
 
         console.log(this.pieData)
@@ -513,6 +557,50 @@ export class BudgetsComponent implements OnInit {
             break;
           }
         }
+
+        var currIndex = 4;
+        if (result.category3 !== "") {
+          if (currIndex == 4) {
+            currIndex = 3;
+          }
+        }
+        else if (result.category2 !== "" && result.category3 === "") {
+          if (currIndex >= 3) {
+            currIndex = 2;
+          }
+        }
+        else if (result.category !== "" && result.category2 === "") {
+          if (currIndex >= 2) {
+            currIndex = 1;
+          }
+        }
+        // Now figure out what to do with it
+        if (currIndex === this.budgetSets[result.category][1]) {
+          if (this.budgetSets[result.category][0] === Number(result.amount)) {
+            if (parents.length > 0) {
+              this.budgetSets[result.category] = [sameLevelAmount, bestIndex];
+            } 
+            else {
+              delete this.budgetSets[result.category];
+            }
+          }
+          else {
+            this.budgetSets[result.category][0] -= Number(result.amount)
+          }
+        }
+
+        this.totalBudget = 0;
+        for (let key in this.budgetSets) {
+          this.totalBudget += this.budgetSets[key][0];
+        }
+        console.log(this.budgetSets)
+
+        this.totalBudgetedExpenses = 0;
+        for (let dataVal of this.pieData) {
+          this.totalBudgetedExpenses += dataVal.total;
+          // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
+        }
+
         // Close dialogue ref
         deleteBudgetRef.close();
       });
@@ -548,13 +636,19 @@ export class BudgetsComponent implements OnInit {
 
         var newCategory = true;
         var oldCategory = null;
+        var oldCategory2 = null;
+        var oldCategory3 = null;
         var oldTotal = 0;
+        var oldAmount = 0;
         // var oldBudget = null;
 
         for (let budget of this.budgets) {
           if (budget._id === currBudget._id) {
             oldCategory = budget.category;
+            oldCategory2 = budget.category2;
+            oldCategory3 = budget.category3;
             oldTotal = budget.total;
+            oldAmount = Number(budget.amount);
             // oldBudget = budget;
             if (budget.category === result.category) {
               newCategory = false;
@@ -611,11 +705,13 @@ export class BudgetsComponent implements OnInit {
 
         var sameLevel = false;
         var sameLevelTotal = 0;
+        var sameLevelAmount = 0;
         if (newBudgetIndex === bestIndex) {
           sameLevel = true;
         }
         for (let pbudget of parents) {
           sameLevelTotal += pbudget.total;
+          sameLevelAmount += Number(pbudget.amount);
         }
 
         // Old Category
@@ -664,8 +760,10 @@ export class BudgetsComponent implements OnInit {
         //   oldsameLevel = true;
         // }
         var oldsameLevelTotal = 0;
+        var oldsameLevelAmount = 0;
         for (let pbudget of oldparents) {
           oldsameLevelTotal += pbudget.total;
+          oldsameLevelAmount += Number(pbudget.amount);
         }
 
         // Only delete from graph if no other budgets with same parent present in list
@@ -815,7 +913,114 @@ export class BudgetsComponent implements OnInit {
               this.pieChartService.sendNewPieDataEvent(this.pieData);
             }
           }
-        } 
+        }
+        
+        var currIndex = 4;
+        if (result.category3 !== "") {
+          if (currIndex == 4) {
+            currIndex = 3;
+          }
+        }
+        else if (result.category2 !== "" && result.category3 === "") {
+          if (currIndex >= 3) {
+            currIndex = 2;
+          }
+        }
+        else if (result.category !== "" && result.category2 === "") {
+          if (currIndex >= 2) {
+            currIndex = 1;
+          }
+        }
+
+        var oldcurrIndex = 4;
+        if (oldCategory3 !== "") {
+          if (oldcurrIndex == 4) {
+            oldcurrIndex = 3;
+          }
+        }
+        else if (oldCategory2 !== "" && oldCategory3 === "") {
+          if (oldcurrIndex >= 3) {
+            oldcurrIndex = 2;
+          }
+        }
+        else if (oldCategory !== "" && oldCategory2 === "") {
+          if (oldcurrIndex >= 2) {
+            oldcurrIndex = 1;
+          }
+        }
+
+        if (result.category !== oldCategory) { 
+          // Figure out delete
+          if (oldcurrIndex === this.budgetSets[oldCategory][1]) {
+            if (this.budgetSets[oldCategory][0] === Number(oldAmount)) {
+              if (oldparents.length > 0) {
+                this.budgetSets[oldCategory] = [oldsameLevelAmount, oldbestIndex];
+              } 
+              else {
+                delete this.budgetSets[oldCategory];
+              } 
+            }
+            else {
+              this.budgetSets[oldCategory][0] -= Number(oldAmount)
+            }
+          }
+          // Figure out push
+          if (result.category in this.budgetSets) {
+            if (currIndex === this.budgetSets[result.category][1]) {
+              this.budgetSets[result.category][0] += Number(result.amount);
+            }
+            else if (currIndex < this.budgetSets[result.category][1]) {
+              this.budgetSets[result.category] = [Number(result.amount), currIndex];
+            }
+          }
+          else {
+            this.budgetSets[result.category] = [Number(result.amount), currIndex];
+          }
+        }
+        else {
+          this.budgetSets[oldCategory] = [Number(oldsameLevelAmount), oldbestIndex];
+          // // Only changed amount
+          // if (oldcurrIndex === currIndex) {
+          //   if (oldcurrIndex === this.budgetSets[result.category][1]) {
+          //     this.budgetSets[result.category][0] += Number(result.amount) - Number(oldAmount);
+          //   }
+          // }
+          // else {
+          //   // Delete
+          //   if (oldcurrIndex === this.budgetSets[result.category][1]) {
+          //     // this.budgetSets[oldCategory][0] -= Number(oldAmount);
+          //     if (this.budgetSets[oldCategory][0] === Number(oldAmount)) {
+          //       if (oldparents.length > 0) {
+          //         this.budgetSets[oldCategory] = [Number(oldsameLevelAmount), oldbestIndex];
+          //       }
+          //     }
+          //     else {
+          //         delete this.budgetSets[oldCategory];
+          //     }
+          //   }
+          //   // Push
+          //   if (result in this.budgetSets) {
+          //     if (currIndex === this.budgetSets[result.category][1]) {
+          //       this.budgetSets[result.category][0] += Number(result.amount)
+          //     }
+          //   }
+          //   else {
+          //     this.budgetSets[result.category] = [Number(result.amount), currIndex];
+          //   }
+          // }
+        }
+
+        this.totalBudget = 0;
+        for (let key in this.budgetSets) {
+          this.totalBudget += this.budgetSets[key][0];
+        }
+        console.log(this.budgetSets)
+
+        this.totalBudgetedExpenses = 0;
+        for (let dataVal of this.pieData) {
+          this.totalBudgetedExpenses += dataVal.total;
+          // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
+        }
       
         // Close dialogue ref
         editBudgetRef.close();
