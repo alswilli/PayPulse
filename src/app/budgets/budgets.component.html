@@ -1,7 +1,23 @@
 <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
-<div *ngIf="!isLoading">
-  <div>
-    <p>Header stuff goes here</p>
+<div [hidden]="isLoading">
+  <div fxLayoutAlign="center bottom">
+    <!-- <p>Header stuff goes here</p> -->
+    <mat-form-field>
+      <mat-label>From:</mat-label>
+      <mat-select id="from" #from> 
+        <mat-option *ngFor="let month of fromMonths" [value]="month">
+          {{month}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field style="margin-left: 10px;">
+      <mat-label>To:</mat-label>
+      <mat-select id="to" #to> 
+        <mat-option *ngFor="let month of toMonths" [value]="month">
+          {{month}}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
   </div>
   <div fxLayout.lt-md="column">
     <!-- <div fxFlex='1'></div> -->
@@ -18,7 +34,7 @@
       </h3>
       <!-- <h3>Budgeted Expenses: {{totalBudgetedExpenses}} / {{totalBudget}}</h3> -->
       <div>
-        <app-pie-chart [data]="pieData"></app-pie-chart>
+        <app-pie-chart *ngIf="!isLoading" [data]="pieData"></app-pie-chart>
         <!-- <div class="visBox"> 
           <app-pie-chart></app-pie-chart>
         </div> -->

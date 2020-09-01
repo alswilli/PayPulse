@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatAccordion, MatDialog } from '@angular/material';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { MatAccordion, MatDialog, MatSelect, MatSelectChange } from '@angular/material';
 import { AddBudgetComponent } from './add-budget/add-budget.component';
 import { AccountService } from '../services/account.service';
 import { mergeMap } from 'rxjs/operators';
@@ -18,7 +18,8 @@ import { basename } from 'path';
 })
 export class BudgetsComponent implements OnInit {
   @ViewChild(MatAccordion) accordion: MatAccordion;
-  @ViewChild('addbudgetform') createAccountFormDirective;
+  @ViewChild('to') matSelectTo: MatSelect;
+  @ViewChild('from') matSelectFrom: MatSelect;
 
   budgets: Budget[];
   categories: any;
@@ -31,6 +32,24 @@ export class BudgetsComponent implements OnInit {
   totalBudget = 0;
   totalBudgetedExpenses = 0;
   budgetSets = new Object();
+  fromMonths = [];
+  toMonths = [];
+  currentFromMonth: string;
+  currentToMonth: string;
+  dates = {
+    "01":"January",
+    "02":"February",
+    "03":"March",
+    "04":"April",
+    "05":"May",
+    "06":"June",
+    "07":"July",
+    "08":"August",
+    "09":"September",
+    "10":"October",
+    "11":"November",
+    "12":"December",
+  }
 
   constructor(public dialog: MatDialog,
     private accountService: AccountService,
@@ -247,8 +266,87 @@ export class BudgetsComponent implements OnInit {
         this.totalBudget += this.budgetSets[key][0];
       }
       console.log(this.budgetSets)
+      
+      var today = new Date();
+      var currMonth = today.getMonth() + 1;
+      var currYear = today.getFullYear();
+      this.currentFromMonth = this.dates[String(currMonth).padStart(2, '0')] + " " + String(currYear);
+      this.currentToMonth = "Present"
+
+      this.toMonths = [this.currentToMonth];
+      this.fromMonths.push(this.currentFromMonth);
+
+      var i = 0;
+      while (i < 23) {
+        currMonth -= 1;
+        if (currMonth === 0) {
+          currMonth = 12;
+        }
+        if (currMonth === 12) {
+          currYear -= 1;
+        }
+        this.fromMonths.push(this.dates[String(currMonth).padStart(2, '0')] + " " + String(currYear));
+        i += 1
+      }
+
+      this.matSelectFrom.value = this.currentFromMonth;
+      this.matSelectTo.value = this.currentToMonth;
+      this.matSelectFrom.selectionChange.subscribe((s: MatSelectChange) => {   
+        console.log(s); 
+        var i = 0;
+        while (this.fromMonths[i] !== s.value) {
+          i += 1
+        } 
+        console.log(this.fromMonths.slice(0, i))
+        var j = 0;
+        this.toMonths = ["Present"];
+        while (j < i) {
+          this.toMonths.push(this.fromMonths[j]);
+          j += 1;
+        }
+        var monthPresent = false;
+        for (let month of this.toMonths) {
+          if (month === this.currentToMonth) {
+            monthPresent = true;
+            break;
+          }
+        }
+        if (!monthPresent) {
+          this.currentToMonth = "Present";
+          this.matSelectTo.value = this.currentToMonth;
+        }
+        // if (!(this.currentToMonth in this.toMonths)) {
+        //   this.currentToMonth = "Present";
+        //   this.matSelectTo.value = this.currentToMonth;
+        // }
+
+        this.currentFromMonth = s.value;
+        
+        // this.fromMonths = this.fromMonths.slice(i, this.fromMonths.length);
+      });
+      this.matSelectTo.selectionChange.subscribe((s: MatSelectChange) => {   
+        console.log(s); 
+        this.currentToMonth = s.value; 
+      });
     });
   }
+
+  // ngAfterViewInit() {
+  //   this.matSelectTo.selectionChange.subscribe((s: MatSelectChange) => {   
+  //     console.log(s);  
+  //     // console.log("yup")
+  //     // this.selectionList.deselectAll();
+  //     // console.log(s);
+  //     // s.option.selected = true;
+  //   });
+  //   this.matSelectFrom.selectionChange.subscribe((s: MatSelectChange) => {   
+  //     console.log(s);  
+  //     // console.log("yup")
+  //     // this.selectionList.deselectAll();
+  //     // console.log(s);
+  //     // s.option.selected = true;
+  //   });
+  // }
 
   onAddBudgetClicked() {
     const addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, edit: false}});
