@@ -23,7 +23,7 @@ export class BudgetsComponent implements OnInit {
 
   budgets: Budget[];
   categories: any;
-  isLoading = true;
+  isLoading: boolean;
   userAccountsDetails: any;
   currentAccountId: string;
   days: number;
@@ -78,6 +78,35 @@ export class BudgetsComponent implements OnInit {
     this.budgets = [];
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
     this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id;
+
+    var today = new Date();
+    var currMonth = today.getMonth() + 1;
+    var currYear = today.getFullYear();
+    this.currentFromMonth = this.dates[String(currMonth).padStart(2, '0')][0] + " " + String(currYear);
+    this.currentToMonth = "Present"
+
+    this.toMonths = [this.currentToMonth];
+    this.fromMonths.push(this.currentFromMonth);
+
+    var i = 0;
+    while (i < 23) {
+      currMonth -= 1;
+      if (currMonth === 0) {
+        currMonth = 12;
+      }
+      if (currMonth === 12) {
+        currYear -= 1;
+      }
+      this.fromMonths.push(this.dates[String(currMonth).padStart(2, '0')][0] + " " + String(currYear));
+      i += 1
+    }
+
+    this.matSelectFrom.value = this.currentFromMonth;
+    this.matSelectTo.value = this.currentToMonth;
+    this.totalMonthsActive = 1;
+
+    this.isLoading = true;
+
     this.accountService.getTransactionCategories()
       .pipe(
         mergeMap((categories) => {
@@ -131,32 +160,6 @@ export class BudgetsComponent implements OnInit {
     .subscribe(transactions => {
       this.transactions = transactions;
       this.onGetTransactions();
-      
-      var today = new Date();
-      var currMonth = today.getMonth() + 1;
-      var currYear = today.getFullYear();
-      this.currentFromMonth = this.dates[String(currMonth).padStart(2, '0')][0] + " " + String(currYear);
-      this.currentToMonth = "Present"
-
-      this.toMonths = [this.currentToMonth];
-      this.fromMonths.push(this.currentFromMonth);
-
-      var i = 0;
-      while (i < 23) {
-        currMonth -= 1;
-        if (currMonth === 0) {
-          currMonth = 12;
-        }
-        if (currMonth === 12) {
-          currYear -= 1;
-        }
-        this.fromMonths.push(this.dates[String(currMonth).padStart(2, '0')][0] + " " + String(currYear));
-        i += 1
-      }
-
-      this.matSelectFrom.value = this.currentFromMonth;
-      this.matSelectTo.value = this.currentToMonth;
-      this.totalMonthsActive = 1;
 
       // FROM SIDE
       this.matSelectFrom.selectionChange.subscribe((s: MatSelectChange) => {   
