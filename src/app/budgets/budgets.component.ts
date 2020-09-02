@@ -35,8 +35,10 @@ export class BudgetsComponent implements OnInit {
   budgetSets = new Object();
   fromMonths = [];
   toMonths = [];
+  totalMonthsActive: number;
   currentFromMonth: string;
   currentToMonth: string;
+  // dataEmpty = true;
   dates = {
     "01":["January", 31],
     "02":["February", 28],
@@ -154,10 +156,13 @@ export class BudgetsComponent implements OnInit {
 
       this.matSelectFrom.value = this.currentFromMonth;
       this.matSelectTo.value = this.currentToMonth;
+      this.totalMonthsActive = 1;
 
       // FROM SIDE
       this.matSelectFrom.selectionChange.subscribe((s: MatSelectChange) => {   
         console.log(s); 
+        this.isLoading = true;
+
         var i = 0;
         while (this.fromMonths[i] !== s.value) {
           i += 1
@@ -182,6 +187,12 @@ export class BudgetsComponent implements OnInit {
           this.subdays = 0;
         }
         this.currentFromMonth = s.value;
+
+        this.totalMonthsActive = 0;
+        while (j >= 0 && this.fromMonths[j] !== this.currentToMonth) {
+          this.totalMonthsActive += 1;
+          j -= 1;
+        }
         
         // this.fromMonths = this.fromMonths.slice(i, this.fromMonths.length);
 
@@ -224,6 +235,7 @@ export class BudgetsComponent implements OnInit {
       this.matSelectTo.selectionChange.subscribe((s: MatSelectChange) => {   
         console.log(s); 
         this.currentToMonth = s.value; 
+        this.isLoading = true;
 
         this.days = 0;
         this.subdays = 0;
@@ -267,6 +279,13 @@ export class BudgetsComponent implements OnInit {
 
         console.log("NUM DAYS: ", this.days)
 
+        this.totalMonthsActive = 0;
+        var j = this.fromMonths.indexOf(this.currentFromMonth, 0);
+        while (j >= 0 && this.fromMonths[j] !== this.currentToMonth) {
+          this.totalMonthsActive += 1;
+          j -= 1;
+        }
+
         this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays)
           .subscribe(transactions => {
             this.transactions = transactions;
@@ -296,8 +315,8 @@ export class BudgetsComponent implements OnInit {
   onGetTransactions() {
     console.log(this.transactions);
       this.pieData = [];
+      // var entered = false;
 
-      var dataEmpty = true;
       for (let budget of this.budgets) {
         var mainCategory = budget.mainCategory;
         var total = 0;
@@ -373,7 +392,8 @@ export class BudgetsComponent implements OnInit {
         }
 
         if (total > 0) {
-          dataEmpty = false;
+          // entered = true;
+          // this.dataEmpty = false;
           if (parentPresent){
             // Update current value
             if (sameLevel) {
@@ -399,9 +419,10 @@ export class BudgetsComponent implements OnInit {
         }
       }
 
-      if (dataEmpty) {
-        this.pieChartService.sendNewPieDataEvent(this.pieData);
-      }
+      // if (!entered) {
+      //   this.dataEmpty = true;
+      //   this.pieChartService.sendNewPieDataEvent(this.pieData);
+      // }
       console.log(this.budgets)
       this.isLoading = false;
       // this.categoriesLoading = false;
@@ -451,6 +472,7 @@ export class BudgetsComponent implements OnInit {
       for (let key in this.budgetSets) {
         this.totalBudget += this.budgetSets[key][0];
       }
+      // this.totalBudget = this.totalBudget * this.totalMonthsActive;
       console.log(this.budgetSets)
   }
 
@@ -923,6 +945,7 @@ export class BudgetsComponent implements OnInit {
         var oldbestIndex = 4;
         for (let budget of this.budgets) {
           if (budget.category === oldCategory) {
+            console.log("AHHHHHHHHHHHHHHHHHHHHHHHHHHHH: ", budget);
             if (budget.category3 !== "") {
               if (oldbestIndex == 4) {
                 oldbestIndex = 3;
@@ -931,7 +954,7 @@ export class BudgetsComponent implements OnInit {
                 oldparents.push(budget);
               }
             }
-            else if (budget.category2 !== "" && budget.category3 === "" && budget.total > 0) {
+            else if (budget.category2 !== "" && budget.category3 === "") {
               if (oldbestIndex >= 3) {
                 oldparents = [];
                 oldbestIndex = 2;
@@ -940,7 +963,8 @@ export class BudgetsComponent implements OnInit {
                 oldparents.push(budget);
               }
             }
-            else if (budget.category !== "" && budget.category2 === "" && budget.total > 0) {
+            else if (budget.category !== "" && budget.category2 === "") {
+              console.log("made it into there")
               if (oldbestIndex >= 2) {
                 oldparents = [];
                 oldbestIndex = 1;
@@ -1182,6 +1206,14 @@ export class BudgetsComponent implements OnInit {
           }
         }
         else {
+          // if (oldParents) {
+          
+          // }
+          // else {
+
+          // }
+          console.log("using old amount")
+          console.log(oldparents)
           this.budgetSets[oldCategory] = [Number(oldsameLevelAmount), oldbestIndex];
           // // Only changed amount
           // if (oldcurrIndex === currIndex) {
@@ -1226,6 +1258,7 @@ export class BudgetsComponent implements OnInit {
           // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
         }
       
+        console.log(oldparents)
         // Close dialogue ref
         editBudgetRef.close();
       });

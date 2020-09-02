@@ -1,5 +1,5 @@
-<mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
-<div [hidden]="isLoading">
+<!-- <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner> -->
+<div>
   <div fxLayoutAlign="center bottom">
     <!-- <p>Header stuff goes here</p> -->
     <mat-form-field>
@@ -23,21 +23,22 @@
     <!-- <div fxFlex='1'></div> -->
     <div fxFlex='50' class="mainPanels">
       <h2>Trends</h2>
-      <h3 *ngIf="(totalBudgetedExpenses / totalBudget) >= 1" style="color: red;">
-        <span style="color: black;">Budgeted Expenses: </span>{{totalBudgetedExpenses}} / {{totalBudget}}
-      </h3>
-      <h3 *ngIf="!((totalBudgetedExpenses / totalBudget) >= 1) && (totalBudgetedExpenses / totalBudget) >= 0.75" style="color: orange;">
-        <span style="color: black;">Budgeted Expenses: </span>{{totalBudgetedExpenses}} / {{totalBudget}}
-      </h3>
-      <h3 *ngIf="!((totalBudgetedExpenses / totalBudget) >= 0.75) && (totalBudgetedExpenses / totalBudget) >= 0" style="color: green;">
-        <span style="color: black;">Budgeted Expenses: </span>{{totalBudgetedExpenses}} / {{totalBudget}}
-      </h3>
-      <!-- <h3>Budgeted Expenses: {{totalBudgetedExpenses}} / {{totalBudget}}</h3> -->
-      <div>
-        <app-pie-chart *ngIf="!isLoading" [data]="pieData"></app-pie-chart>
-        <!-- <div class="visBox"> 
-          <app-pie-chart></app-pie-chart>
-        </div> -->
+      <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+      <div *ngIf="!isLoading">
+        <h3 *ngIf="(totalBudgetedExpenses / (totalBudget * totalMonthsActive)) >= 1" style="color: red;">
+          <span style="color: black;">Budgeted Expenses: </span>{{totalBudgetedExpenses}} / {{(totalBudget * totalMonthsActive)}}
+        </h3>
+        <h3 *ngIf="!((totalBudgetedExpenses / (totalBudget * totalMonthsActive)) >= 1) && (totalBudgetedExpenses / (totalBudget * totalMonthsActive)) >= 0.75" style="color: orange;">
+          <span style="color: black;">Budgeted Expenses: </span>{{totalBudgetedExpenses}} / {{(totalBudget * totalMonthsActive)}}
+        </h3>
+        <h3 *ngIf="!((totalBudgetedExpenses / (totalBudget * totalMonthsActive)) >= 0.75) && (totalBudgetedExpenses / (totalBudget * totalMonthsActive)) >= 0" style="color: green;">
+          <span style="color: black;">Budgeted Expenses: </span>{{totalBudgetedExpenses}} / {{(totalBudget * totalMonthsActive)}}
+        </h3>
+        <!-- <h3>Budgeted Expenses: {{totalBudgetedExpenses}} / {{totalBudget}}</h3> -->
+        <div>
+          <app-pie-chart *ngIf="totalBudgetedExpenses > 0" [data]="pieData"></app-pie-chart>
+          <p *ngIf="totalBudgetedExpenses === 0">Graph is empty!</p>
+        </div>
       </div>
     </div>
     <!-- <div fxFlex='1'></div> -->
@@ -49,52 +50,55 @@
         </div>
         <button mat-button (click)="accordion.openAll()">Expand All</button>
         <button mat-button (click)="accordion.closeAll()">Collapse All</button>
-      </div> 
-      <div *ngIf="budgets.length === 0">
-        <p>No budgets added! Please add a budget using the 'Add New Budget' button above</p>
       </div>
-        <mat-accordion class="example-headers-align" multi>
-          <div class="budgetList">
-            <mat-expansion-panel *ngFor="let budget of budgets">
-              <mat-expansion-panel-header>
-                <p fxFlex *ngIf="budget.mainCategory === budget.category3">
-                  {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
-                </p>
-                <p fxFlex *ngIf="budget.mainCategory === budget.category2">
-                  {{ budget.category }}: <b>{{ budget.category2 }}</b> 
-                </p>
-                <p fxFlex *ngIf="budget.mainCategory === budget.category">
-                  <b>{{ budget.category }}</b> 
-                </p>
-                <p fxLayoutAlign="end center" style="margin-right: 10px;">
-                  <span *ngIf="(budget.total / budget.amount) >= 1" style="color: red;">
-                    <b>{{ budget.total }} / {{ budget.amount }}</b>
-                  </span>
-                  <span *ngIf="!((budget.total / budget.amount) >= 1) && (budget.total / budget.amount) >= 0.75" style="color: orange;">
-                    <b>{{ budget.total }} / {{ budget.amount }}</b>
-                  </span>
-                  <span *ngIf="!((budget.total / budget.amount) >= 0.75) && (budget.total / budget.amount) >= 0" style="color: green;">
-                    <b>{{ budget.total }} / {{ budget.amount }}</b>
-                  </span>
-                </p>
-              </mat-expansion-panel-header>
-          
-              <mat-form-field>
-                <mat-label>First name</mat-label>
-                <input matInput>
-              </mat-form-field>
-          
-              <mat-form-field>
-                <mat-label>Age</mat-label>
-                <input matInput type="number" min="1">
-              </mat-form-field>
-              <p></p>
-              <button mat-raised-button style="background-color: grey; color: white;" (click)="onEditBudgetClicked(budget);">Edit Budget</button>
-              <button mat-raised-button color="warn" style="margin: 10px;"(click)="onDeleteBudgetClicked(budget);">Delete Budget</button>
-          
-            </mat-expansion-panel>
-          </div>
-        </mat-accordion>
+      <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+      <div *ngIf="!isLoading"> 
+        <div *ngIf="budgets.length === 0">
+          <p>No budgets added! Please add a budget using the 'Add New Budget' button above</p>
+        </div>
+          <mat-accordion class="example-headers-align" multi>
+            <div class="budgetList">
+              <mat-expansion-panel *ngFor="let budget of budgets">
+                <mat-expansion-panel-header>
+                  <p fxFlex *ngIf="budget.mainCategory === budget.category3">
+                    {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
+                  </p>
+                  <p fxFlex *ngIf="budget.mainCategory === budget.category2">
+                    {{ budget.category }}: <b>{{ budget.category2 }}</b> 
+                  </p>
+                  <p fxFlex *ngIf="budget.mainCategory === budget.category">
+                    <b>{{ budget.category }}</b> 
+                  </p>
+                  <p fxLayoutAlign="end center" style="margin-right: 10px;">
+                    <span *ngIf="(budget.total / (budget.amount * totalMonthsActive)) >= 1" style="color: red;">
+                      <b>{{ budget.total }} / {{ (budget.amount * totalMonthsActive) }}</b>
+                    </span>
+                    <span *ngIf="!((budget.total / (budget.amount * totalMonthsActive)) >= 1) && (budget.total / (budget.amount * totalMonthsActive)) >= 0.75" style="color: orange;">
+                      <b>{{ budget.total }} / {{ (budget.amount * totalMonthsActive) }}</b>
+                    </span>
+                    <span *ngIf="!((budget.total / (budget.amount * totalMonthsActive)) >= 0.75) && (budget.total / (budget.amount * totalMonthsActive)) >= 0" style="color: green;">
+                      <b>{{ budget.total }} / {{ (budget.amount * totalMonthsActive) }}</b>
+                    </span>
+                  </p>
+                </mat-expansion-panel-header>
+            
+                <mat-form-field>
+                  <mat-label>First name</mat-label>
+                  <input matInput>
+                </mat-form-field>
+            
+                <mat-form-field>
+                  <mat-label>Age</mat-label>
+                  <input matInput type="number" min="1">
+                </mat-form-field>
+                <p></p>
+                <button mat-raised-button style="background-color: grey; color: white;" (click)="onEditBudgetClicked(budget);">Edit Budget</button>
+                <button mat-raised-button color="warn" style="margin: 10px;"(click)="onDeleteBudgetClicked(budget);">Delete Budget</button>
+            
+              </mat-expansion-panel>
+            </div>
+          </mat-accordion>
+      </div>
     </div>
     <!-- <div fxFlex='1'></div> -->
   </div>
