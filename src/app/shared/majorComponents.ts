@@ -5,7 +5,7 @@ export const MAJORS: MajorComponent[] = [
     {
         id: '0',
         name: 'Transactions',
-        description: "Here is a summary of your recent transactions",
+        description: "Here is a summary of your recent transactions for this month",
         cards: [
             {
                 id: '0',
@@ -14,23 +14,23 @@ export const MAJORS: MajorComponent[] = [
             }
         ]
     },
-    // {
-    //     id: '1',
-    //     name: 'Budgets',
-    //     description: "Here is a quick summary of your budget totals for this month",
-    //     cards: [
-    //         {
-    //             id: '0',
-    //             name: 'Budget total',
-    //             data: 'GET CURRENT BUDGET AMOUNT AND TOTAL BUDGET AMOUNT',
-    //         },
-    //         {
-    //             id: '1',
-    //             name: 'Budget versus last month',
-    //             data: 'GET BUDGET TOTALS FOR EVERY DAY LAST/THIS MONTH',
-    //         },
-    //     ]
-    // },
+    {
+        id: '1',
+        name: 'Budgets',
+        description: "Here is a quick summary of your top budgets for this month",
+        cards: [
+            {
+                id: '0',
+                name: 'Top Budgets',
+                data: ['GET CURRENT BUDGET AMOUNT AND TOTAL BUDGET AMOUNT'],
+            },
+            // {
+            //     id: '1',
+            //     name: 'Budget versus last month',
+            //     data: 'GET BUDGET TOTALS FOR EVERY DAY LAST/THIS MONTH',
+            // },
+        ]
+    },
     // {
     //     id: '2',
     //     name: 'Goals',

@@ -72,6 +72,9 @@
             <div *ngIf="component.name === 'Transactions' && card.name === 'Recent Transactions'">
               <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
               <div *ngIf="!isLoading"> 
+                <div *ngIf="parsedTransactions.length === 0">
+                  <p>No recent transactions for this month yet!</p>
+                </div>
                 <p *ngFor="let recentData of parsedTransactions">
                   <span><b>Account Name:</b> {{recentData.accountName}} </span>
                   <span><b>Amount:</b> {{recentData.amount}} </span>
@@ -81,15 +84,24 @@
                 </p>
               </div>
             </div>
-            <!-- <div *ngIf="errMess">
-              <h2>Error</h2>
-              <h4>{{errMess}}</h4>
-            </div> -->
+            <div *ngIf="component.name === 'Budgets' && card.name === 'Top Budgets'">
+              <!-- <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+              <div *ngIf="!isLoading"> 
+                <p *ngFor="let recentData of parsedTransactions">
+                  <span><b>Account Name:</b> {{recentData.accountName}} </span>
+                  <span><b>Amount:</b> {{recentData.amount}} </span>
+                  <span><b>Transaction Name:</b> {{recentData.transactionName}} </span>
+                  <span><b>Category:</b> {{recentData.category}} </span>
+                  <span><b>Date:</b> {{recentData.date}} </span>
+                </p>
+              </div> -->
+            </div>
           </mat-card-content>
         </mat-card>
       </mat-card-content>
       <mat-card-actions>
-        <button mat-button class="manageButton" routerLink='/transactions'>Manage {{component.name}}</button>
+        <button mat-button *ngIf="component.name === 'Transactions'" class="manageButton" routerLink='/transactions'>Manage {{component.name}}</button>
+        <button mat-button *ngIf="component.name === 'Budgets'" class="manageButton" routerLink='/budgets'>Manage {{component.name}}</button>
       </mat-card-actions>
     </mat-card>
   </div>

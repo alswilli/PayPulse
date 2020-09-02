@@ -73,8 +73,11 @@ export class HomeComponent implements OnInit {
       this.userAccountsIds = this.userAccountsDetails.ids
       console.log("Current Account Id: ", this.currentAccountId); 
       console.log("All Accounts: ", this.accounts);
+      var today = new Date();
+      var numDays = today.getDate() - 1;
+      var subDays = 0;
       // Now get the currentAccount transactions
-      this.accountService.getRecentTransactions(this.currentAccountId)
+      this.accountService.getRecentTransactions(this.currentAccountId, numDays, subDays)
         .subscribe(transactions => {
           this.isLoading = false;
           // this.firstLoad = false;
@@ -182,8 +185,11 @@ export class HomeComponent implements OnInit {
           this.currentAccountName = this.userAccountsDetails.currentAccount[0].institutionName;
           console.log(this.currentAccountId); 
           console.log(this.currentAccountName);
+          var today = new Date();
+          var numDays = today.getDate() - 1;
+          var subDays = 0;
           // Now get the currentAccount transactions
-          this.accountService.getRecentTransactions(this.currentAccountId)
+          this.accountService.getRecentTransactions(this.currentAccountId, numDays, subDays)
             .subscribe(transactions => {
               this.isLoading = false;
               this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
@@ -247,8 +253,11 @@ export class HomeComponent implements OnInit {
       this.userAccountsIds = this.userAccountsDetails.ids
       console.log("Current Account Id: ", this.currentAccountId); 
       console.log("All Accounts: ", this.accounts);
+      var today = new Date();
+      var numDays = today.getDate() - 1;
+      var subDays = 0;
       // Now get the currentAccount transactions
-      this.accountService.getRecentTransactions(this.currentAccountId)
+      this.accountService.getRecentTransactions(this.currentAccountId, numDays, subDays)
         .subscribe(transactions => {
           this.isLoading = false;
           this.firstLoad = false;
@@ -363,8 +372,11 @@ export class HomeComponent implements OnInit {
             console.log(this.currentAccountId); 
             this.preSelection = [];// need to delete and then add
             this.preSelection.push(this.currentAccountName)  
+            var today = new Date();
+            var numDays = today.getDate() - 1;
+            var subDays = 0;
             // Now get the currentAccount transactions
-            this.accountService.getRecentTransactions(this.currentAccountId)
+            this.accountService.getRecentTransactions(this.currentAccountId, numDays, subDays)
               .subscribe(transactions => {
                 this.isLoading = false;
                 this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend

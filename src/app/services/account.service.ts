@@ -101,8 +101,9 @@ export class AccountService {
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
-  getRecentTransactions(accountId: string) {
-    return this.http.get<Transaction[]>(baseURL + 'plaid/accounts/transactions/'  + accountId + '?recentTransactions=true');
+  getRecentTransactions(accountId: string, days: number, subdays: number) {
+    const queryParams = `&days=${days}&subdays=${subdays}`;
+    return this.http.get<Transaction[]>(baseURL + 'plaid/accounts/transactions/'  + accountId + '?recentTransactions=true' + queryParams);
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 

@@ -89,7 +89,16 @@ plaidRouter.route("/accounts/add")
             if (allAccounts.length < 1) {
               newAccount.current = true;
             }
-            newAccount.save().then(account => res.json(account))
+            newAccount.save().then(account => {
+              var editedAccount = {
+                _id: account._id,
+                userId: account.userId,
+                institutionId: account.institutionId,
+                institutionName: account.institutionName,
+                subAccounts: account.subAccounts
+              };
+              res.json(editedAccount);
+            })
           }
         })
       })
@@ -124,7 +133,14 @@ plaidRouter.route("/accounts/:accountId")
       console.log("    ");
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      res.json(account);
+      var editedAccount = {
+        _id: account._id,
+        userId: account.userId,
+        institutionId: account.institutionId,
+        institutionName: account.institutionName,
+        subAccounts: account.subAccounts
+      };
+      res.json(editedAccount);
   }, (err) => next(err))
   .catch((err) => next(err));
 })
@@ -133,7 +149,14 @@ plaidRouter.route("/accounts/:accountId")
   .then((resp) => {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      res.json(resp);
+      var editedAccount = {
+        _id: account._id,
+        userId: resp.userId,
+        institutionId: account.institutionId,
+        institutionName: account.institutionName,
+        subAccounts: resp.subAccounts
+      };
+      res.json(editedAccount);
   }, (err) => next(err))
   .catch((err) => next(err));
 });
@@ -154,13 +177,38 @@ plaidRouter.route("/accounts")
   if (req.query.current) {
     console.log("curr");
     Account.find({ userId: req.user.id, current: true })
-    .then(accounts => res.json(accounts))
+    .then(account => {
+      console.log(account)
+      var editedAccount = {
+        _id: account[0]._id,
+        userId: account[0].userId,
+        institutionId: account[0].institutionId,
+        institutionName: account[0].institutionName,
+        subAccounts: account[0].subAccounts
+      };
+      res.json([editedAccount]);
+      // res.json(accounts);
+    })
     .catch(err => console.log(err));
   }
   else {
     console.log("all");
     Account.find( { userId: req.user.id })
-    .then(accounts => res.json({success: true, numAccounts: accounts.length, accountsData: accounts}))
+    .then(accounts => {
+      console.log(accounts)
+      var editedAccounts = [];
+      for (let account of accounts) {
+        var editedAccount = {
+          _id: account._id,
+          userId: account.userId,
+          institutionId: account.institutionId,
+          institutionName: account.institutionName,
+          subAccounts: account.subAccounts
+        };
+        editedAccounts.push(editedAccount);
+      }
+      res.json({success: true, numAccounts: accounts.length, accountsData: editedAccounts});
+    })
     .catch(err => console.log(err));
   }
 });
@@ -194,7 +242,7 @@ plaidRouter.route("/accounts/transactions/:accountId")
   }
   else {
     today = now.format("YYYY-MM-DD");
-    numDaysAgo = now.subtract(30, "days").format("YYYY-MM-DD"); // Change this if you want more transactions
+    numDaysAgo = now.subtract(365, "days").format("YYYY-MM-DD"); // Change this if you want more transactions
   }
   // const thirtyDaysAgo = now.subtract(30, "days").format("YYYY-MM-DD"); // Change this if you want more transactions
   // console.log("30 DAY AGO: ", thirtyDaysAgo);
@@ -206,11 +254,13 @@ plaidRouter.route("/accounts/transactions/:accountId")
   // Account.find({ accountId: req.body.accountId })
   Account.findById(req.params.accountId)
     .then(account => {
-      console.log(account);
+      console.log("THIS IS THE ACCOUNT: ", account);
+      console.log(account.userId)
       ACCESS_TOKEN = account.accessToken;
       const institutionName = account.institutionName;
       var finalTransactions = []
       console.log(ACCESS_TOKEN);
+      console.log(account.accessToken)
       // console.log(thirtyDaysAgo);
       console.log(today);
       client.getTransactions(ACCESS_TOKEN, numDaysAgo, today, function(error, response) {
