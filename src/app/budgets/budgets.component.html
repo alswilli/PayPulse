@@ -1,7 +1,6 @@
 <!-- <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner> -->
 <div>
-  <div fxLayoutAlign="center bottom">
-    <!-- <p>Header stuff goes here</p> -->
+  <!-- <div fxLayoutAlign="center bottom">
     <mat-form-field>
       <mat-label>From:</mat-label>
       <mat-select id="from" #from> 
@@ -18,11 +17,27 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
-  </div>
+  </div> -->
   <div fxLayout.lt-md="column">
     <!-- <div fxFlex='1'></div> -->
     <div fxFlex='50' class="mainPanels">
       <h2>Trends</h2>
+      <mat-form-field>
+        <mat-label>From:</mat-label>
+        <mat-select id="from" #from> 
+          <mat-option *ngFor="let month of fromMonths" [value]="month">
+            {{month}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field style="margin-left: 10px;">
+        <mat-label>To:</mat-label>
+        <mat-select id="to" #to> 
+          <mat-option *ngFor="let month of toMonths" [value]="month">
+            {{month}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
       <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
       <div *ngIf="!isLoading">
         <h3 *ngIf="(totalBudgetedExpenses / (totalBudget * totalMonthsActive)) >= 1" style="color: red;">

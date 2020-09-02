@@ -20,7 +20,10 @@ budgetRouter.route("/")
     // Check if budget already exists for specific user
     Budget.findOne ({
         userId: req.user.id,
-        mainCategory: req.body.mainCategory
+        mainCategory: req.body.mainCategory,
+        category: req.body.category,
+        category2: req.body.category2,
+        category3: req.body.category3
     })
     .then(budget => {
         if (budget) {
@@ -58,7 +61,10 @@ budgetRouter.route("/:budgetId")
 .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Budget.findOne ({
         userId: req.user.id,
-        mainCategory: req.body.mainCategory
+        mainCategory: req.body.mainCategory,
+        category: req.body.category,
+        category2: req.body.category2,
+        category3: req.body.category3
     })
     .then(budget => {
         if (budget && budget._id != req.params.budgetId) {

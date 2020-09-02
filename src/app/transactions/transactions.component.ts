@@ -35,10 +35,10 @@ export class TransactionsComponent implements OnInit {
   userAccounts: Account[];
   userAccountsDetails;
   currentAccountId: string;
-  postsPerPage = 5;
+  postsPerPage = 10;
   currentPage = 1;
   adjustedPage: number;
-  pageSizeOptions = [5, 10, 25, 100];
+  pageSizeOptions = [10, 25, 50, 100];
   isLoading = false;
   subAccount: string;
   subAccountId: string;
