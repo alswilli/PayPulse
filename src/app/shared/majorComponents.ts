@@ -5,7 +5,7 @@ export const MAJORS: MajorComponent[] = [
     {
         id: '0',
         name: 'Transactions',
-        description: "Here is a summary of your recent transactions for this month",
+        description: "Here is a summary of your recent transactions from the last 30 days",
         cards: [
             {
                 id: '0',
@@ -17,7 +17,7 @@ export const MAJORS: MajorComponent[] = [
     {
         id: '1',
         name: 'Budgets',
-        description: "Here is a quick summary of your top budgets for this month",
+        description: "Here is a quick summary of your top budgets from the last 30 days",
         cards: [
             {
                 id: '0',
