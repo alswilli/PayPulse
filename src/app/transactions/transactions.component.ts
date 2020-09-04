@@ -109,6 +109,14 @@ export class TransactionsComponent implements OnInit {
     console.log(totalCurrent);
     this.balancesCurrentDict['All'] = totalCurrent;
 
+    for (let key in this.balancesCurrentDict) {
+      var currVal = String(this.balancesCurrentDict[key])
+      var i = currVal.indexOf(".");
+      if (i > -1 && i + 3 < currVal.length) {
+        this.balancesCurrentDict[key] = Number(currVal.substring(0, i+3));
+      }
+    }
+
     console.log("List Value: ", this.listValue);
     console.log('Current Page: ', this.currentPage);
     this.adjustedPage = this.currentPage-1;
