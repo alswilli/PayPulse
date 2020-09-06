@@ -90,14 +90,19 @@ plaidRouter.route("/accounts/add")
               newAccount.current = true;
             }
             newAccount.save().then(account => {
-              var editedAccount = {
-                _id: account._id,
-                userId: account.userId,
-                institutionId: account.institutionId,
-                institutionName: account.institutionName,
-                subAccounts: account.subAccounts
-              };
-              res.json(editedAccount);
+              // var editedAccount = {
+              //   _id: account._id,
+              //   userId: account.userId,
+              //   institutionId: account.institutionId,
+              //   institutionName: account.institutionName,
+              //   subAccounts: account.subAccounts
+              // };
+              // if (allAccounts.length < 1) {
+              //   editedAccount.current = true;
+              // }
+              newAccount.accessToken = null;
+              newAccount.itemId = null;
+              res.json(account);
             })
           }
         })
@@ -133,14 +138,18 @@ plaidRouter.route("/accounts/:accountId")
       console.log("    ");
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      var editedAccount = {
-        _id: account._id,
-        userId: account.userId,
-        institutionId: account.institutionId,
-        institutionName: account.institutionName,
-        subAccounts: account.subAccounts
-      };
-      res.json(editedAccount);
+      // var editedAccount = {
+      //   _id: account._id,
+      //   userId: account.userId,
+      //   institutionId: account.institutionId,
+      //   institutionName: account.institutionName,
+      //   subAccounts: account.subAccounts,
+      //   current: account.current
+      // };
+      // res.json(editedAccount);
+      account.accessToken = null;
+      account.itemId = null;
+      res.json(account);
   }, (err) => next(err))
   .catch((err) => next(err));
 })
@@ -149,14 +158,18 @@ plaidRouter.route("/accounts/:accountId")
   .then((resp) => {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      var editedAccount = {
-        _id: account._id,
-        userId: resp.userId,
-        institutionId: account.institutionId,
-        institutionName: account.institutionName,
-        subAccounts: resp.subAccounts
-      };
-      res.json(editedAccount);
+      // var editedAccount = {
+      //   _id: resp._id,
+      //   userId: resp.userId,
+      //   institutionId: resp.institutionId,
+      //   institutionName: resp.institutionName,
+      //   subAccounts: resp.subAccounts,
+      //   current: resp.current
+      // };
+      // res.json(editedAccount);
+      resp.accessToken = null;
+      resp.itemId = null;
+      res.json(resp)
   }, (err) => next(err))
   .catch((err) => next(err));
 });
@@ -179,15 +192,26 @@ plaidRouter.route("/accounts")
     Account.find({ userId: req.user.id, current: true })
     .then(account => {
       console.log(account)
-      var editedAccount = {
-        _id: account[0]._id,
-        userId: account[0].userId,
-        institutionId: account[0].institutionId,
-        institutionName: account[0].institutionName,
-        subAccounts: account[0].subAccounts
-      };
-      res.json([editedAccount]);
+      // if (account.length > 0) {
+      //   var editedAccount = {
+      //     _id: account[0]._id,
+      //     userId: account[0].userId,
+      //     institutionId: account[0].institutionId,
+      //     institutionName: account[0].institutionName,
+      //     subAccounts: account[0].subAccounts,
+      //     current: account[0].current
+      //   };
+      //   res.json(editedAccount);
+      // }
+      // else {
+      //   res.json(account);
+      // }
       // res.json(accounts);
+      if (account.length > 0) {
+        account[0].accessToken = null;
+        account[0].itemId = null;
+      }
+      res.json(account);
     })
     .catch(err => console.log(err));
   }
@@ -196,18 +220,24 @@ plaidRouter.route("/accounts")
     Account.find( { userId: req.user.id })
     .then(accounts => {
       console.log(accounts)
-      var editedAccounts = [];
+      // var editedAccounts = [];
+      // for (let account of accounts) {
+      //   var editedAccount = {
+      //     _id: account._id,
+      //     userId: account.userId,
+      //     institutionId: account.institutionId,
+      //     institutionName: account.institutionName,
+      //     subAccounts: account.subAccounts,
+      //     current: account.current
+      //   };
+      //   editedAccounts.push(editedAccount);
+      // }
+      // res.json({success: true, numAccounts: accounts.length, accountsData: editedAccounts});
       for (let account of accounts) {
-        var editedAccount = {
-          _id: account._id,
-          userId: account.userId,
-          institutionId: account.institutionId,
-          institutionName: account.institutionName,
-          subAccounts: account.subAccounts
-        };
-        editedAccounts.push(editedAccount);
+        account.accessToken = null;
+        account.itemId = null;
       }
-      res.json({success: true, numAccounts: accounts.length, accountsData: editedAccounts});
+      res.json({success: true, numAccounts: accounts.length, accountsData: accounts});
     })
     .catch(err => console.log(err));
   }

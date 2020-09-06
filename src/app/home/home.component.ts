@@ -42,8 +42,8 @@ export class HomeComponent implements OnInit {
   fullLoad = false;
   categories: any;
   budgets: Budget[];
-  days: number;
-  subdays: number;
+  days = 30;
+  subdays = 0;
   transactions: any[];
   top3Budgets = [];
 
@@ -84,8 +84,7 @@ export class HomeComponent implements OnInit {
       console.log("All Accounts: ", this.accounts);
       var today = new Date();
       // this.days = today.getDate() - 1;
-      this.days = 30;
-      this.subdays = 0;
+
       // Now get the currentAccount transactions
       this.accountService.getRecentTransactions(this.currentAccountId, this.days, this.subdays)
       .subscribe((transactions) => {
@@ -150,7 +149,9 @@ export class HomeComponent implements OnInit {
   }
 
   getTopBudgets() {
-    this.accountService.getTransactionCategories()
+    console.log(this.categories)
+    if (this.categories == null) {
+      this.accountService.getTransactionCategories()
       .pipe(
         mergeMap((categories) => {
           console.log(categories);
@@ -192,6 +193,16 @@ export class HomeComponent implements OnInit {
         this.getTop3Budgets();
         this.isLoading = false;
       });
+    }
+    else {
+      this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays)
+        .subscribe(transactions => {
+          this.transactions = transactions;
+          this.onGetTransactions();
+          this.getTop3Budgets();
+          this.isLoading = false;
+        });
+    }
   }
 
   onGetTransactions() {
@@ -225,6 +236,7 @@ export class HomeComponent implements OnInit {
       if(diffA <= diffB) return -1;
     });
     var i = 0;
+    this.top3Budgets = [];
     while (i < 3) {
       this.top3Budgets.push(sortedBudgets[i]);
       i += 1;
@@ -281,13 +293,11 @@ export class HomeComponent implements OnInit {
           this.currentAccountName = this.userAccountsDetails.currentAccount[0].institutionName;
           console.log(this.currentAccountId); 
           console.log(this.currentAccountName);
-          var today = new Date();
-          var numDays = today.getDate() - 1;
-          var subDays = 0;
+
           // Now get the currentAccount transactions
-          this.accountService.getRecentTransactions(this.currentAccountId, numDays, subDays)
+          this.accountService.getRecentTransactions(this.currentAccountId, this.days, this.subdays)
             .subscribe(transactions => {
-              this.isLoading = false;
+              // this.isLoading = false;
               this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
               this.recentTransactions.forEach(element => {
                 console.log(element);
@@ -318,6 +328,7 @@ export class HomeComponent implements OnInit {
                 this.parsedTransactions.push(newTransaction);
               }
               console.log("Parsed transactions: "+ this.parsedTransactions);
+              this.getTopBudgets();
             });
 
           this.preSelection = [];// need to delete and then add
@@ -349,14 +360,12 @@ export class HomeComponent implements OnInit {
       this.userAccountsIds = this.userAccountsDetails.ids
       console.log("Current Account Id: ", this.currentAccountId); 
       console.log("All Accounts: ", this.accounts);
-      var today = new Date();
-      var numDays = today.getDate() - 1;
-      var subDays = 0;
+
       // Now get the currentAccount transactions
-      this.accountService.getRecentTransactions(this.currentAccountId, numDays, subDays)
+      this.accountService.getRecentTransactions(this.currentAccountId, this.days, this.subdays)
         .subscribe(transactions => {
-          this.isLoading = false;
-          this.firstLoad = false;
+          // this.isLoading = false;
+          // this.firstLoad = false;
           this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
           this.recentTransactions.forEach(element => {
             console.log(element);
@@ -381,6 +390,7 @@ export class HomeComponent implements OnInit {
               accountName: currAccountName
             };
             this.parsedTransactions.push(newTransaction);
+            this.getTopBudgets();
           }
           console.log("Parsed transactions: "+ this.parsedTransactions);
         });
@@ -468,13 +478,11 @@ export class HomeComponent implements OnInit {
             console.log(this.currentAccountId); 
             this.preSelection = [];// need to delete and then add
             this.preSelection.push(this.currentAccountName)  
-            var today = new Date();
-            var numDays = today.getDate() - 1;
-            var subDays = 0;
+
             // Now get the currentAccount transactions
-            this.accountService.getRecentTransactions(this.currentAccountId, numDays, subDays)
+            this.accountService.getRecentTransactions(this.currentAccountId, this.days, this.subdays)
               .subscribe(transactions => {
-                this.isLoading = false;
+                // this.isLoading = false;
                 this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
                 this.recentTransactions.forEach(element => {
                   console.log(element);
@@ -499,6 +507,7 @@ export class HomeComponent implements OnInit {
                     accountName: currAccountName
                   };
                   this.parsedTransactions.push(newTransaction);
+                  this.getTopBudgets();
                 }
                 console.log("Parsed transactions: "+ this.parsedTransactions);
               });

@@ -97,6 +97,7 @@
                   <p fxFlex *ngIf="budget.mainCategory === budget.category">
                     <b>{{ budget.category }}</b> 
                   </p>
+                  <span fxFlex></span>
                   <p fxLayoutAlign="end center" style="margin-right: 10px;">
                     <span *ngIf="(budget.total / (budget.amount)) >= 1" style="color: red;">
                       <b>{{ budget.total }} / {{ (budget.amount) }}</b>
