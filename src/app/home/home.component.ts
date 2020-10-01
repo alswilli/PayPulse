@@ -237,7 +237,7 @@ export class HomeComponent implements OnInit {
     });
     var i = 0;
     this.top3Budgets = [];
-    while (i < 3) {
+    while (i < 3 && sortedBudgets[i]) {
       this.top3Budgets.push(sortedBudgets[i]);
       i += 1;
     }
