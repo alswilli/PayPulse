@@ -31,7 +31,7 @@
           <mat-form-field *ngIf="secondSelected" style="margin-left: 10px;">
             <mat-label>Budget Subcategory</mat-label>
             <mat-select formControlName="category3"> 
-              <mat-option *ngFor="let category of categories3 | keyvalue" [value]="category.key">
+              <mat-option *ngFor="let category of categories3 | keyvalue" (click)="thirdOpSelected($event.target.innerHTML)" [value]="category.key">
                 {{category.key}}
               </mat-option>
             </mat-select>
@@ -44,9 +44,12 @@
             <input matInput formControlName="amount" type="number" required>
             <!-- <mat-error *ngIf="formErrors.amount">{{formErrors.amount}}</mat-error> -->
             <mat-error *ngIf="addBudgetForm.get('amount').hasError('required')">Amount is required.</mat-error>
-            <mat-error *ngIf="addBudgetForm.get('amount').hasError('min')">Amount must be greater than 0.</mat-error>
+            <mat-error *ngIf="addBudgetForm.get('amount').hasError('min')">Amount must be greater than or equal to {{minVal}}</mat-error>
+            <mat-error *ngIf="addBudgetForm.get('amount').hasError('max')">Amount must be less than or equal to {{maxVal}}</mat-error>
           </mat-form-field>
         </p>
+        <span>Min Amount: {{this.minVal}}</span>
+        <span>Max Amount: {{this.maxVal}}</span>
         <button mat-button *ngIf="!edit" [disabled]="addBudgetForm.invalid" type="submit" class="mat-primary" cdkFocusInitial>Add Budget</button>
         <button mat-button *ngIf="edit" [disabled]="addBudgetForm.invalid" type="submit" class="mat-primary" cdkFocusInitial>Edit Budget</button>
         <button mat-button mat-dialog-close>Cancel</button>

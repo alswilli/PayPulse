@@ -20,10 +20,14 @@ export class AddBudgetComponent implements OnInit {
   categories: any;
   categories2: any;
   categories3: any;
+  budgets: any;
+  budgetMins: any;
   isLoading: boolean;
   firstSelected = false;
   secondSelected = false;
   edit: boolean;
+  minVal: number;
+  maxVal: number;
   // subscription: Subscription;
 
   constructor(public dialogRef: MatDialogRef<AddBudgetComponent>,
@@ -33,10 +37,16 @@ export class AddBudgetComponent implements OnInit {
     private budgetService: BudgetService) { }
   
   ngOnInit() {
+    this.minVal = 1;
+    this.maxVal = Number.POSITIVE_INFINITY;
+    this.budgetMins = {};
     this.createForm();
     // this.categories = ["Gas", "Food", "Rent"]
     this.isLoading = true;
     this.categories = this.data.categories;
+    this.budgets = this.data.budgets;
+    this.createBudgetMins();
+    console.log("Active Budgets: ", this.budgets)
     this.edit = this.data.edit
     if (this.edit === true) {
       console.log(this.addBudgetForm);
@@ -93,6 +103,7 @@ export class AddBudgetComponent implements OnInit {
     'amount': ''
   };
 
+  // These were not working so used mat-error
   validationMessages = {
     'category': {
       'required':      'Category is required.'
@@ -108,7 +119,7 @@ export class AddBudgetComponent implements OnInit {
       category: ['', [Validators.required] ],
       category2: ['', [] ],
       category3: ['', [] ],
-      amount: ['', [Validators.required, Validators.min(1)] ]
+      amount: ['', [Validators.required, Validators.min(this.minVal), Validators.max(this.maxVal)] ]
     });
 
     this.addBudgetForm.valueChanges
@@ -192,9 +203,234 @@ export class AddBudgetComponent implements OnInit {
     }
   }
 
+  getMinMaxVals(){
+    var budget = this.addBudgetForm.value;
+    var budgetLevel = null;
+    if (budget.category2 && budget.category3) {
+      budgetLevel = 3;
+    }
+    else if (budget.category2) {
+      budgetLevel = 2
+    }
+    else {
+      budgetLevel = 1
+    }
+
+    var key = budget.category
+    if (key in this.budgetMins) {
+      // Top case
+      if (budgetLevel === 1) {
+        if (2 in this.budgetMins[key]) {
+          // this.minVal = this.budgetMins[key][2];
+          this.minVal = 0;
+          for (let cat of Object.keys(this.budgetMins[key][2])) {
+            this.minVal = this.minVal + this.budgetMins[key][2][cat];
+          }
+        }
+        else if (3 in this.budgetMins[key]) {
+          this.minVal = 0;
+          for (let cat of Object.keys(this.budgetMins[key][3])) {
+            this.minVal = this.minVal + this.budgetMins[key][3][cat];
+          }
+        }
+        else {
+          this.minVal = 1
+        }
+        this.maxVal = Number.POSITIVE_INFINITY;
+      }
+
+      // Middle case
+      else if (budgetLevel === 2) {
+        if (1 in this.budgetMins[key] && 3 in this.budgetMins[key]) {
+          // min
+          if (budget.category2 in this.budgetMins[key][3]) {
+            this.minVal = this.budgetMins[key][3][budget.category2]
+          }
+          else {
+            this.minVal = 1
+          }
+
+          // max
+          var otherVals = 0;
+          for (let cat of Object.keys(this.budgetMins[key][2])) {
+            if (cat !== budget.category2) {
+              otherVals = otherVals + this.budgetMins[key][2][cat];
+            }
+          }
+          this.maxVal = this.budgetMins[key][1] - otherVals;
+        }
+        else if (1 in this.budgetMins[key]) {
+          this.minVal = 1
+          var otherVals = 0;
+          for (let cat of Object.keys(this.budgetMins[key][2])) {
+            if (cat !== budget.category2) {
+              otherVals = otherVals + this.budgetMins[key][2][cat];
+            }
+          }
+          this.maxVal = this.budgetMins[key][1] - otherVals;
+        }
+        else if (3 in this.budgetMins[key]) {
+          if (budget.category2 in this.budgetMins[key][3]) {
+            this.minVal = this.budgetMins[key][3][budget.category2]
+          }
+          else {
+            this.minVal = 1
+          }
+          this.maxVal = this.maxVal = Number.POSITIVE_INFINITY;
+        }
+        else {
+          this.minVal = 1
+          this.maxVal = this.maxVal = Number.POSITIVE_INFINITY;
+        }
+      }
+
+      // Bottom case
+      else {
+        if (2 in this.budgetMins[key] && 1 in this.budgetMins[key]) {
+          if (budget.category2 in this.budgetMins[key][2]) {
+            var currVals = 0;
+            if (budget.category2 in this.budgetMins[key][3]) {
+              currVals = this.budgetMins[key][3][budget.category2];
+              this.maxVal = this.budgetMins[key][2][budget.category2] - currVals;
+            }
+            else {
+              this.maxVal = this.budgetMins[key][2][budget.category2];
+            }
+          }
+          else {
+            var otherVals = 0;
+            for (let cat of Object.keys(this.budgetMins[key][2])) {
+              if (cat !== budget.category2) {
+                otherVals = otherVals + this.budgetMins[key][2][cat];
+              }
+            }
+            var currVals = 0;
+            if (budget.category2 in this.budgetMins[key][3]) {
+              currVals = this.budgetMins[key][3][budget.category2];
+              this.maxVal = this.budgetMins[key][1] - otherVals - currVals;
+            }
+            else {
+              this.maxVal = this.budgetMins[key][1] - otherVals;
+            }
+          }
+        }
+        else if (2 in this.budgetMins[key]) {
+          if (budget.category2 in this.budgetMins[key][2]) {
+            var currVals = 0;
+            if (budget.category2 in this.budgetMins[key][3]) {
+              currVals = this.budgetMins[key][3][budget.category2];
+              this.maxVal = this.budgetMins[key][2][budget.category2] - currVals;
+            }
+            else {
+              this.maxVal = this.budgetMins[key][2][budget.category2];
+            }
+          }
+          else {
+            this.maxVal = Number.POSITIVE_INFINITY;
+          }
+        }
+        else if (1 in this.budgetMins[key]) {
+          var currVals = 0;
+          if (budget.category2 in this.budgetMins[key][3]) {
+            currVals = this.budgetMins[key][3][budget.category2];
+            this.maxVal = this.budgetMins[key][1] - currVals;
+          }
+          else {
+            this.maxVal = this.budgetMins[key][1];
+          }
+        }
+        else {
+          this.maxVal = Number.POSITIVE_INFINITY;
+        }
+        this.minVal = 1;
+      }
+    }
+    else {
+      this.minVal = 1;
+      this.maxVal = Number.POSITIVE_INFINITY;
+    }
+    
+    this.addBudgetForm.controls.amount.setValidators([Validators.required, Validators.min(this.minVal), Validators.max(this.maxVal)]);
+
+    this.addBudgetForm.controls.amount.updateValueAndValidity();
+
+    console.log("Min Val: ", this.minVal)
+    console.log("Max Val: ", this.maxVal)
+  }
+
+  createBudgetMins() {
+    for (let budget of this.budgets) {
+      var budgetLevel = null;
+      if (budget.category2 && budget.category3) {
+        budgetLevel = 3;
+      }
+      else if (budget.category2) {
+        budgetLevel = 2
+      }
+      else {
+        budgetLevel = 1
+      } 
+
+      // var key = budget.category + String(budgetLevel);
+      var key = budget.category
+      if (key in this.budgetMins) {
+        if (budgetLevel in this.budgetMins[key]) {
+          if (budgetLevel === 3) {
+            if (budget.category2 in this.budgetMins[key][budgetLevel]) {
+              this.budgetMins[key][budgetLevel][budget.category2] = this.budgetMins[key][budgetLevel][budget.category2] + Number(budget.amount);
+            }
+            else {
+              this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
+            }
+          }
+          else if (budgetLevel === 2) {
+            if (budget.category2 in this.budgetMins[key][budgetLevel]) {
+              this.budgetMins[key][budgetLevel][budget.category2] = this.budgetMins[key][budgetLevel][budget.category2] + Number(budget.amount);
+            }
+            else {
+              this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
+            }
+          }
+          else {
+            this.budgetMins[key][budgetLevel] = this.budgetMins[key][budgetLevel] + Number(budget.amount);
+          }
+        }
+        else {
+          if (budgetLevel === 3) {
+            this.budgetMins[key][budgetLevel] = {}
+            this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
+          }
+          if (budgetLevel === 2) {
+            this.budgetMins[key][budgetLevel] = {}
+            this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
+          }
+          else {
+            this.budgetMins[key][budgetLevel] = Number(budget.amount);
+          }
+        }
+      }
+      else {
+        this.budgetMins[key] = {};
+        if (budgetLevel === 3) {
+          this.budgetMins[key][budgetLevel] = {}
+          this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
+        }
+        else if (budgetLevel === 2) {
+          this.budgetMins[key][budgetLevel] = {}
+          this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
+        }
+        else {
+          this.budgetMins[key][budgetLevel] = Number(budget.amount);
+        }
+      }
+    }
+    console.log(this.budgetMins)
+  }
+
   firstOpSelected(select) {
     console.log(select);
     console.log(this.categories);
+    console.log(this.addBudgetForm)
     this.firstSelected = false;
     this.secondSelected = false;
     // if (this.edit) {
@@ -212,6 +448,8 @@ export class AddBudgetComponent implements OnInit {
         this.firstSelected = true;
       }
     }
+
+    this.getMinMaxVals()
   }
 
   secondOpSelected(select) {
@@ -233,6 +471,13 @@ export class AddBudgetComponent implements OnInit {
         this.secondSelected = true;
       }
     }
+    this.getMinMaxVals()
+  }
+
+  thirdOpSelected(select) {
+    console.log(select);
+    console.log(this.categories3);
+    this.getMinMaxVals()
   }
 
 }

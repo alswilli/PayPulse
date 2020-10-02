@@ -480,7 +480,7 @@ export class BudgetsComponent implements OnInit {
   }
 
   onAddBudgetClicked() {
-    const addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, edit: false}});
+    const addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: false}});
     addBudgetRef.componentInstance.onAdd
       .subscribe(result => {
         console.log(result);
@@ -837,7 +837,7 @@ export class BudgetsComponent implements OnInit {
 
   onEditBudgetClicked(currBudget) {
     console.log(currBudget);
-    const editBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, edit: true, budget: currBudget}});
+    const editBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: true, budget: currBudget}});
     editBudgetRef.componentInstance.onEdit
       .subscribe(result => {
         console.log(result);
