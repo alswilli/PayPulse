@@ -1,5 +1,6 @@
 import { of } from 'rxjs';
 import { TRANSACTIONS } from '../shared/transactions';
+import { CATEGORIES } from '../shared/categories';
 
 export class AccountServiceStub {
   getUserList() {
@@ -37,8 +38,12 @@ export class AccountServiceStub {
     
   }
 
-  getTransactions(accountId: string, postsPerPage: number, currentPage: number) {
+  getTransactions(accountId: string, postsPerPage: number, currentPage: number, subAccount: string, subAccoutId: string) {
     return of({transactions: TRANSACTIONS, maxTransactions: 1});
+  }
+
+  getTransactionCategories() {
+    return of(CATEGORIES)
   }
 
   getRecentTransactions(accountId: string) {

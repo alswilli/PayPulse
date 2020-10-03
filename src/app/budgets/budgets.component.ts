@@ -110,7 +110,7 @@ export class BudgetsComponent implements OnInit {
     this.accountService.getTransactionCategories()
       .pipe(
         mergeMap((categories) => {
-          console.log(categories);
+          console.log("Categories: ", categories);
           this.categories = {};
           for (let row of categories) {
             var i = 0;

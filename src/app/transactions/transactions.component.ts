@@ -68,9 +68,9 @@ export class TransactionsComponent implements OnInit {
     console.log("ngInit");
 
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
-    console.log(this.userAccountsDetails)
+    console.log("Current Account Details: ", this.userAccountsDetails)
     this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id; 
-    console.log(this.currentAccountId);
+    console.log("Current Account Id: ", this.currentAccountId);
 
     this.listValue.push('All');
     this.subAccount = 'All';
@@ -82,9 +82,11 @@ export class TransactionsComponent implements OnInit {
     this.balancesCurrentDict = {};
     this.balancesCurrentDict['All'] = 0;
     this.preSelection.push('All')
-    console.log(this.preSelection);
+    console.log("Pre Selection: ", this.preSelection);
     for (let account of this.userAccountsDetails.currentAccount) {
+      console.log("A");
       for (let subAcc of account.subAccounts) {
+        console.log("B");
         this.listValue.push(subAcc.name);
         // console.log(subAcc.name);
         // console.log(subAcc.account_id);
@@ -94,6 +96,7 @@ export class TransactionsComponent implements OnInit {
         this.balancesCurrentDict[subAcc.name] = subAcc.balances.current;
       }
     }
+    console.log("C");
 
     // var totalAvailable = 0;
     var totalCurrent = 0;
@@ -106,12 +109,13 @@ export class TransactionsComponent implements OnInit {
       totalCurrent = totalCurrent + this.balancesCurrentDict[key];
     }
     // console.log(totalAvailable);
-    console.log(totalCurrent);
+    console.log("Total Current: ", totalCurrent);
     this.balancesCurrentDict['All'] = totalCurrent;
 
     for (let key in this.balancesCurrentDict) {
       var currVal = String(this.balancesCurrentDict[key])
       var i = currVal.indexOf(".");
+      console.log("Curr val: ", currVal)
       if (i > -1 && i + 3 < currVal.length) {
         this.balancesCurrentDict[key] = Number(currVal.substring(0, i+3));
       }

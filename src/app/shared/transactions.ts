@@ -6,8 +6,9 @@ export const TRANSACTIONS: Transaction[] = [
         category: ["Payment", "Credit Card"],
         date: "2020-07-14",
         transactionName: "CREDIT CARD 3333 PAYMENT *//",
+        accountName: "Checking",
         _id: "K75d11MPvAHz9zqraBJLsW8m3Xz3JKTVbwVJ4",
-        account_id: "SDFKGSF9435986FGEF8EF"
+        account_id: "8wefiwef"
     },
     // {
     //     id: '1',
