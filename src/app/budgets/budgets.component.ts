@@ -140,6 +140,7 @@ export class BudgetsComponent implements OnInit {
       mergeMap(budgets => {
         console.log("made it");
         this.budgets = budgets;
+        console.log(this.budgets)
         var today = new Date();
 
         this.days = today.getDate()-1;
@@ -315,6 +316,26 @@ export class BudgetsComponent implements OnInit {
   //   });
   // }
 
+  truncateVal(val) {
+    console.log(val)
+    var strVal = String(val);
+    var i = 0;
+    while (i < strVal.length) {
+      if (strVal[i] == ".") {
+        if (i+3 <= strVal.length) {
+          i = i + 3;
+        }
+        else if (i+2 <= strVal.length) {
+          i = i + 2;
+        }
+        break;  
+      }
+      i = i + 1
+    }
+    console.log(i)
+    return Number(strVal.substring(0, i));
+  }
+
   onGetTransactions() {
     console.log(this.transactions);
       this.pieData = [];
@@ -331,6 +352,7 @@ export class BudgetsComponent implements OnInit {
             }
           }
         }
+        total = this.truncateVal(total);
         budget.total = total;
 
         var parents = []

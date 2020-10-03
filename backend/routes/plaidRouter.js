@@ -24,7 +24,7 @@ const client = new plaid.Client(
   PLAID_CLIENT_ID,
   PLAID_SECRET,
   PLAID_PUBLIC_KEY,
-  plaid.environments.sandbox,
+  plaid.environments.development,
   { version: "2018-05-22" }
 );
 

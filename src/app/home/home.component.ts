@@ -222,12 +222,34 @@ export class HomeComponent implements OnInit {
     } 
   }
 
+  truncateVal(val) {
+    console.log(val)
+    var strVal = String(val);
+    var i = 0;
+    while (i < strVal.length) {
+      if (strVal[i] == ".") {
+        if (i+3 <= strVal.length) {
+          i = i + 3;
+        }
+        else if (i+2 <= strVal.length) {
+          i = i + 2;
+        }
+        break;  
+      }
+      i = i + 1
+    }
+    console.log(i)
+    return Number(strVal.substring(0, i));
+  }
+
   getTop3Budgets() {
     var sortedBudgets = [];
+    console.log(this.budgets)
     for (let budget of this.budgets) {
-      if (budget.total < Number(budget.amount) && budget.total > 0) {
-        sortedBudgets.push(budget);
-      }
+      // if (budget.total < Number(budget.amount) && budget.total > 0) {
+      //   sortedBudgets.push(budget);
+      // }
+      sortedBudgets.push(budget);
     }
     sortedBudgets.sort((a, b) => {
       var diffA = Number(a.amount) - a.total;
@@ -238,6 +260,8 @@ export class HomeComponent implements OnInit {
     var i = 0;
     this.top3Budgets = [];
     while (i < 3 && sortedBudgets[i]) {
+      var truncatedTotal = this.truncateVal(sortedBudgets[i].total)
+      sortedBudgets[i].total = truncatedTotal;
       this.top3Budgets.push(sortedBudgets[i]);
       i += 1;
     }

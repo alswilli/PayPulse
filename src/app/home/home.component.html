@@ -29,7 +29,7 @@
     <!-- <p>Bank Account Selected: {{currentAccountName}}</p> -->
     <div>
       <!-- <button mat-raised-button class="addDeleteButtons" routerLink='/linkAccount' color="primary">Add Account</button> -->
-      <mr-ngx-plaid-link-button env="sandbox" publicKey="ea1ee62219264cf290c12041f96bba" (Success)="onPlaidSuccess($event)" 
+      <mr-ngx-plaid-link-button env="development" publicKey="ea1ee62219264cf290c12041f96bba" (Success)="onPlaidSuccess($event)" 
       (Exit)="onPlaidExit($event)" (Load)="onPlaidLoad($event)" (Event)="onPlaidEvent($event)" 
       className="launch-plaid-link-button" buttonText="Add Account" 
       (Click)="onPlaidClick($event)" webhook="https://507ec71083932519eb6c52a27bbe8afd.m.pipedream.net"
@@ -88,6 +88,9 @@
             <div *ngIf="component.name === 'Budgets' && card.name === 'Top Budgets'">
               <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
               <div *ngIf="!isLoading"> 
+                <div *ngIf="top3Budgets.length === 0">
+                  <p>No recent budgets for this month yet!</p>
+                </div>
                 <div *ngFor="let budget of top3Budgets">
                   <p fxFlex *ngIf="budget.mainCategory === budget.category3">
                     {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
