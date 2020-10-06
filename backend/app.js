@@ -36,6 +36,9 @@ connect.then((db) => {
 //   }
 // });
 
+var distDir = __dirname + "/dist/";
+app.use(express.static(distDir));
+
 app.use(passport.initialize());
 
 // Connecting middleware
@@ -44,13 +47,13 @@ app.use('/plaid', plaidRouter);
 app.use('/users', userRouter);
 app.use('/budgets', budgetRouter);
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname + 'dist')));
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(express.static(path.join(__dirname + 'dist')));
 
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'PayPulse', 'index.html'));
-  })
-}
+//   app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'dist', 'PayPulse', 'index.html'));
+//   })
+// }
 
 module.exports = app;
 
