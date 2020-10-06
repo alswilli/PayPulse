@@ -50,10 +50,12 @@ connect.then((db) => {
 //   // });
 // }
 
-app.use(express.static(path.join(__dirname, '..', 'dist', 'PayPulse')));
-app.get('/*', function(req,res) {
-  res.sendFile(path.join(__dirname, '..', 'dist', 'PayPulse', 'index.html'));
-});
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '..', 'dist', 'PayPulse')));
+  app.get('/*', function(req,res) {
+    res.sendFile(path.join(__dirname, '..', 'dist', 'PayPulse', 'index.html'));
+  });
+}
 
 app.use(passport.initialize());
 
