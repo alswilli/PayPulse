@@ -8,7 +8,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "heroku-postbuild": "npm install && ng build --prod --aot && cd dist"
+    "preinstall": "npm install -g angular-cli",
+    "heroku-postbuild": "ng build --prod --aot"
   },
   "private": true,
   "dependencies": {
