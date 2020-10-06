@@ -50,9 +50,9 @@ connect.then((db) => {
 //   // });
 // }
 
-app.use(express.static(__dirname + '/dist/pay-pulse'));
+app.use(express.static(__dirname + '../dist/pay-pulse'));
 app.get('/*', function(req,res) {
-  res.sendFile(path.join(__dirname + '/dist/pay-pulse/index.html'));
+  res.sendFile(path.join(__dirname + '../dist/pay-pulse/index.html'));
 });
 
 app.use(passport.initialize());
