@@ -1,0 +1,30 @@
+{
+  "name": "pay-pulse",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.4",
+    "dotenv": "^8.2.0",
+    "express": "^4.16.3",
+    "hammerjs": "^2.0.8",
+    "jsonwebtoken": "^8.3.0",
+    "moment": "^2.27.0",
+    "mongoose": "^5.1.7",
+    "mongoose-currency": "^0.2.0",
+    "morgan": "^1.9.0",
+    "multer": "^1.3.1",
+    "ngx-plaid-link": "^1.0.2",
+    "passport": "^0.4.0",
+    "passport-facebook-token": "^3.3.0",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^5.0.1",
+    "plaid": "^5.2.0"
+  },
+  "engines": { "node" : "10.4.0" },
+  "scripts": {
+    "start": "node server.js",
+    "heroku-postbuild": "cd dist && npm install && ng build --prod"
+  }
+}

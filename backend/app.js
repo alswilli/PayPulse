@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const passport = require('passport');
+const path = require('path');
 
 const app = express()
 
@@ -19,21 +20,21 @@ const mongoDatabaseName = process.env.MONGODB_DATABASE_NAME;
 
 // const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName + "?retryWrites=true&w=majority";
 const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName;
-const connect = mongoose.connect(url);
+const connect = mongoose.connect( process.env.MONGODB_URI || url);
 
 connect.then((db) => {
     console.log("Connected correctly to server");
 }, (err) => { console.log(err); });
 
-// Secure traffic only
-app.all('*', (req, res, next) => {
-  if (req.secure) {
-    return next();
-  }
-  else {
-    res.redirect(307, 'https://' + req.hostname + ':' + app.get('secPort') + req.url);
-  }
-});
+// // Secure traffic only
+// app.all('*', (req, res, next) => {
+//   if (req.secure) {
+//     return next();
+//   }
+//   else {
+//     res.redirect(307, 'https://' + req.hostname + ':' + app.get('secPort') + req.url);
+//   }
+// });
 
 app.use(passport.initialize());
 
@@ -42,6 +43,14 @@ app.use('/transactions', transactionRouter);
 app.use('/plaid', plaidRouter);
 app.use('/users', userRouter);
 app.use('/budgets', budgetRouter);
+
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static('dist/PayPulse'));
+
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'PayPulse', 'index.html'));
+  })
+}
 
 module.exports = app;
 

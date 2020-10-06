@@ -3,7 +3,7 @@
   <div fxFlex='18'>
     <h4 matSubheader class="toggleHeader">Accounts</h4>
     <div style="border-style: solid; border-width: 1px;">
-      <mat-selection-list *ngIf="!firstLoad">
+      <mat-selection-list>
         <mat-list-option class="mat-primary" *ngFor="let list of listValue" (click)="onSubAccountChanged(list);" 
         [selected]="preSelection.indexOf(list) > -1" [value]="list">
           <div>

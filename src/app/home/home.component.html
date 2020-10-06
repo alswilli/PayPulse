@@ -29,7 +29,7 @@
     <!-- <p>Bank Account Selected: {{currentAccountName}}</p> -->
     <div>
       <!-- <button mat-raised-button class="addDeleteButtons" routerLink='/linkAccount' color="primary">Add Account</button> -->
-      <mr-ngx-plaid-link-button env="development" publicKey="ea1ee62219264cf290c12041f96bba" (Success)="onPlaidSuccess($event)" 
+      <mr-ngx-plaid-link-button env="sandbox" publicKey="ea1ee62219264cf290c12041f96bba" (Success)="onPlaidSuccess($event)" 
       (Exit)="onPlaidExit($event)" (Load)="onPlaidLoad($event)" (Event)="onPlaidEvent($event)" 
       className="launch-plaid-link-button" buttonText="Add Account" 
       (Click)="onPlaidClick($event)" webhook="https://507ec71083932519eb6c52a27bbe8afd.m.pipedream.net"

@@ -26,7 +26,7 @@ export class HomeComponent implements OnInit {
   @ViewChild(MatSelectionList) selectionList: MatSelectionList;
 
   majorComponents: MajorComponent[] = MAJORS;
-  recentTransactions: Transaction[];
+  recentTransactions: any[];
   parsedTransactions: Object[];
   userAccountsDetails: any;
   accounts: any;
@@ -50,6 +50,7 @@ export class HomeComponent implements OnInit {
   clientForm: FormGroup;
   listValue: any = [];
   preSelection = [];
+  environment: string;
 
   constructor(private transactionService: TransactionService,
     private accountService: AccountService,
@@ -64,6 +65,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.isLoading = true;
+    // this.environment = process.env.PLAID_ENVIRONMENT;
     // this.firstLoad = true;
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
     console.log(this.userAccountsDetails)
@@ -90,6 +92,7 @@ export class HomeComponent implements OnInit {
       .subscribe((transactions) => {
         // this.isLoading = false;
         // this.firstLoad = false;
+        console.log("Inside Transactions")
         this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
         this.recentTransactions.forEach(element => {
           console.log(element);

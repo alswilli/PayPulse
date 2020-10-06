@@ -17,17 +17,17 @@ export class TransactionService {
 
   getTransactions(postsPerPage: number, currentPage: number) {
     const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}`;
-    return this.http.get<{transactions: Transaction[], maxTransactions: number}>(baseURL + 'transactions' + queryParams)
+    return this.http.get<{transactions: any[], maxTransactions: number}>(baseURL + 'transactions' + queryParams)
       .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
-  getTransaction(id: string): Observable<Transaction> {
-    return this.http.get<Transaction>(baseURL + 'transactions/' + id)
+  getTransaction(id: string): Observable<any> {
+    return this.http.get<any>(baseURL + 'transactions/' + id)
       .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
   getRecentTransactions() {
-    return this.http.get<Transaction[]>(baseURL + 'transactions?recentTransactions=true')
+    return this.http.get<any[]>(baseURL + 'transactions?recentTransactions=true')
       .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 

@@ -6,7 +6,7 @@
 var app = require('./app');
 var debug = require('debug')('pay-pulse');
 var http = require('http');
-var https = require('https');
+// var https = require('https');
 
 /**
  * Get port from environment and store in Express.
@@ -14,7 +14,7 @@ var https = require('https');
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
-app.set('secPort',port+443);
+// app.set('secPort',port+443);
 
 /**
  * Create HTTP server.
@@ -26,32 +26,34 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+server.listen(app.get('port'), () => {
+   console.log('Server listening on port ',app.get('port'));
+});
 server.on('error', onError);
 server.on('listening', onListening);
 
-/**
- * Create HTTPS server.
- */ 
+// /**
+//  * Create HTTPS server.
+//  */ 
  
-var options = {
-//   key: fs.readFileSync(__dirname+'/private.key'),
-//   cert: fs.readFileSync(__dirname+'/certificate.pem')
-    key: process.env.HTTPS_PRIVATE_KEY,
-    cert: process.env.HTTPS_CERTIFICATE
-};
+// var options = {
+// //   key: fs.readFileSync(__dirname+'/private.key'),
+// //   cert: fs.readFileSync(__dirname+'/certificate.pem')
+//     key: process.env.HTTPS_PRIVATE_KEY,
+//     cert: process.env.HTTPS_CERTIFICATE
+// };
 
-var secureServer = https.createServer(options,app);
+// var secureServer = https.createServer(options,app);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
+// /**
+//  * Listen on provided port, on all network interfaces.
+//  */
 
-secureServer.listen(app.get('secPort'), () => {
-   console.log('Server listening on port ',app.get('secPort'));
-});
-secureServer.on('error', onError);
-secureServer.on('listening', onListening);
+// secureServer.listen(app.get('secPort'), () => {
+//    console.log('Server listening on port ',app.get('secPort'));
+// });
+// secureServer.on('error', onError);
+// secureServer.on('listening', onListening);
 
 /**
  * Normalize a port into a number, string, or false.

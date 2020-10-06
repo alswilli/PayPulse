@@ -24,7 +24,7 @@ const client = new plaid.Client(
   PLAID_CLIENT_ID,
   PLAID_SECRET,
   PLAID_PUBLIC_KEY,
-  plaid.environments.development,
+  plaid.environments.sandbox,
   { version: "2018-05-22" }
 );
 
@@ -296,11 +296,13 @@ plaidRouter.route("/accounts/transactions/:accountId")
       client.getTransactions(ACCESS_TOKEN, numDaysAgo, today, function(error, response) {
         if (error != null) {
           // prettyPrintResponse(error);
+          console.log(error)
           return res.json({
             error: error
           });
         } else {
           console.log("here");
+          console.log("First Transaction: ", response.transactions[0])
           // Checks for pagination query params
           if (pageSize && currentPage) {
             // Filter for subAccount

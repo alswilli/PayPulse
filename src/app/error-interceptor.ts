@@ -16,6 +16,7 @@ import {
     intercept(req: HttpRequest<any>, next: HttpHandler) {
       return next.handle(req).pipe(
         catchError((error: HttpErrorResponse) => {
+          console.log("ERROR: ", error)
           let errorMessage = "An unknown error occurred!";
           if (error.error.message) {
             errorMessage = error.error.message;

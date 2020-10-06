@@ -97,19 +97,19 @@ export class AccountService {
 
   getTransactions(accountId: string, postsPerPage: number, currentPage: number, subAccount: string, subAccountId: string) {
     const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}&subAccount=${subAccount}&subAccountId=${subAccountId}`;
-    return this.http.get<{transactions: Transaction[], maxTransactions: number}>(baseURL + 'plaid/accounts/transactions/' + accountId + queryParams);
+    return this.http.get<{transactions: any[], maxTransactions: number}>(baseURL + 'plaid/accounts/transactions/' + accountId + queryParams);
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
   getRecentTransactions(accountId: string, days: number, subdays: number) {
     const queryParams = `&days=${days}&subdays=${subdays}`;
-    return this.http.get<Transaction[]>(baseURL + 'plaid/accounts/transactions/'  + accountId + '?recentTransactions=true' + queryParams);
+    return this.http.get<any[]>(baseURL + 'plaid/accounts/transactions/'  + accountId + '?recentTransactions=true' + queryParams);
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
   getBudgetTransactions(accountId: string, days: number, subdays: number) {
     const queryParams = `&days=${days}&subdays=${subdays}`;
-    return this.http.get<Transaction[]>(baseURL + 'plaid/accounts/transactions/'  + accountId + '?budgetTransactions=true' + queryParams);
+    return this.http.get<any[]>(baseURL + 'plaid/accounts/transactions/'  + accountId + '?budgetTransactions=true' + queryParams);
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 

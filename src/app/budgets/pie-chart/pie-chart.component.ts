@@ -34,6 +34,7 @@ export class PieChartComponent implements OnInit {
   constructor(private pieChartService: PieChartService) { }
 
   ngOnInit(): void {
+    console.log("In the pie chart component")
     this.createSvg();
     this.createColors();
     this.createPie();
@@ -118,7 +119,12 @@ export class PieChartComponent implements OnInit {
     //   .innerRadius(0)
     //   .outerRadius(this.radius)
     // )
-    .attr('fill', (d, i) => (this.colors(i)))
+
+    .attr('fill', (d, i) => {
+      console.log("COLOR: ", this.colors(i))
+      return this.colors(i);
+    })
+    // .style('fill', 'darkOrange')
     .attr("stroke", "#121926")
     .style("stroke-width", "1px")
     .attr("id", "mypiechart");
