@@ -44,13 +44,14 @@ app.use('/plaid', plaidRouter);
 app.use('/users', userRouter);
 app.use('/budgets', budgetRouter);
 
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static('dist/PayPulse'));
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(express.static('dist/PayPulse'));
 
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'dist', 'PayPulse', 'index.html'));
-  })
-}
+//   app.get('*', (req, res) => {
+//     res.sendFile(path.join(__dirname, 'dist', 'PayPulse', 'index.html'));
+//   })
+// }
+app.use(express.static(__dirname + '/dist'));
 
 module.exports = app;
 
