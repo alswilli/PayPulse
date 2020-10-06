@@ -2,17 +2,17 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 
-// const whitelist = ['http://localhost:3000', 'https://localhost:4200', 'https://paypulse-real.herokuapp.com'];
+const whitelist = ['http://localhost:3000', 'https://localhost:4200', 'https://paypulse-real.herokuapp.com'];
 var corsOptionsDelegate = (req, callback) => {
-    // var corsOptions;
-    var corsOptions = { origin: true };
-    // console.log(req.header('Origin'));
-    // if(whitelist.indexOf(req.header('Origin')) !== -1) {
-    //     corsOptions = { origin: true };
-    // }
-    // else {
-    //     corsOptions = { origin: false };
-    // }
+    var corsOptions;
+    // corsOptions = { origin: true };
+    console.log(req.header('Origin'));
+    if(whitelist.indexOf(req.header('Origin')) !== -1) {
+        corsOptions = { origin: true };
+    }
+    else {
+        corsOptions = { origin: false };
+    }
     callback(null, corsOptions);
 };
 
