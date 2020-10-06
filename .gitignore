@@ -7,7 +7,6 @@
 /backend/bin/private.key
 
 # compiled output
-/dist
 /tmp
 /out-tsc
 
