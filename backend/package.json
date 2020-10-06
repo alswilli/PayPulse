@@ -25,6 +25,6 @@
   "engines": { "node" : "10.4.0" },
   "scripts": {
     "start": "node server.js",
-    "heroku-postbuild": "cd dist && npm install && ng build --prod"
+    "postinstall": "ng build --aot --prod"
   }
 }
