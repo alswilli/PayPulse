@@ -3,7 +3,7 @@
 /**
  * Module dependencies.
  */
-var app = require('./backend/app');
+var app = require('./app');
 var debug = require('debug')('pay-pulse');
 var http = require('http');
 // var https = require('https');
