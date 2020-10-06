@@ -39,22 +39,18 @@ connect.then((db) => {
 // var distDir = __dirname + "/dist/";
 // app.use(express.static(distDir));
 
-// if (process.env.NODE_ENV === 'production') {
-//   // Exprees will serve up production assets
-//   // app.use(express.static('dist/PayPulse'));
-//   app.use(express.static(path.join(__dirname, 'dist', "PayPulse")))
-
-//   // // Express serve up index.html file if it doesn't recognize route
-//   // app.get('*', (req, res) => {
-//   //   res.sendFile(path.join(__dirname, 'dist', 'PayPulse', 'index.html'));
-//   // });
-// }
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '..', 'dist', 'PayPulse')));
+  app.get('/*', function(req,res) {
+    res.sendFile(path.join(__dirname, '..', 'dist', 'PayPulse', 'index.html'));
+  });
+}
 
 
-app.use(express.static(path.join(__dirname, '..', 'dist', 'PayPulse')));
-app.get('/*', function(req,res) {
-  res.sendFile(path.join(__dirname, '..', 'dist', 'PayPulse', 'index.html'));
-});
+// app.use(express.static(path.join(__dirname, '..', 'dist', 'PayPulse')));
+// app.get('/*', function(req,res) {
+//   res.sendFile(path.join(__dirname, '..', 'dist', 'PayPulse', 'index.html'));
+// });
 
 
 app.use(passport.initialize());
@@ -64,14 +60,6 @@ app.use('/transactions', transactionRouter);
 app.use('/plaid', plaidRouter);
 app.use('/users', userRouter);
 app.use('/budgets', budgetRouter);
-
-// if (process.env.NODE_ENV === 'production') {
-//   app.use(express.static(path.join(__dirname + 'dist')));
-
-//   app.get('*', (req, res) => {
-//     res.sendFile(path.join(__dirname, 'dist', 'PayPulse', 'index.html'));
-//   })
-// }
 
 module.exports = app;
 
