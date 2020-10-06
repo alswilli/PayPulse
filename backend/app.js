@@ -36,8 +36,18 @@ connect.then((db) => {
 //   }
 // });
 
-var distDir = __dirname + "/dist/";
-app.use(express.static(distDir));
+// var distDir = __dirname + "/dist/";
+// app.use(express.static(distDir));
+
+if (process.env.NODE_ENV === 'production') {
+  // Exprees will serve up production assets
+  app.use(express.static('dist/PayPulse'));
+
+  // Express serve up index.html file if it doesn't recognize route
+  app.get('*', (req, res) => {
+    res.sendFile(path.resolve(__dirname, 'dist', 'PayPulse', 'index.html'));
+  });
+}
 
 app.use(passport.initialize());
 
