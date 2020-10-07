@@ -1,5 +1,5 @@
 import { of } from 'rxjs';
-import { TRANSACTIONS } from '../shared/transactions';
+import { TRANSACTIONS, LESSTHAN30TRANSACTIONS, MORETHAN30TRANSACTIONS } from '../shared/transactions';
 import { CATEGORIES } from '../shared/categories';
 
 export class AccountServiceStub {
@@ -48,5 +48,14 @@ export class AccountServiceStub {
 
   getRecentTransactions(accountId: string) {
     
+  }
+
+  getBudgetTransactions(accountId: string, days: number, subdays: number) {
+    if (days < 30) {
+      return of(LESSTHAN30TRANSACTIONS)
+    }
+    else if (days >= 30) {
+      return of(MORETHAN30TRANSACTIONS)
+    }
   }
 }

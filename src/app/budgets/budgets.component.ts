@@ -347,12 +347,14 @@ export class BudgetsComponent implements OnInit {
         for (let transaction of this.transactions) {
           for (let category of transaction.category) {
             if (category === mainCategory) {
+              console.log("Amount: ", transaction.amount)
               total += transaction.amount;
               break;
             }
           }
         }
         total = this.truncateVal(total);
+        console.log("Total: ", total)
         budget.total = total;
 
         var parents = []

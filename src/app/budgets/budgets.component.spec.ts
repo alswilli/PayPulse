@@ -23,12 +23,12 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { NgxPlaidLinkModule } from 'ngx-plaid-link';
 import { HttpClientModule } from '@angular/common/http';
-import { MatExpansionModule } from '@angular/material/expansion';
+import { MatExpansionModule, MatAccordion } from '@angular/material/expansion';
 
 import { MatGridListModule } from '@angular/material/grid-list';;
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSelectModule, MatSelect } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSliderModule } from '@angular/material/slider';
@@ -36,6 +36,8 @@ import { PieChartComponent } from './pie-chart/pie-chart.component';
 import { AccountService } from '../services/account.service';
 import { AccountServiceStub } from '../mock-services/account.service.mock';
 import { baseURL } from '../shared/baseurl';
+import { BudgetService } from '../services/budget.service';
+import { BudgetServiceStub } from '../mock-services/budget.service.mock';
 
 describe('BudgetsComponent', () => {
   let component: BudgetsComponent;
@@ -71,7 +73,10 @@ describe('BudgetsComponent', () => {
         RouterTestingModule.withRoutes([{ path: 'budgets', component: BudgetsComponent }]) ],
       providers: [
         { provide: AccountService, useClass: AccountServiceStub },
-        { provide: 'baseURL', useValue: baseURL }
+        { provide: BudgetService, useClass: BudgetServiceStub },
+        { provide: 'baseURL', useValue: baseURL },
+        MatAccordion,
+        MatSelect
       ]
     })
     .compileComponents();
@@ -167,7 +172,7 @@ describe('BudgetsComponent', () => {
     localStorage.setItem('User Accounts Details', JSON.stringify(store));
     fixture = TestBed.createComponent(BudgetsComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
+    fixture.autoDetectChanges();
 
     const mockLocalStorage = {
       getItem: (key: string): string => {
