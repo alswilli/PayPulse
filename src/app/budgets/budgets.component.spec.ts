@@ -44,6 +44,8 @@ import { DeleteBudgetComponent } from './delete-budget/delete-budget.component';
 import { BrowserDynamicTestingModule } from '@angular/platform-browser-dynamic/testing';
 import { componentFactoryName } from '@angular/compiler';
 import { ADDEDBUDGETS } from '../shared/budgets';
+import { moveBindingIndexToReservedSlot } from '@angular/core/src/render3/instructions';
+import { Budget } from '../shared/budget';
 
 // <<-- Create a MatDialog mock class -->>
 export class MatDialogStub {
@@ -247,35 +249,7 @@ describe('BudgetsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // it('should open the AddBudgetsComponent with correct data in a MatDialog', fakeAsync(() => {
-  //   // fixture.whenStable().then(() => {
-    
-  //   // })
-  //   // var categories = {
-  //   //   'Food and Drink' : {
-  //   //     'Restaurant' : {
-  //   //       'Fast Food' : {},
-  //   //       'American' : {}
-  //   //     },
-  //   //     'Nightlife' : {}
-  //   //   }
-  //   // }
-  //   // console.log(categories)
-  //   // var budgets = []
-  //   // console.log(budgets);
-    
-  //   spyOn(component.dialog,'open').and.callThrough();
-  //   component.onAddBudgetClicked();
-  //   expect(component.dialog.open).toHaveBeenCalledWith(AddBudgetComponent, {
-  //     data: {
-  //       categories: component.categories,
-  //       budgets: component.budgets,
-  //       edit: false
-  //     }
-  //   });
-  // }));
-
-  it('should open the AddBudgetsComponent, add a new budget, and close', fakeAsync((done) => {
+  it('should open the AddBudgetsComponent in a MatDialog with correct data', fakeAsync(() => {
     spyOn(component.dialog,'open').and.callThrough();
     component.onAddBudgetClicked();
     expect(component.dialog.open).toHaveBeenCalledWith(AddBudgetComponent, {
@@ -286,66 +260,72 @@ describe('BudgetsComponent', () => {
       }
     });
 
-    
+    component.addBudgetRef.close();
+  }));
+
+  it('should add a new budget and submit on MatDialog', fakeAsync((done) => {
+    spyOn(component.dialog,'open').and.callThrough();
+    component.onAddBudgetClicked();
+    expect(component.dialog.open).toHaveBeenCalledWith(AddBudgetComponent, {
+      data: {
+        categories: component.categories,
+        budgets: component.budgets,
+        edit: false
+      }
+    });
+
+    childComponent.addBudgetForm.value.category = "Food and Drink";
+    childComponent.addBudgetForm.value.category2 = "Restaurants";
+    childComponent.addBudgetForm.value.category3 = "";
+    childComponent.addBudgetForm.value.amount = "350";
+
+    var currBudget: Budget = {
+      _id : "",
+      userId : "",
+      mainCategory : "Restaurants",
+      category : childComponent.addBudgetForm.value.category,
+      category2 : childComponent.addBudgetForm.value.category2,
+      category3 : "",
+      amount : childComponent.addBudgetForm.value.amount,
+      total : 0
+    }
 
     spyOn(childComponent.onAdd,'emit').and.callThrough();
     // childComponent.onFormConfirmed();
     var addButton = childFixture.debugElement.nativeElement.querySelector('#addbutton');
-    // console.log(addButton)
-    // addButton.disabled = false;
-    // console.log(addButton)
-    // addButton.click();
     addButton.dispatchEvent(new Event('click'));
     tick(5);
-    expect(childComponent.onAdd.emit).toHaveBeenCalledWith( ADDEDBUDGETS );
+    // expect(childComponent.onAdd.emit).toHaveBeenCalledWith( ADDEDBUDGETS );
+    expect(childComponent.onAdd.emit).toHaveBeenCalledWith(currBudget);
+    // expect(childComponent.onAdd.emit).toHaveBeenCalled();
 
     fixture.detectChanges();
     childFixture.detectChanges();
 
-    
-
-    component.addBudgetRef.componentInstance.onAdd.emit( ADDEDBUDGETS );
-
     discardPeriodicTasks()
 
-    // component.addBudgetRef.componentInstance.onAdd.subscribe(res => {
-    //   console.log("RES: ", res)
-    //   expect(true).toEqual(false);
-    //   done();
-    // })
-    // childComponent.onAdd.subscribe(res => {
-    //   expect(true).toEqual(false);
-    //   expect(res).toEqual(2);
-    // })
-
-    // spyOn(component.addBudgetRef.componentInstance.onAdd,'emit').and.callThrough();
-    // component.addBudgetRef.componentInstance.onFormConfirmed();
-    // expect(component.addBudgetRef.componentInstance.onAdd.emit).toHaveBeenCalled();
-    
-    // expect(component.budgets.length).toEqual(3)
-    // component.addBudgetRef.close()
+    component.addBudgetRef.close()
   }));
 
-  // it('should open add dialog component', () => {
-  //   component.onAddBudgetClicked();
-  // });
+  it('should add new budget to budget list', () => {
+    expect(component.budgets.length).toEqual(2);
 
-  // it('should open add dialog when add button clicked', () => {
-  //   const addButton = document.querySelector('#addButton');
-   
-  //   addButton.click();
-  //   fixture.detectChanges();
-   
-  //   fixture.whenStable().then(() => {
-  //     const dialogDiv = document.querySelector('mat-dialog-container');
-  //     expect(dialogDiv).toBeTruthy();
-  //   });
-  // });
+    var currBudget: Budget = {
+      _id : "",
+      userId : "",
+      mainCategory : "Restaurants",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "",
+      amount : "350",
+      total : 0
+    }
 
-  // it('should open the AddBudgetsComponent, add a new budget, and close 2', () => 
-  //   // let abc = new AddBudgetComponent();
-  //   // spyOn(component.dialog, 'open')
-  //   //  .and
-  //   //  .returnValue({onAdd: () => of( ADDEDBUDGETS )});
-  // });
+    component.onAddBudgetClicked();
+    // component.addBudgetRef.componentInstance.onAdd.emit( ADDEDBUDGETS );
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(3);
+    // expect(component.budgets[component.budgets.length-1]).toEqual(ADDEDBUDGETS);
+    expect(component.budgets[component.budgets.length-1]).toEqual(currBudget);
+  })
 });
