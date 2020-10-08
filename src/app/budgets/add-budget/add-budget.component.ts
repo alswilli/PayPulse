@@ -45,8 +45,11 @@ export class AddBudgetComponent implements OnInit {
     this.isLoading = true;
     this.categories = this.data.categories;
     this.budgets = this.data.budgets;
-    this.createBudgetMins();
     console.log("Active Budgets: ", this.budgets)
+    console.log("Categories: ", this.categories)
+    // this.createBudgetMins();
+    // console.log("Active Budgets: ", this.budgets)
+    // console.log("Categories: ", this.categories)
     this.edit = this.data.edit
     if (this.edit === true) {
       console.log(this.addBudgetForm);
@@ -61,38 +64,8 @@ export class AddBudgetComponent implements OnInit {
         category3: this.data.budget.category3, amount: this.data.budget.amount});
     }
     this.getMinMaxVals();
+    console.log("here")
     this.isLoading = false;
-    // this.subscription = this.accountService.getCategoriesSub()
-    //     .subscribe(categories => { console.log(categories); this.categories = categories; this.categoriesLoading = false;});
-    // this.accountService.getTransactionCategories()
-    //     .subscribe(categories => {
-    //       console.log(categories);
-    //       this.categories = {};
-    //       for (let row of categories) {
-    //         var i = 0;
-    //         var currStr = "";
-    //         var curr = this.categories;
-    //         while (i < row.hierarchy.length) {
-    //           currStr = row.hierarchy[i];
-    //           // if (currStr !== "") {
-    //           //   currStr = currStr + "." + row.hierarchy[i];
-    //           // }
-    //           // else {
-    //           //   currStr = row.hierarchy[i];
-    //           // }
-    //           if (currStr in curr) {
-    //             curr = curr[currStr];
-    //           }
-    //           else {
-    //             curr[currStr] = {};
-    //             curr = curr[currStr];
-    //           }
-    //           i += 1;
-    //         }
-    //       }
-    //       console.log(this.categories);
-    //       this.categoriesLoading = false;
-    //     });
   }
 
   // ngOnDestroy() {
@@ -189,7 +162,11 @@ export class AddBudgetComponent implements OnInit {
     }
     else {
       this.budgetService.addBudget(returnFormValues).subscribe(res => {
+        console.log("HERERERER: ", res)
+
         this.onAdd.emit(res);
+        // this.dialogRef.close(res)
+
         // this.isLoading = false;
   
         // this.addBudgetFormDirective.resetForm();

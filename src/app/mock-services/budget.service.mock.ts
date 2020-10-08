@@ -1,6 +1,6 @@
 import { of } from 'rxjs';
 import { TRANSACTIONS } from '../shared/transactions';
-import { BUDGETS } from '../shared/budgets';
+import { BUDGETS, ADDEDBUDGETS } from '../shared/budgets';
 
 export class BudgetServiceStub {
 
@@ -9,7 +9,7 @@ export class BudgetServiceStub {
   }
 
   addBudget(budgetData: Object) {
-    
+    return of(ADDEDBUDGETS)
   }
 
   updateBudget(budgetId: string, update: object) {

@@ -38,6 +38,7 @@ export class BudgetsComponent implements OnInit {
   totalMonthsActive: number;
   currentFromMonth: string;
   currentToMonth: string;
+  addBudgetRef: any;
   // dataEmpty = true;
   dates = {
     "01":["January", 31],
@@ -504,10 +505,12 @@ export class BudgetsComponent implements OnInit {
   }
 
   onAddBudgetClicked() {
-    const addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: false}});
-    addBudgetRef.componentInstance.onAdd
+    console.log("add clicked")
+    this.addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: false}});
+    this.addBudgetRef.componentInstance.onAdd
+    // this.addBudgetRef.close()
       .subscribe(result => {
-        console.log(result);
+        console.log("RESULT: ", result);
         var total = 0;
         for (let transaction of this.transactions) {
           for (let category of transaction.category) {
@@ -651,7 +654,7 @@ export class BudgetsComponent implements OnInit {
         }
 
         // Close dialogue ref
-        addBudgetRef.close();
+        this.addBudgetRef.close();
       });
   }
 
