@@ -1,6 +1,6 @@
 import { Transaction } from './transaction';
 
-export const TRANSACTIONS: Transaction[] = [
+export const TRANSACTIONS: any[] = [
     {
         amount: '25',
         category: ["Payment", "Credit Card"],
@@ -80,21 +80,9 @@ export const TRANSACTIONS: Transaction[] = [
     // },
 ];
 
-export const LESSTHAN30TRANSACTIONS: Transaction[] = [
+export const LESSTHAN30TRANSACTIONS: any[] = [
     {
-        amount: '350',
-        category: ["Food and Drink"],
-        date: "2020-07-14",
-        transactionName: "CREDIT CARD 3333 PAYMENT *//",
-        accountName: "Checking",
-        _id: "K75d11MPvAHz9zqraBJLsW8m3Xz3JKTVbwVJ4",
-        account_id: "8wefiwef"
-    }
-];
-
-export const MORETHAN30TRANSACTIONS: Transaction[] = [
-    {
-        amount: '350',
+        amount: 350,
         category: ["Food and Drink"],
         date: "2020-07-14",
         transactionName: "CREDIT CARD 3333 PAYMENT *//",
@@ -103,7 +91,46 @@ export const MORETHAN30TRANSACTIONS: Transaction[] = [
         account_id: "8wefiwef"
     },
     {
-        amount: '250',
+        amount: 250,
+        category: ["Food and Drink", "Restaurants"],
+        date: "2020-07-14",
+        transactionName: "CREDIT CARD 3333 PAYMENT *//",
+        accountName: "Checking",
+        _id: "K75d11MPvAHz9zqraBJLsW8m3XrererJKTVbwVJ4",
+        account_id: "8wefiwef"
+    },
+    {
+        amount: 50,
+        category: ["Food and Drink", "Restaurants", "Fast Food"],
+        date: "2020-07-14",
+        transactionName: "CREDIT CARD 3333 PAYMENT *//",
+        accountName: "Checking",
+        _id: "K75d11MPwerrvAHz9zqraBJLsW8m3Xz3JKTVbwVJ4",
+        account_id: "8wefiwef"
+    },
+    {
+        amount: 50,
+        category: ["Food and Drink", "Restaurants", "American"],
+        date: "2020-07-14",
+        transactionName: "CREDIT CARD 3333 PAYMENT *//",
+        accountName: "Checking",
+        _id: "K75d11MPwerrvAHwwez9zqraBJLsW8m3Xz3JKTVbwVJ4",
+        account_id: "8wefiwef"
+    }
+];
+
+export const MORETHAN30TRANSACTIONS: any[] = [
+    {
+        amount: 350,
+        category: ["Food and Drink"],
+        date: "2020-07-14",
+        transactionName: "CREDIT CARD 3333 PAYMENT *//",
+        accountName: "Checking",
+        _id: "K75d11MPvAHz9zqraBJLsW8m3Xz3JKTVbwVJ4",
+        account_id: "8wefiwef"
+    },
+    {
+        amount: 250,
         category: ["Shops"],
         date: "2020-07-14",
         transactionName: "CREDIT CARD 3333 PAYMENT *//",

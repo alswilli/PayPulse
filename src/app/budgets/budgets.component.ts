@@ -749,6 +749,7 @@ export class BudgetsComponent implements OnInit {
           }
         }
 
+        // Start of deletion
         for (let dataVal of this.pieData) {
           if (dataVal.mainCategory === currBudget.category) {
             console.log("Found pie data")
@@ -1154,10 +1155,12 @@ export class BudgetsComponent implements OnInit {
               //   }  
               if (dataVal.total !== sameLevelTotal) {
                 if (sameLevelTotal > 0) {
+                  console.log("H")
                   dataVal.total = sameLevelTotal;
                   this.pieChartService.sendNewPieDataEvent(this.pieData);
                 }
                 else {
+                  console.log("I")
                   const indexPie = this.pieData.indexOf(dataVal, 0);
                   this.pieData.splice(indexPie, 1);
                   this.pieChartService.sendNewPieDataEvent(this.pieData);
@@ -1168,6 +1171,7 @@ export class BudgetsComponent implements OnInit {
           }
           if (notPresent) {
             if (result.total > 0) {
+              console.log("J")
               this.pieData.push({mainCategory: result.category, category: result.category, 
                 category2: result.category2, category3: result.category3, total: result.total})
               this.pieChartService.sendNewPieDataEvent(this.pieData);

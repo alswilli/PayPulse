@@ -275,53 +275,53 @@ describe('BudgetsComponent', () => {
     discardPeriodicTasks()
   }));
 
-  // it('should add a new budget and submit on MatDialog', fakeAsync((done) => {
-  //   spyOn(component.dialog,'open').and.callThrough();
+  // // it('should add a new budget and submit on MatDialog', fakeAsync((done) => {
+  // //   spyOn(component.dialog,'open').and.callThrough();
 
-  //   var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
-  //   addNewButton.dispatchEvent(new Event('click'));
+  // //   var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+  // //   addNewButton.dispatchEvent(new Event('click'));
 
-  //   // component.onAddBudgetClicked();
-  //   expect(component.dialog.open).toHaveBeenCalledWith(AddBudgetComponent, {
-  //     data: {
-  //       categories: component.categories,
-  //       budgets: component.budgets,
-  //       edit: false
-  //     }
-  //   });
+  // //   // component.onAddBudgetClicked();
+  // //   expect(component.dialog.open).toHaveBeenCalledWith(AddBudgetComponent, {
+  // //     data: {
+  // //       categories: component.categories,
+  // //       budgets: component.budgets,
+  // //       edit: false
+  // //     }
+  // //   });
 
-  //   childComponent.addBudgetForm.value.category = "Food and Drink";
-  //   childComponent.addBudgetForm.value.category2 = "Restaurants";
-  //   childComponent.addBudgetForm.value.category3 = "";
-  //   childComponent.addBudgetForm.value.amount = "350";
+  // //   childComponent.addBudgetForm.value.category = "Food and Drink";
+  // //   childComponent.addBudgetForm.value.category2 = "Restaurants";
+  // //   childComponent.addBudgetForm.value.category3 = "";
+  // //   childComponent.addBudgetForm.value.amount = "350";
 
-  //   var currBudget: Budget = {
-  //     _id : "",
-  //     userId : "",
-  //     mainCategory : "Restaurants",
-  //     category : childComponent.addBudgetForm.value.category,
-  //     category2 : childComponent.addBudgetForm.value.category2,
-  //     category3 : "",
-  //     amount : childComponent.addBudgetForm.value.amount,
-  //     total : 0
-  //   }
+  // //   var currBudget: Budget = {
+  // //     _id : "",
+  // //     userId : "",
+  // //     mainCategory : "Restaurants",
+  // //     category : childComponent.addBudgetForm.value.category,
+  // //     category2 : childComponent.addBudgetForm.value.category2,
+  // //     category3 : "",
+  // //     amount : childComponent.addBudgetForm.value.amount,
+  // //     total : 0
+  // //   }
 
-  //   spyOn(childComponent.onAdd,'emit').and.callThrough();
-  //   // childComponent.onFormConfirmed();
-  //   var addButton = childFixture.debugElement.nativeElement.querySelector('#addbutton');
-  //   addButton.dispatchEvent(new Event('click'));
-  //   tick(5);
-  //   // expect(childComponent.onAdd.emit).toHaveBeenCalledWith( ADDEDBUDGETS );
-  //   expect(childComponent.onAdd.emit).toHaveBeenCalledWith(currBudget);
-  //   // expect(childComponent.onAdd.emit).toHaveBeenCalled();
+  // //   spyOn(childComponent.onAdd,'emit').and.callThrough();
+  // //   // childComponent.onFormConfirmed();
+  // //   var addButton = childFixture.debugElement.nativeElement.querySelector('#addbutton');
+  // //   addButton.dispatchEvent(new Event('click'));
+  // //   tick(5);
+  // //   // expect(childComponent.onAdd.emit).toHaveBeenCalledWith( ADDEDBUDGETS );
+  // //   expect(childComponent.onAdd.emit).toHaveBeenCalledWith(currBudget);
+  // //   // expect(childComponent.onAdd.emit).toHaveBeenCalled();
 
-  //   fixture.detectChanges();
-  //   childFixture.detectChanges();
+  // //   fixture.detectChanges();
+  // //   childFixture.detectChanges();
 
-  //   discardPeriodicTasks()
+  // //   discardPeriodicTasks()
 
-  //   component.addBudgetRef.close()
-  // }));
+  // //   component.addBudgetRef.close()
+  // // }));
 
   it('should add new budget to budget list', () => {
     expect(component.budgets.length).toEqual(2);
@@ -348,7 +348,7 @@ describe('BudgetsComponent', () => {
     expect(component.budgets[component.budgets.length-1]).toEqual(currBudget);
   })
 
-  /*####### EDITING BUDGETS #######*/ 
+  // /*####### EDITING BUDGETS #######*/ 
 
   it('should open the AddBudgetsComponent in a MatDialog with correct data after pressing Edit Budget button', fakeAsync(() => {
     spyOn(component.dialog,'open').and.callThrough();
@@ -376,102 +376,102 @@ describe('BudgetsComponent', () => {
     // discardPeriodicTasks()
   }));
 
-  // it('should edit budget and submit on MatDialog', async(() => {
-  //   console.log('should edit budget and submit on MatDialog')
-  //   spyOn(component.dialog,'open').and.callThrough();
-  //   var editButton1 = fixture.debugElement.nativeElement.querySelector('#editButton1');
-  //   console.log(editButton1)
-  //   editButton1.dispatchEvent(new Event('click'));
-  //   // editButton1.click()
-  //   var currBudget = component.budgets[1];
+  // // it('should edit budget and submit on MatDialog', async(() => {
+  // //   console.log('should edit budget and submit on MatDialog')
+  // //   spyOn(component.dialog,'open').and.callThrough();
+  // //   var editButton1 = fixture.debugElement.nativeElement.querySelector('#editButton1');
+  // //   console.log(editButton1)
+  // //   editButton1.dispatchEvent(new Event('click'));
+  // //   // editButton1.click()
+  // //   var currBudget = component.budgets[1];
 
-  //   expect(component.dialog.open).toHaveBeenCalledWith(AddBudgetComponent, {
-  //     data: {
-  //       categories: component.categories,
-  //       budgets: component.budgets,
-  //       edit: true,
-  //       budget: currBudget
-  //     }
-  //   });
+  // //   expect(component.dialog.open).toHaveBeenCalledWith(AddBudgetComponent, {
+  // //     data: {
+  // //       categories: component.categories,
+  // //       budgets: component.budgets,
+  // //       edit: true,
+  // //       budget: currBudget
+  // //     }
+  // //   });
 
-  //   // component.onEditBudgetClicked(currBudget);
-  //   console.log(component.dialog.afterOpen)
-  //   childFixture.whenStable().then(() => {
-  //     childFixture.detectChanges();
-  //     console.log(childComponent.edit)
-  //   })
+  // //   // component.onEditBudgetClicked(currBudget);
+  // //   console.log(component.dialog.afterOpen)
+  // //   childFixture.whenStable().then(() => {
+  // //     childFixture.detectChanges();
+  // //     console.log(childComponent.edit)
+  // //   })
 
-  //   //   console.log("DONE");
-  //   //   console.log(childComponent);
+  // //   //   console.log("DONE");
+  // //   //   console.log(childComponent);
 
-  //   //   // fixture.detectChanges();
-  //   // // childFixture.detectChanges();
-  //   // // tick()
-  //   // // fixture.detectChanges();
-  //   // // childFixture.detectChanges();
-  //   // // childComponent.ngOnInit();
-  //   // // tick()
-  //   // // fixture.detectChanges();
-  //   // // childFixture.detectChanges();
+  // //   //   // fixture.detectChanges();
+  // //   // // childFixture.detectChanges();
+  // //   // // tick()
+  // //   // // fixture.detectChanges();
+  // //   // // childFixture.detectChanges();
+  // //   // // childComponent.ngOnInit();
+  // //   // // tick()
+  // //   // // fixture.detectChanges();
+  // //   // // childFixture.detectChanges();
 
-  //   // console.log(childComponent);
+  // //   // console.log(childComponent);
 
-  //   // childComponent.addBudgetForm.value.category = "Food and Drink";
-  //   // childComponent.addBudgetForm.value.category2 = "Restaurants";
-  //   // childComponent.addBudgetForm.value.category3 = "Fast Food";
-  //   // childComponent.addBudgetForm.value.amount = "200";
+  // //   // childComponent.addBudgetForm.value.category = "Food and Drink";
+  // //   // childComponent.addBudgetForm.value.category2 = "Restaurants";
+  // //   // childComponent.addBudgetForm.value.category3 = "Fast Food";
+  // //   // childComponent.addBudgetForm.value.amount = "200";
 
-  //   // // childComponent.addBudgetForm.setValue({
-  //   // //   category: this.addBudgetForm.value.category, 
-  //   // //   category2: this.addBudgetForm.value.category2, 
-  //   // //   category3: this.addBudgetForm.value.category3, 
-  //   // //   amount: this.addBudgetForm.value.amount});
+  // //   // // childComponent.addBudgetForm.setValue({
+  // //   // //   category: this.addBudgetForm.value.category, 
+  // //   // //   category2: this.addBudgetForm.value.category2, 
+  // //   // //   category3: this.addBudgetForm.value.category3, 
+  // //   // //   amount: this.addBudgetForm.value.amount});
 
 
-  //   // console.log(childComponent);
-  //   // var currBudget: Budget = {
-  //   //   _id : "",
-  //   //   userId : "",
-  //   //   mainCategory : "Fast Food",
-  //   //   category : childComponent.addBudgetForm.value.category,
-  //   //   category2 : childComponent.addBudgetForm.value.category2,
-  //   //   category3 : childComponent.addBudgetForm.value.category3,
-  //   //   amount : childComponent.addBudgetForm.value.amount,
-  //   //   total : 0
-  //   // };
+  // //   // console.log(childComponent);
+  // //   // var currBudget: Budget = {
+  // //   //   _id : "",
+  // //   //   userId : "",
+  // //   //   mainCategory : "Fast Food",
+  // //   //   category : childComponent.addBudgetForm.value.category,
+  // //   //   category2 : childComponent.addBudgetForm.value.category2,
+  // //   //   category3 : childComponent.addBudgetForm.value.category3,
+  // //   //   amount : childComponent.addBudgetForm.value.amount,
+  // //   //   total : 0
+  // //   // };
 
-  //   // console.log("Curr Budget: ", currBudget);
+  // //   // console.log("Curr Budget: ", currBudget);
 
-  //   // spyOn(childComponent.onEdit,'emit').and.callThrough();
+  // //   // spyOn(childComponent.onEdit,'emit').and.callThrough();
     
-  //   // var addButton = childFixture.debugElement.nativeElement.querySelector('#addbutton');
-  //   // console.log("Add button: ", addButton);
+  // //   // var addButton = childFixture.debugElement.nativeElement.querySelector('#addbutton');
+  // //   // console.log("Add button: ", addButton);
 
-  //   // // var editButton = childFixture.debugElement.nativeElement.querySelector('#editbutton');
-  //   // // console.log("Edit button: ", editButton)
+  // //   // // var editButton = childFixture.debugElement.nativeElement.querySelector('#editbutton');
+  // //   // // console.log("Edit button: ", editButton)
 
-  //   // // childComponent.firstOpSelected("Food and Drink")
+  // //   // // childComponent.firstOpSelected("Food and Drink")
 
-  //   // // spyOn(childComponent.onEdit,'emit').and.callThrough();
-  //   // // childComponent.onFormConfirmed();
+  // //   // // spyOn(childComponent.onEdit,'emit').and.callThrough();
+  // //   // // childComponent.onFormConfirmed();
     
-  //   // console.log("Edit in test: ", childComponent.edit)
-  //   // addButton.dispatchEvent(new Event('click'));
+  // //   // console.log("Edit in test: ", childComponent.edit)
+  // //   // addButton.dispatchEvent(new Event('click'));
     
-  //   // expect(childComponent.onEdit.emit).toHaveBeenCalledWith(currBudget);
-  //   // // // expect(childComponent.onAdd.emit).toHaveBeenCalled();
+  // //   // expect(childComponent.onEdit.emit).toHaveBeenCalledWith(currBudget);
+  // //   // // // expect(childComponent.onAdd.emit).toHaveBeenCalled();
 
-  //   // fixture.detectChanges();
-  //   // childFixture.detectChanges();
+  // //   // fixture.detectChanges();
+  // //   // childFixture.detectChanges();
 
-  //   // // discardPeriodicTasks()
+  // //   // // discardPeriodicTasks()
 
-  //   // // component.editBudgetRef.close()
-  //   // })
+  // //   // // component.editBudgetRef.close()
+  // //   // })
     
 
     
-  // }));
+  // // }));
 
   it('should edit budget in budget list', () => {
     console.log('should edit new budget to budget list')
@@ -508,7 +508,7 @@ describe('BudgetsComponent', () => {
     expect(component.budgets[1]).toEqual(nextBudget);
   })
 
-  /*####### DELETING BUDGETS #######*/ 
+  // /*####### DELETING BUDGETS #######*/ 
 
   it('should open the DeleteBudgetsComponent in a MatDialog with correct data after pressing Delete Budget button', fakeAsync(() => {
     spyOn(component.dialog,'open').and.callThrough();
@@ -543,7 +543,7 @@ describe('BudgetsComponent', () => {
       category2 : "Restaurants",
       category3 : "Fast Food",
       amount : "200",
-      total : 0
+      total : 50
     }
     expect(component.budgets.length).toEqual(3);
     expect(component.budgets[1]).toEqual(currBudget);
@@ -556,10 +556,106 @@ describe('BudgetsComponent', () => {
     expect(component.budgets.length).toEqual(2);
   })
 
-  /*####### GRAPH TESTS #######*/ 
+  // /*####### RESET GRAPH #######*/ 
 
-  // it("test", () => {
-  //   expect(component.budgets.length).toEqual(3);
+  it("should delete all existing budgets", () => {
+    expect(component.budgets.length).toEqual(2);
+    var count = component.budgets.length - 1;
+    var list = fixture.debugElement.nativeElement.querySelector('.budgetList');
+    console.log(list)
+    while (count >= 0) {
+      var currBudget = component.budgets[count];
+      console.log(currBudget)
+
+      component.onDeleteBudgetClicked(currBudget)
+    
+      component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+      count = count - 1;
+    }
+    expect(component.budgets.length).toEqual(0);
+  })
+
+  // /*####### GRAPH TESTS #######*/
+
+  // // Adding
+  // it('when total = 0, should not add to pie graph and should add to list', () => {
+
+  // })
+  // it('when total > 0, and parent budget not present on graph, should add to graph and list', () => {
+
+  // })
+  // it('when total > 0, parent budget present on graph, and existing same category budgets are on same category level (highest), should update graph total and add to list', () => {
+
+  // })
+  // it('when total > 0, parent budget present on graph, and existing same category budgets are not on the same category level (highest), and existing graph total < new total, should overwrite graph total and add to list ', () => {
+    
+  // })
+
+
+
+  // // Editing
+  // // A - D (deletions)
+  // it("when new budget category is new, and old category still in list, and current graph total for old category != total for old category, and total for old category > 0, should overwrite old category on graph total and update list accordingly", () => {
+
+  // })
+
+  // it("when new budget category is new, and old category still in list, and current graph total for old category != total for old category, and total for old category = 0, should delete old category from graph and update list accordingly", () => {
+
+  // })
+
+  // it("when new budget category is new, and old category still in list, and current graph total for old category = total for old category, should not update old category on graph and update list accordingly", () => {
+
+  // })
+
+  // it("when new budget category is new, and old category not still in list, should delete old category from graph and update list accordingly", () => {
+
+  // })
+  // // E - G (additions)
+  // it("when new budget category is new, and handled deletions, and parent budget for new category already present on graph, and graph total for new category < total for budgets on highest level in new category (same category as new budget), should overwrite graph total and update list accordingly", () => {
+
+  // })
+  // it("when new budget category is new, and handled deletions, and parent budget for new category already present on graph, and graph total for new category >= total for budgets on highest level in new category (same category as new budget), should not update graph total and update list accordingly", () => {
+
+  // })
+  // it("when new budget category is new, and handled deletions, and parent budget for new category not already present on graph, and new budget total > 0, should add budget to graph and update list accordingly", () => {
+    
+  // })
+  // it("when new budget category is new, and handled deletions, and parent budget for new category not already present on graph, and new budget total = 0, should not add budget to graph and update list accordingly", () => {
+    
+  // })
+  // // H - J (not a new category)
+  // it("when new budget category is not new, and category was previously present on graph, and total on graph != total from highest budgets, and total from highest budgets > 0, should overwrite graph total and update list accordingly", () => {
+
+  // })
+  // // I don't think this can ever happen
+  // // it("when new budget category is not new, and category was previously present on graph, and total on graph != total from highest budgets, and total from highest budgets = 0, should remove category from graph and update list accordingly", () => {
+    
+  // // })
+  // it("when new budget category is not new, and category was not present on graph, and result total > 0, should add to graph and update list accordingly", () => {
+
+  // })
+  // it("when new budget category is not new, and category was not present on graph, and result total = 0, should not add to graph and update list accordingly", () => {
+    
+  // })
+
+
+
+  // // Deleting
+  // it("when deleted budget category has no budgets left, should delete category from graph and list", () => {
+
+  // })
+  // // Could probably rework code so this test isn't needed, same wth adding
+  // it("when deleted budget category has budgets left, and those budgets are on the same level as deleted budget, and remaining total > 0, should update category total on graph and delete from list", () => {
+
+  // })
+  // it("when deleted budget category has budgets left, and those budgets are on the same level as deleted budget, and remaining total = 0, should delete category from graph and list", () => {
+
+  // })
+  // it("when deleted budget category has budgets left, and those budgets are not on the same level as deleted budget, and category total on graph != remaining total for category from list, and remaining total > 0, should overwrite graph total and delete from list", () => {
+
+  // })
+  // it("when deleted budget category has budgets left, and those budgets are not on the same level as deleted budget, and category total on graph != remaining total for category from list, and remaining total = 0, should delete category from graph and list", () => {
+
   // })
 });
 
