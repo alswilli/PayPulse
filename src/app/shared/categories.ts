@@ -6,6 +6,11 @@ export const CATEGORIES: any = [
     },
     {
         hierarchy: [
+            "Shops"
+        ]
+    },
+    {
+        hierarchy: [
             "Food and Drink",
             "Restaurant"
         ]

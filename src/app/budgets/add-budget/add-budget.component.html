@@ -3,7 +3,8 @@
   <div>
     <mat-dialog-content *ngIf="!isLoading" class="mat-typography">
       <!-- <h4>Select a Budget Category:</h4> -->
-      <h3>Add Budget</h3>
+      <h3 *ngIf="edit">Edit Budget</h3>
+      <h3 *ngIf="!edit">Add Budget</h3>
       <form novalidate [formGroup]="addBudgetForm" #addbudgetform="ngForm" (ngSubmit)="onFormConfirmed()" fxLayout="column">
         <p>
           <mat-form-field style="margin-left: 10px;">
@@ -51,7 +52,7 @@
         <span>Min Amount: {{this.minVal}}</span>
         <span>Max Amount: {{this.maxVal}}</span>
         <button mat-button *ngIf="!edit" id="addbutton" [disabled]="addBudgetForm.invalid" type="button" class="mat-primary" (click)="onFormConfirmed()" cdkFocusInitial>Add Budget</button>
-        <button mat-button *ngIf="edit" [disabled]="addBudgetForm.invalid" type="button" class="mat-primary" cdkFocusInitial>Edit Budget</button>
+        <button mat-button *ngIf="edit" id="editbutton" [disabled]="addBudgetForm.invalid" type="button" class="mat-primary" (click)="onFormConfirmed()" cdkFocusInitial>Edit Budget</button>
         <button mat-button mat-dialog-close>Cancel</button>
       </form>
       <!-- <mat-form-field style="margin-left: 10px;">

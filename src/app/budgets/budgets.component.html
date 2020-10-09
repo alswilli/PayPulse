@@ -73,8 +73,8 @@
         </div>
           <mat-accordion class="example-headers-align" multi>
             <div class="budgetList">
-              <mat-expansion-panel *ngFor="let budget of budgets">
-                <mat-expansion-panel-header>
+              <mat-expansion-panel *ngFor="let budget of budgets; let i = index;">
+                <mat-expansion-panel-header id="{{'budgetHeader' + i}}">
                   <p fxFlex *ngIf="budget.mainCategory === budget.category3">
                     {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
                   </p>
@@ -96,19 +96,8 @@
                     </span>
                   </p>
                 </mat-expansion-panel-header>
-            
-                <!-- <mat-form-field>
-                  <mat-label>First name</mat-label>
-                  <input matInput>
-                </mat-form-field>
-            
-                <mat-form-field>
-                  <mat-label>Age</mat-label>
-                  <input matInput type="number" min="1">
-                </mat-form-field>
-                <p></p> -->
-                <button mat-raised-button style="background-color: grey; color: white;" (click)="onEditBudgetClicked(budget);">Edit Budget</button>
-                <button mat-raised-button color="warn" style="margin: 10px;"(click)="onDeleteBudgetClicked(budget);">Delete Budget</button>
+                <button mat-raised-button style="background-color: grey; color: white;" id="{{'editButton' + i}}" (click)="onEditBudgetClicked(budget);">Edit Budget</button>
+                <button mat-raised-button color="warn" style="margin: 10px;" id="{{'deleteButton' + i}}" (click)="onDeleteBudgetClicked(budget);">Delete Budget</button>
             
               </mat-expansion-panel>
             </div>

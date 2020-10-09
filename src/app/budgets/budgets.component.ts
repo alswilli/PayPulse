@@ -39,6 +39,8 @@ export class BudgetsComponent implements OnInit {
   currentFromMonth: string;
   currentToMonth: string;
   addBudgetRef: any;
+  editBudgetRef: any;
+  deleteBudgetRef: any;
   // dataEmpty = true;
   dates = {
     "01":["January", 31],
@@ -660,8 +662,8 @@ export class BudgetsComponent implements OnInit {
 
   onDeleteBudgetClicked(currBudget) {
     console.log(currBudget);
-    const deleteBudgetRef = this.dialog.open(DeleteBudgetComponent, {data: {budget: currBudget}});
-    deleteBudgetRef.componentInstance.onDelete
+    this.deleteBudgetRef = this.dialog.open(DeleteBudgetComponent, {data: {budget: currBudget}});
+    this.deleteBudgetRef.componentInstance.onDelete
       .subscribe(result => {
         console.log(result);
         const index = this.budgets.indexOf(currBudget, 0);
@@ -858,14 +860,14 @@ export class BudgetsComponent implements OnInit {
         }
 
         // Close dialogue ref
-        deleteBudgetRef.close();
+        this.deleteBudgetRef.close();
       });
   }
 
   onEditBudgetClicked(currBudget) {
     console.log(currBudget);
-    const editBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: true, budget: currBudget}});
-    editBudgetRef.componentInstance.onEdit
+    this.editBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: true, budget: currBudget}});
+    this.editBudgetRef.componentInstance.onEdit
       .subscribe(result => {
         console.log(result);
         var total = 0;
@@ -1290,7 +1292,7 @@ export class BudgetsComponent implements OnInit {
       
         console.log(oldparents)
         // Close dialogue ref
-        editBudgetRef.close();
+        this.editBudgetRef.close();
       });
   }
 }

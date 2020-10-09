@@ -4,7 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { BudgetsComponent } from './budgets.component';
 
 import { BrowserModule, By } from '@angular/platform-browser';
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA, ComponentRef } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, ComponentRef, ɵConsole } from '@angular/core';
 // import { AppRoutingModule } from './app-routing/app-routing.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatToolbarModule } from '@angular/material/toolbar'; 
@@ -115,9 +115,13 @@ describe('BudgetsComponent', () => {
         MatSelect,
         MatDialog
       ],
+      schemas: [
+        CUSTOM_ELEMENTS_SCHEMA
+      ]
     }).overrideModule(BrowserDynamicTestingModule, {
       set: {
-        entryComponents: [ AddBudgetComponent ],
+        entryComponents: [ AddBudgetComponent,
+        DeleteBudgetComponent ],
       }
     })
     .compileComponents();
@@ -218,12 +222,12 @@ describe('BudgetsComponent', () => {
     component = fixture.componentInstance;
     fixture.autoDetectChanges();
 
-    childComponent.addBudgetForm = formBuilder.group({
-        category: "Food and Drink",
-        category2: "Restaurant",
-        category23: null,
-        amount: "67"
-    });
+    // childComponent.addBudgetForm = formBuilder.group({
+    //     category: "Food and Drink",
+    //     category2: "Restaurant",
+    //     category23: null,
+    //     amount: "67"
+    // });
 
     const mockLocalStorage = {
       getItem: (key: string): string => {
@@ -249,9 +253,15 @@ describe('BudgetsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should open the AddBudgetsComponent in a MatDialog with correct data', fakeAsync(() => {
+  /*####### ADDING BUDGETS #######*/ 
+
+  it('should open the AddBudgetsComponent in a MatDialog with correct data ater pressing Add New Budget button', fakeAsync(() => {
     spyOn(component.dialog,'open').and.callThrough();
-    component.onAddBudgetClicked();
+
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
+
+    // component.onAddBudgetClicked();
     expect(component.dialog.open).toHaveBeenCalledWith(AddBudgetComponent, {
       data: {
         categories: component.categories,
@@ -259,53 +269,59 @@ describe('BudgetsComponent', () => {
         edit: false
       }
     });
-
-    component.addBudgetRef.close();
-  }));
-
-  it('should add a new budget and submit on MatDialog', fakeAsync((done) => {
-    spyOn(component.dialog,'open').and.callThrough();
-    component.onAddBudgetClicked();
-    expect(component.dialog.open).toHaveBeenCalledWith(AddBudgetComponent, {
-      data: {
-        categories: component.categories,
-        budgets: component.budgets,
-        edit: false
-      }
-    });
-
-    childComponent.addBudgetForm.value.category = "Food and Drink";
-    childComponent.addBudgetForm.value.category2 = "Restaurants";
-    childComponent.addBudgetForm.value.category3 = "";
-    childComponent.addBudgetForm.value.amount = "350";
-
-    var currBudget: Budget = {
-      _id : "",
-      userId : "",
-      mainCategory : "Restaurants",
-      category : childComponent.addBudgetForm.value.category,
-      category2 : childComponent.addBudgetForm.value.category2,
-      category3 : "",
-      amount : childComponent.addBudgetForm.value.amount,
-      total : 0
-    }
-
-    spyOn(childComponent.onAdd,'emit').and.callThrough();
-    // childComponent.onFormConfirmed();
-    var addButton = childFixture.debugElement.nativeElement.querySelector('#addbutton');
-    addButton.dispatchEvent(new Event('click'));
-    tick(5);
-    // expect(childComponent.onAdd.emit).toHaveBeenCalledWith( ADDEDBUDGETS );
-    expect(childComponent.onAdd.emit).toHaveBeenCalledWith(currBudget);
-    // expect(childComponent.onAdd.emit).toHaveBeenCalled();
-
-    fixture.detectChanges();
-    childFixture.detectChanges();
-
+    tick(5)
     discardPeriodicTasks()
-
-    component.addBudgetRef.close()
+    component.addBudgetRef.close();
+    discardPeriodicTasks()
   }));
+
+  // it('should add a new budget and submit on MatDialog', fakeAsync((done) => {
+  //   spyOn(component.dialog,'open').and.callThrough();
+
+  //   var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+  //   addNewButton.dispatchEvent(new Event('click'));
+
+  //   // component.onAddBudgetClicked();
+  //   expect(component.dialog.open).toHaveBeenCalledWith(AddBudgetComponent, {
+  //     data: {
+  //       categories: component.categories,
+  //       budgets: component.budgets,
+  //       edit: false
+  //     }
+  //   });
+
+  //   childComponent.addBudgetForm.value.category = "Food and Drink";
+  //   childComponent.addBudgetForm.value.category2 = "Restaurants";
+  //   childComponent.addBudgetForm.value.category3 = "";
+  //   childComponent.addBudgetForm.value.amount = "350";
+
+  //   var currBudget: Budget = {
+  //     _id : "",
+  //     userId : "",
+  //     mainCategory : "Restaurants",
+  //     category : childComponent.addBudgetForm.value.category,
+  //     category2 : childComponent.addBudgetForm.value.category2,
+  //     category3 : "",
+  //     amount : childComponent.addBudgetForm.value.amount,
+  //     total : 0
+  //   }
+
+  //   spyOn(childComponent.onAdd,'emit').and.callThrough();
+  //   // childComponent.onFormConfirmed();
+  //   var addButton = childFixture.debugElement.nativeElement.querySelector('#addbutton');
+  //   addButton.dispatchEvent(new Event('click'));
+  //   tick(5);
+  //   // expect(childComponent.onAdd.emit).toHaveBeenCalledWith( ADDEDBUDGETS );
+  //   expect(childComponent.onAdd.emit).toHaveBeenCalledWith(currBudget);
+  //   // expect(childComponent.onAdd.emit).toHaveBeenCalled();
+
+  //   fixture.detectChanges();
+  //   childFixture.detectChanges();
+
+  //   discardPeriodicTasks()
+
+  //   component.addBudgetRef.close()
+  // }));
 
   it('should add new budget to budget list', () => {
     expect(component.budgets.length).toEqual(2);
@@ -321,11 +337,233 @@ describe('BudgetsComponent', () => {
       total : 0
     }
 
-    component.onAddBudgetClicked();
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
+
+    // component.onAddBudgetClicked();
     // component.addBudgetRef.componentInstance.onAdd.emit( ADDEDBUDGETS );
     component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
     expect(component.budgets.length).toEqual(3);
     // expect(component.budgets[component.budgets.length-1]).toEqual(ADDEDBUDGETS);
     expect(component.budgets[component.budgets.length-1]).toEqual(currBudget);
   })
+
+  /*####### EDITING BUDGETS #######*/ 
+
+  it('should open the AddBudgetsComponent in a MatDialog with correct data after pressing Edit Budget button', fakeAsync(() => {
+    spyOn(component.dialog,'open').and.callThrough();
+
+    // var budgetList = fixture.debugElement.nativeElement.querySelector('.budgetList');
+    // console.log(budgetList)
+
+    var editButton1 = fixture.debugElement.nativeElement.querySelector('#editButton1');
+    console.log(editButton1)
+    editButton1.dispatchEvent(new Event('click'));
+
+    var currBudget = component.budgets[1];
+
+    expect(component.dialog.open).toHaveBeenCalledWith(AddBudgetComponent, {
+      data: {
+        categories: component.categories,
+        budgets: component.budgets,
+        edit: true,
+        budget: currBudget
+      }
+    });
+    // tick(5)
+    // discardPeriodicTasks()
+    component.editBudgetRef.close();
+    // discardPeriodicTasks()
+  }));
+
+  // it('should edit budget and submit on MatDialog', async(() => {
+  //   console.log('should edit budget and submit on MatDialog')
+  //   spyOn(component.dialog,'open').and.callThrough();
+  //   var editButton1 = fixture.debugElement.nativeElement.querySelector('#editButton1');
+  //   console.log(editButton1)
+  //   editButton1.dispatchEvent(new Event('click'));
+  //   // editButton1.click()
+  //   var currBudget = component.budgets[1];
+
+  //   expect(component.dialog.open).toHaveBeenCalledWith(AddBudgetComponent, {
+  //     data: {
+  //       categories: component.categories,
+  //       budgets: component.budgets,
+  //       edit: true,
+  //       budget: currBudget
+  //     }
+  //   });
+
+  //   // component.onEditBudgetClicked(currBudget);
+  //   console.log(component.dialog.afterOpen)
+  //   childFixture.whenStable().then(() => {
+  //     childFixture.detectChanges();
+  //     console.log(childComponent.edit)
+  //   })
+
+  //   //   console.log("DONE");
+  //   //   console.log(childComponent);
+
+  //   //   // fixture.detectChanges();
+  //   // // childFixture.detectChanges();
+  //   // // tick()
+  //   // // fixture.detectChanges();
+  //   // // childFixture.detectChanges();
+  //   // // childComponent.ngOnInit();
+  //   // // tick()
+  //   // // fixture.detectChanges();
+  //   // // childFixture.detectChanges();
+
+  //   // console.log(childComponent);
+
+  //   // childComponent.addBudgetForm.value.category = "Food and Drink";
+  //   // childComponent.addBudgetForm.value.category2 = "Restaurants";
+  //   // childComponent.addBudgetForm.value.category3 = "Fast Food";
+  //   // childComponent.addBudgetForm.value.amount = "200";
+
+  //   // // childComponent.addBudgetForm.setValue({
+  //   // //   category: this.addBudgetForm.value.category, 
+  //   // //   category2: this.addBudgetForm.value.category2, 
+  //   // //   category3: this.addBudgetForm.value.category3, 
+  //   // //   amount: this.addBudgetForm.value.amount});
+
+
+  //   // console.log(childComponent);
+  //   // var currBudget: Budget = {
+  //   //   _id : "",
+  //   //   userId : "",
+  //   //   mainCategory : "Fast Food",
+  //   //   category : childComponent.addBudgetForm.value.category,
+  //   //   category2 : childComponent.addBudgetForm.value.category2,
+  //   //   category3 : childComponent.addBudgetForm.value.category3,
+  //   //   amount : childComponent.addBudgetForm.value.amount,
+  //   //   total : 0
+  //   // };
+
+  //   // console.log("Curr Budget: ", currBudget);
+
+  //   // spyOn(childComponent.onEdit,'emit').and.callThrough();
+    
+  //   // var addButton = childFixture.debugElement.nativeElement.querySelector('#addbutton');
+  //   // console.log("Add button: ", addButton);
+
+  //   // // var editButton = childFixture.debugElement.nativeElement.querySelector('#editbutton');
+  //   // // console.log("Edit button: ", editButton)
+
+  //   // // childComponent.firstOpSelected("Food and Drink")
+
+  //   // // spyOn(childComponent.onEdit,'emit').and.callThrough();
+  //   // // childComponent.onFormConfirmed();
+    
+  //   // console.log("Edit in test: ", childComponent.edit)
+  //   // addButton.dispatchEvent(new Event('click'));
+    
+  //   // expect(childComponent.onEdit.emit).toHaveBeenCalledWith(currBudget);
+  //   // // // expect(childComponent.onAdd.emit).toHaveBeenCalled();
+
+  //   // fixture.detectChanges();
+  //   // childFixture.detectChanges();
+
+  //   // // discardPeriodicTasks()
+
+  //   // // component.editBudgetRef.close()
+  //   // })
+    
+
+    
+  // }));
+
+  it('should edit budget in budget list', () => {
+    console.log('should edit new budget to budget list')
+    var currBudget: Budget = {
+      _id : "p08ygiugrg",
+      userId : "sdfsf",
+      mainCategory : "Shops",
+      category : "Shops",
+      category2 : "",
+      category3 : "",
+      amount : "500",
+      total : 0
+    }
+    expect(component.budgets.length).toEqual(3);
+    expect(component.budgets[1]).toEqual(currBudget);
+
+    var editButton1 = fixture.debugElement.nativeElement.querySelector('#editButton1');
+    console.log(editButton1)
+    editButton1.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "p08ygiugrg",
+      userId : "sdfsf",
+      mainCategory : "Fast Food",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Fast Food",
+      amount : "200",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(3);
+    expect(component.budgets[1]).toEqual(nextBudget);
+  })
+
+  /*####### DELETING BUDGETS #######*/ 
+
+  it('should open the DeleteBudgetsComponent in a MatDialog with correct data after pressing Delete Budget button', fakeAsync(() => {
+    spyOn(component.dialog,'open').and.callThrough();
+
+    // var budgetList = fixture.debugElement.nativeElement.querySelector('.budgetList');
+    // console.log(budgetList)
+
+    var deleteButton1 = fixture.debugElement.nativeElement.querySelector('#deleteButton1');
+    console.log(deleteButton1)
+    deleteButton1.dispatchEvent(new Event('click'));
+
+    var currBudget = component.budgets[1];
+
+    expect(component.dialog.open).toHaveBeenCalledWith(DeleteBudgetComponent, {
+      data: {
+        budget: currBudget
+      }
+    });
+    // tick(5)
+    // discardPeriodicTasks()
+    component.deleteBudgetRef.close();
+    // discardPeriodicTasks()
+  }));
+
+  it('should delete budget in budget list', () => {
+    console.log('should delete budget in budget list')
+    var currBudget: Budget = {
+      _id : "p08ygiugrg",
+      userId : "sdfsf",
+      mainCategory : "Fast Food",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Fast Food",
+      amount : "200",
+      total : 0
+    }
+    expect(component.budgets.length).toEqual(3);
+    expect(component.budgets[1]).toEqual(currBudget);
+
+    var deleteButton1 = fixture.debugElement.nativeElement.querySelector('#deleteButton1');
+    console.log(deleteButton1)
+    deleteButton1.dispatchEvent(new Event('click'));
+  
+    component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+    expect(component.budgets.length).toEqual(2);
+  })
+
+  /*####### GRAPH TESTS #######*/ 
+
+  // it("test", () => {
+  //   expect(component.budgets.length).toEqual(3);
+  // })
 });
+
+
+
+
+

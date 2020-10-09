@@ -93,7 +93,7 @@ describe('AddBudgetComponent', () => {
     component.addBudgetForm = formBuilder.group({
         category: null,
         category2: null,
-        category23: null,
+        category3: null,
         amount: null
     });
     fixture.detectChanges();

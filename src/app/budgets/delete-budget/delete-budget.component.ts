@@ -21,9 +21,9 @@ export class DeleteBudgetComponent implements OnInit {
     this.isLoading = false;
   }
 
-  onDeleteConfirmed(currBudgetId) {
+  onDeleteConfirmed(currBudgetId, currBudget) {
     this.isLoading = true;
-    this.budgetService.deleteBudget(currBudgetId).subscribe(res => {
+    this.budgetService.deleteBudget(currBudgetId, currBudget).subscribe(res => {
       this.onDelete.emit(res);
     }, errmess => this.isLoading = false
     );

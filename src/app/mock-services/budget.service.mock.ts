@@ -21,18 +21,30 @@ export class BudgetServiceStub {
       category : budgetData.category,
       category2 : budgetData.category2,
       category3 : budgetData.category3,
-      amount : "350",
+      amount : budgetData.amount,
       total : 0
     }
     console.log("NEW BUDGET: ", newBudget)
     return of(newBudget)
   }
 
-  updateBudget(budgetId: string, update: object) {
-    
+  updateBudget(budgetId: string, budgetData) {
+    console.log("ID: ", budgetId)
+    var editedBudget: Budget = {
+        _id : budgetId,
+      userId : "",
+      mainCategory : budgetData.mainCategory,
+      category : budgetData.category,
+      category2 : budgetData.category2,
+      category3 : budgetData.category3,
+      amount : budgetData.amount,
+      total : 0
+    }
+    console.log("EDITED BUDGET: ", editedBudget)
+    return of(editedBudget)
   }
 
-  deleteBudget(budgetId: string) {
-    
+  deleteBudget(budgetId: string, budget) {
+    return of(budget);
   }
 }

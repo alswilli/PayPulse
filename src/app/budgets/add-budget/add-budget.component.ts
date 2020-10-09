@@ -45,16 +45,19 @@ export class AddBudgetComponent implements OnInit {
     this.isLoading = true;
     this.categories = this.data.categories;
     this.budgets = this.data.budgets;
+    this.edit = this.data.edit
+    console.log(this.data)
     console.log("Active Budgets: ", this.budgets)
     console.log("Categories: ", this.categories)
-    // this.createBudgetMins();
+    console.log("Edit: ", this.edit)
+    //this.createBudgetMins(); //-> NEED TO FIX FOR TESTS TO WORK
     // console.log("Active Budgets: ", this.budgets)
     // console.log("Categories: ", this.categories)
-    this.edit = this.data.edit
     if (this.edit === true) {
-      console.log(this.addBudgetForm);
+      console.log(this.data.budget)
       if (this.data.budget.category3 !== '') {
         this.firstOpSelected(this.data.budget.category);
+        console.log(this.categories)
         this.secondOpSelected(this.data.budget.category2);
       }
       else if (this.data.budget.category2 !== '') {
@@ -422,6 +425,7 @@ export class AddBudgetComponent implements OnInit {
   }
 
   firstOpSelected(select) {
+    console.log("In first")
     console.log(select);
     console.log(this.categories);
     console.log(this.addBudgetForm)
@@ -436,6 +440,8 @@ export class AddBudgetComponent implements OnInit {
     if (select[0] == " ") {
       select = select.substring(1, select.length-1)
     }
+    console.log(select)
+    console.log(this.categories)
     if (select in this.categories) {
       this.categories2 = this.categories[select];
       if (Object.keys(this.categories2).length > 0) {
@@ -443,10 +449,12 @@ export class AddBudgetComponent implements OnInit {
       }
     }
 
+    console.log("CATEGORIES 2: ", this.categories2)
     this.getMinMaxVals()
   }
 
   secondOpSelected(select) {
+    console.log("In second")
     console.log(select);
     console.log(this.categories2);
     this.secondSelected = false;

@@ -82,7 +82,7 @@ export const TRANSACTIONS: Transaction[] = [
 
 export const LESSTHAN30TRANSACTIONS: Transaction[] = [
     {
-        amount: '300',
+        amount: '350',
         category: ["Food and Drink"],
         date: "2020-07-14",
         transactionName: "CREDIT CARD 3333 PAYMENT *//",
@@ -94,7 +94,7 @@ export const LESSTHAN30TRANSACTIONS: Transaction[] = [
 
 export const MORETHAN30TRANSACTIONS: Transaction[] = [
     {
-        amount: '300',
+        amount: '350',
         category: ["Food and Drink"],
         date: "2020-07-14",
         transactionName: "CREDIT CARD 3333 PAYMENT *//",
