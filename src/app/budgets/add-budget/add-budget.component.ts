@@ -50,7 +50,7 @@ export class AddBudgetComponent implements OnInit {
     console.log("Active Budgets: ", this.budgets)
     console.log("Categories: ", this.categories)
     console.log("Edit: ", this.edit)
-    //this.createBudgetMins(); //-> NEED TO FIX FOR TESTS TO WORK
+    this.createBudgetMins(); //-> NEED TO FIX FOR TESTS TO WORK
     // console.log("Active Budgets: ", this.budgets)
     // console.log("Categories: ", this.categories)
     if (this.edit === true) {
