@@ -6,6 +6,7 @@ import { timer } from 'rxjs';
 
 import { baseURL } from '../shared/baseurl';
 import { ProcessHTTPMsgService } from './process-httpmsg.service';
+import { Router } from '@angular/router';
 
 interface AuthResponse {
   status: string;
@@ -39,11 +40,13 @@ export class AuthService {
   username: Subject<string> = new Subject<string>();
   tokenTimer: Subject<number> = new Subject<number>();
   // tokenTimer: any;
+  nodeTimer: NodeJS.Timer;
   timeLeft: number = 30;
   authToken: string = undefined;
 
    constructor(private http: HttpClient,
-     private processHTTPMsgService: ProcessHTTPMsgService) {
+     private processHTTPMsgService: ProcessHTTPMsgService,
+     private router: Router) {
    }
 
    checkJWTtoken() {
@@ -68,18 +71,28 @@ export class AuthService {
 
    loadUserCredentials() {
      const credentials = JSON.parse(localStorage.getItem(this.tokenKey));
+     const expiration = new Date(localStorage.getItem('expiration'))
      console.log('loadUserCredentials ', credentials);
+     console.log(expiration)
      if (credentials && credentials.username !== undefined) {
        this.useCredentials(credentials);
        if (this.authToken) {
         this.checkJWTtoken();
+        const now = new Date();
+        console.log(expiration.getTime())
+        console.log(now.getTime())
+        console.log(expiration)
+        console.log(now)
+        const expiresIn = (expiration.getTime() - now.getTime()) / 1000;
+        this.startTimer(expiresIn)
        }
      }
    }
 
-   storeUserCredentials(credentials: any) {
+   storeUserCredentials(credentials: any, expirationDate: Date) {
      console.log('storeUserCredentials ', credentials);
      localStorage.setItem(this.tokenKey, JSON.stringify(credentials));
+     localStorage.setItem('expiration', expirationDate.toISOString());
      this.useCredentials(credentials);
    }
 
@@ -94,6 +107,7 @@ export class AuthService {
      this.clearUsername();
      this.isAuthenticated = false;
      localStorage.removeItem(this.tokenKey);
+     localStorage.removeItem('expiration');
    }
 
    storeUserAccountsDetails(details: any) {
@@ -118,8 +132,11 @@ export class AuthService {
      return this.http.post<AuthResponse>(baseURL + 'users/login',
        {'username': user.username, 'password': user.password})
        .pipe( map(res => {
-         console.log(res)
-           this.storeUserCredentials({username: user.username, token: res.token});
+           console.log(res)
+           const now = new Date();
+           const expirationDate = new Date(now.getTime() + res.exp * 1000);
+           this.storeUserCredentials({username: user.username, token: res.token}, expirationDate);
+           console.log(expirationDate)
            this.startTimer(res.exp);
            return {'success': true, 'username': user.username };
        }),
@@ -131,8 +148,10 @@ export class AuthService {
     return this.http.post<FbAuthResponse>(baseURL + 'users/facebook/token',
        {access_token: fbAuthResponse.accessToken})
        .pipe( map(res => {
-        console.log(res)
-           this.storeUserCredentials({username: res.username, token: res.token});
+           console.log(res)
+           const now = new Date();
+           const expirationDate = new Date(now.getTime() + res.exp * 1000);
+           this.storeUserCredentials({username: res.username, token: res.token}, expirationDate);
            this.startTimer(res.exp);
            return {'success': true, 'username': res.username };
        }), map(res2 => {
@@ -146,6 +165,9 @@ export class AuthService {
    logOut() {
      this.destroyUserCredentials();
      this.destroyUserAccountsDetails();
+     this.router.navigate(['/login']);
+     clearTimeout(this.nodeTimer)
+     this.clearTokenTimer()
    }
 
    isLoggedIn(): Boolean {
@@ -163,20 +185,25 @@ export class AuthService {
    startTimer(expTime) {
     //  // repeat with the interval of 2 seconds
     //  let timerId = setInterval(() => console.log("tick"), 2000);
-
     //  // after 5 seconds stop
     //  setTimeout(() => { clearInterval(timerId); console.log('stop'); }, 10000);
 
-
-
-    // const source = timer(1000, 1000);
-    // const abc = source.subscribe(val => {
-    //   console.log(val, '-');
-    //   var tokenTimer = this.timeLeft - val;
-    //   if (tokenTimer < 15) {
-    //     this.sendTokenTimer(tokenTimer)
-    //   }
-    // });
+    const source = timer(1000, 1000);
+    const abc = source.subscribe(val => {
+      // console.log(val, '-');
+      var tokenTimer = expTime - val;
+      this.sendTokenTimer(tokenTimer)
+      if (tokenTimer < 15) {
+        console.log("Logging out in 15 seconds, would you like to stay logged in?")
+      }
+    });
+    console.log("EXP TIME: ", expTime)
+    this.nodeTimer = setTimeout(() => {
+      console.log("Inside the log out block")
+      this.logOut();
+      // this.tokenTimer.unsubscribe();
+      abc.unsubscribe();
+    }, expTime*1000)
    }
 
    getTokenTimer(): Observable<number>  {

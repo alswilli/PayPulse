@@ -41,6 +41,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }); 
 
     this.authService.loadUserCredentials();
+    console.log("LOAD WAS CALLED")
       // this.subscription = this.authService.getEmail()
         // .subscribe(email => { console.log(email); this.email = email; });
     this.usernameSubscription = this.authService.getUsername()
@@ -68,7 +69,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // this.email = undefined;
     this.username = undefined;
     this.authService.logOut();
-    this.router.navigate(['/login']);
+    this.tokenSubscription.unsubscribe();
+    // this.router.navigate(['/login']);
   }
 
 }
