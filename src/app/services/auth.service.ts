@@ -7,6 +7,8 @@ import { timer } from 'rxjs';
 import { baseURL } from '../shared/baseurl';
 import { ProcessHTTPMsgService } from './process-httpmsg.service';
 import { Router } from '@angular/router';
+import { MatDialog, MatDialogRef } from '@angular/material';
+import { TokenExpiredComponent } from '../token-expired/token-expired.component';
 
 interface AuthResponse {
   status: string;
@@ -43,10 +45,13 @@ export class AuthService {
   nodeTimer: NodeJS.Timer;
   timeLeft: number = 30;
   authToken: string = undefined;
+  tokenExpiredRef: MatDialogRef<TokenExpiredComponent>;
+  abc: any;
 
    constructor(private http: HttpClient,
      private processHTTPMsgService: ProcessHTTPMsgService,
-     private router: Router) {
+     private router: Router,
+     public dialog: MatDialog) {
    }
 
    checkJWTtoken() {
@@ -167,7 +172,8 @@ export class AuthService {
      this.destroyUserAccountsDetails();
      this.router.navigate(['/login']);
      clearTimeout(this.nodeTimer)
-     this.clearTokenTimer()
+     this.clearTokenTimer();
+     this.abc.unsubscribe();
    }
 
    isLoggedIn(): Boolean {
@@ -187,22 +193,55 @@ export class AuthService {
     //  let timerId = setInterval(() => console.log("tick"), 2000);
     //  // after 5 seconds stop
     //  setTimeout(() => { clearInterval(timerId); console.log('stop'); }, 10000);
-
+    console.log("START TIMER")
+    var dialogOpened = false;
     const source = timer(1000, 1000);
-    const abc = source.subscribe(val => {
+    this.abc = source.subscribe(val => {
       // console.log(val, '-');
       var tokenTimer = expTime - val;
-      this.sendTokenTimer(tokenTimer)
-      if (tokenTimer < 15) {
-        console.log("Logging out in 15 seconds, would you like to stay logged in?")
+      // console.log("TOKEN TIMER: ", tokenTimer)
+      // this.sendTokenTimer(tokenTimer) 
+      if (tokenTimer <= 61) {
+        console.log("TOKEN TIMER: ", tokenTimer)
+      }
+      if (tokenTimer <= 61 && !dialogOpened) {
+        // console.log("Logging out in 15 seconds, would you like to stay logged in?")
+        this.tokenExpiredRef = this.dialog.open(TokenExpiredComponent, {data: {tokenTimer: tokenTimer}});
+        this.tokenExpiredRef.componentInstance.onLogout
+          .subscribe(() => {
+            this.logOut();
+            this.abc.unsubscribe();
+          });
+        this.tokenExpiredRef.componentInstance.onStayLoggedIn
+          .subscribe(() => {
+            console.log("back in auth")
+            this.http.get<FbAuthResponse>(baseURL + 'users/newJWTtoken')
+              .subscribe(res => {
+                console.log(res)
+                clearTimeout(this.nodeTimer)
+                this.clearTokenTimer();
+                this.abc.unsubscribe();
+                this.tokenExpiredRef.close();
+                const now = new Date();
+                const expirationDate = new Date(now.getTime() + res.exp * 1000);
+                this.storeUserCredentials({username: res.username, token: res.token}, expirationDate);
+                this.startTimer(res.exp);
+                return {'success': true, 'username': res.username };
+              },
+              err => {
+                // console.log('JWT Token invalid: ', err);
+              });
+          });
+        dialogOpened = true;
       }
     });
     console.log("EXP TIME: ", expTime)
     this.nodeTimer = setTimeout(() => {
       console.log("Inside the log out block")
+      this.tokenExpiredRef.close();
       this.logOut();
       // this.tokenTimer.unsubscribe();
-      abc.unsubscribe();
+      // abc.unsubscribe();
     }, expTime*1000)
    }
 

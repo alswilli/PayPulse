@@ -1,0 +1,14 @@
+<div>
+  <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+  <div *ngIf="!isLoading">
+    <h3>Delete Account</h3>
+    <mat-dialog-content class="mat-typography">
+      <p>You will be logged out in <b>{{currSeconds}}</b> seconds.</p>
+      <p> Would you like to stay logged in?</p>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close (click)="logout();">Logout</button>
+      <button mat-button class="mat-primary" (click)="stayLoggedIn();" cdkFocusInitial>Stay logged in</button>
+    </mat-dialog-actions>
+  </div>
+</div>

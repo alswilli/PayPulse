@@ -59,6 +59,7 @@ import { ErrorInterceptor } from './error-interceptor';
 import { PieChartComponent } from './budgets/pie-chart/pie-chart.component';
 import { AddBudgetComponent } from './budgets/add-budget/add-budget.component';
 import { DeleteBudgetComponent } from './budgets/delete-budget/delete-budget.component';
+import { TokenExpiredComponent } from './token-expired/token-expired.component';
 
 @NgModule({
   declarations: [
@@ -78,7 +79,8 @@ import { DeleteBudgetComponent } from './budgets/delete-budget/delete-budget.com
     ErrorComponent,
     PieChartComponent,
     AddBudgetComponent,
-    DeleteBudgetComponent
+    DeleteBudgetComponent,
+    TokenExpiredComponent
   ],
   imports: [
     BrowserModule,
@@ -136,7 +138,8 @@ import { DeleteBudgetComponent } from './budgets/delete-budget/delete-budget.com
     DeleteAccountComponent,
     ErrorComponent,
     AddBudgetComponent,
-    DeleteBudgetComponent
+    DeleteBudgetComponent,
+    TokenExpiredComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

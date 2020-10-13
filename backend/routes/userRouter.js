@@ -73,7 +73,7 @@ router.post('/login', cors.corsWithOptions, (req, res, next) => {
       var token = authenticate.getToken({_id: req.user._id});
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      res.json({success: true, status: 'Login Successful!', token: token, exp: 30});
+      res.json({success: true, status: 'Login Successful!', token: token, exp: 3600});
     }); 
   }) (req, res, next);
 });
@@ -96,7 +96,7 @@ router.post('/facebook/token', cors.corsWithOptions, passport.authenticate('face
     var token = authenticate.getToken({_id: req.user._id});
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    res.json({success: true, username: req.user.username, token: token, status: 'You are successfully logged in!', exp: 30});
+    res.json({success: true, username: req.user.username, token: token, status: 'You are successfully logged in!', exp: 3600});
   }
 });
 
@@ -117,6 +117,20 @@ router.get('/checkJWTtoken', cors.corsWithOptions, (req, res) => {
 
     }
   }) (req, res);
+});
+
+router.get('/newJWTtoken', cors.corsWithOptions, authenticate.verifyUser, (req, res) => { 
+  console.log("Fetching new token")
+  if (req.user) {
+    var token = authenticate.getToken({_id: req.user._id});
+    res.statusCode = 200;
+    res.setHeader('Content-Type', 'application/json');
+    res.json({success: true, username: req.user.username, token: token, status: 'New token gathered!', exp: 3600});
+  }
+  else {
+    // console.log(res)
+    console.log(error)
+  }
 });
 
 module.exports = router;
