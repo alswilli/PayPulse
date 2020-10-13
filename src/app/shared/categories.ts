@@ -35,4 +35,11 @@ export const CATEGORIES: any = [
             "American"
         ]
     },
+    {
+        hierarchy: [
+            "Food and Drink",
+            "Restaurant",
+            "Categories"
+        ]
+    },
 ];

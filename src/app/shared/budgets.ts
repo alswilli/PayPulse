@@ -14,8 +14,8 @@ export const BUDGETS: Budget[] = [
     {
         _id: "p08ygiugrg",
         userId: "sdfsf",
-        mainCategory: "Shops",
-        category: "Shops",
+        mainCategory: "Travel",
+        category: "Travel",
         category2: "",
         category3: "",
         amount: '500',

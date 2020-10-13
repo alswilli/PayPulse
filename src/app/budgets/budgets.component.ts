@@ -506,6 +506,10 @@ export class BudgetsComponent implements OnInit {
       console.log(this.budgetSets)
   }
 
+  // Notes:
+  // pieData.mainCategory is the highest level, not the lowest like in the budgets
+  // sameLevelTotal is actaully remaining total
+
   onAddBudgetClicked() {
     console.log("add clicked")
     this.addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: false}});

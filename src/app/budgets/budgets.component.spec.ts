@@ -478,8 +478,8 @@ describe('BudgetsComponent', () => {
     var currBudget: Budget = {
       _id : "p08ygiugrg",
       userId : "sdfsf",
-      mainCategory : "Shops",
-      category : "Shops",
+      mainCategory : "Travel",
+      category : "Travel",
       category2 : "",
       category3 : "",
       amount : "500",
@@ -575,88 +575,926 @@ describe('BudgetsComponent', () => {
     expect(component.budgets.length).toEqual(0);
   })
 
-  // /*####### GRAPH TESTS #######*/
+  /*####### GRAPH TESTS #######*/
 
-  // // Adding
-  // it('when total = 0, should not add to pie graph and should add to list', () => {
+  // Adding
+  it('when total = 0, should not add to pie graph and should add to list', () => {
+    expect(component.budgets.length).toEqual(0);
+    expect(component.pieData.length).toEqual(0);
+    var currBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Austrailian",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Austrailian",
+      amount : "50",
+      total : 0
+    }
 
-  // })
-  // it('when total > 0, and parent budget not present on graph, should add to graph and list', () => {
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
 
-  // })
-  // it('when total > 0, parent budget present on graph, and existing same category budgets are on same category level (highest), should update graph total and add to list', () => {
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(0);
 
-  // })
-  // it('when total > 0, parent budget present on graph, and existing same category budgets are not on the same category level (highest), and existing graph total < new total, should overwrite graph total and add to list ', () => {
+    // Reset
+    var count = component.budgets.length - 1;
+    var list = fixture.debugElement.nativeElement.querySelector('.budgetList');
+    console.log(list)
+    while (count >= 0) {
+      var currBudget = component.budgets[count];
+      console.log(currBudget)
+
+      component.onDeleteBudgetClicked(currBudget)
     
-  // })
+      component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+      count = count - 1;
+    }
+    expect(component.budgets.length).toEqual(0);
+  }) 
+  it('when total > 0, and parent budget not present on graph, should add to graph and list', () => {
+    expect(component.budgets.length).toEqual(0);
+    expect(component.pieData.length).toEqual(0);
+    var currBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "American",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "American",
+      amount : "50",
+      total : 0
+    }
 
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
 
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    console.log("Budgets in the test: ", component.budgets)
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(50);
+    console.log("Pie data in the test: ", component.pieData)
+  })
 
-  // // Editing
-  // // A - D (deletions)
-  // it("when new budget category is new, and old category still in list, and current graph total for old category != total for old category, and total for old category > 0, should overwrite old category on graph total and update list accordingly", () => {
+  it('when total > 0, parent budget present on graph, and existing same category budgets are on same category level (highest), should update graph total and add to list', () => {
+    expect(component.budgets.length).toEqual(1);
+    expect(component.pieData.length).toEqual(1);
+    var currBudget: Budget = {
+      _id : "2",
+      userId : "1",
+      mainCategory : "Fast Food",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Fast Food",
+      amount : "50",
+      total : 0
+    }
 
-  // })
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
 
-  // it("when new budget category is new, and old category still in list, and current graph total for old category != total for old category, and total for old category = 0, should delete old category from graph and update list accordingly", () => {
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(100);
 
-  // })
+    // Reset
+    var count = component.budgets.length - 1;
+    var list = fixture.debugElement.nativeElement.querySelector('.budgetList');
+    console.log(list)
+    while (count >= 0) {
+      var currBudget = component.budgets[count];
+      console.log(currBudget)
 
-  // it("when new budget category is new, and old category still in list, and current graph total for old category = total for old category, should not update old category on graph and update list accordingly", () => {
-
-  // })
-
-  // it("when new budget category is new, and old category not still in list, should delete old category from graph and update list accordingly", () => {
-
-  // })
-  // // E - G (additions)
-  // it("when new budget category is new, and handled deletions, and parent budget for new category already present on graph, and graph total for new category < total for budgets on highest level in new category (same category as new budget), should overwrite graph total and update list accordingly", () => {
-
-  // })
-  // it("when new budget category is new, and handled deletions, and parent budget for new category already present on graph, and graph total for new category >= total for budgets on highest level in new category (same category as new budget), should not update graph total and update list accordingly", () => {
-
-  // })
-  // it("when new budget category is new, and handled deletions, and parent budget for new category not already present on graph, and new budget total > 0, should add budget to graph and update list accordingly", () => {
+      component.onDeleteBudgetClicked(currBudget)
     
-  // })
-  // it("when new budget category is new, and handled deletions, and parent budget for new category not already present on graph, and new budget total = 0, should not add budget to graph and update list accordingly", () => {
+      component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+      count = count - 1;
+    }
+    expect(component.budgets.length).toEqual(0);
+  }) 
+  it('when total > 0, parent budget present on graph, and existing same category budgets are not on the same category level (highest), and existing graph total < new total, should overwrite graph total and add to list ', () => {
+    expect(component.budgets.length).toEqual(0);
+    expect(component.pieData.length).toEqual(0);
+    var currBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Restaurants",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "",
+      amount : "500",
+      total : 0
+    }
+
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(350);
+
+    var currBudget: Budget = {
+      _id : "2",
+      userId : "1",
+      mainCategory : "Nightlife",
+      category : "Food and Drink",
+      category2 : "Nightlife",
+      category3 : "",
+      amount : "500",
+      total : 0
+    }
+
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(351);
+  })
+
+  it('when total > 0, parent budget present on graph, and existing same category budgets are not on the same category level (highest), and existing graph total >= new total, should do nothing to graph total and add to list ', () => {
+    expect(component.budgets.length).toEqual(2);
+    expect(component.pieData.length).toEqual(1);
+    var currBudget: Budget = {
+      _id : "3",
+      userId : "1",
+      mainCategory : "Fast Food",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Fast Food",
+      amount : "50",
+      total : 0
+    }
+
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(3);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(351);
+  })
+
+  // Editing
+  // A - D (deletions)
+  it("when new budget category is new, and old category still in list, and current graph total for old category != total for old category, and total for old category > 0, should overwrite old category on graph total and update list accordingly", () => {
+    var editButton1 = fixture.debugElement.nativeElement.querySelector('#editButton1');
+    console.log(editButton1)
+    editButton1.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "2",
+      userId : "1",
+      mainCategory : "Bicycles",
+      category : "Shop",
+      category2 : "Bicycles",
+      category3 : "",
+      amount : "200",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(3);
+    expect(component.budgets[1]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(component.budgets[2].category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(350);
+
+    // Reset
+    var count = component.budgets.length - 1;
+    var list = fixture.debugElement.nativeElement.querySelector('.budgetList');
+    console.log(list)
+    while (count >= 0) {
+      var currBudget = component.budgets[count];
+      console.log(currBudget)
+
+      component.onDeleteBudgetClicked(currBudget)
     
-  // })
-  // // H - J (not a new category)
-  // it("when new budget category is not new, and category was previously present on graph, and total on graph != total from highest budgets, and total from highest budgets > 0, should overwrite graph total and update list accordingly", () => {
+      component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+      count = count - 1;
+    }
+    expect(component.budgets.length).toEqual(0);
+  })
 
-  // })
-  // // I don't think this can ever happen
-  // // it("when new budget category is not new, and category was previously present on graph, and total on graph != total from highest budgets, and total from highest budgets = 0, should remove category from graph and update list accordingly", () => {
+  it("when new budget category is new, and old category still in list, and current graph total for old category != total for old category, and total for old category = 0, should delete old category from graph and update list accordingly", fakeAsync(() => {
+    var currBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Restaurants",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "",
+      amount : "500",
+      total : 0
+    }
+
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(350);
+
+    fixture.detectChanges();
+
+    // tick()
+
+    var editButton0 = fixture.debugElement.nativeElement.querySelector('#editButton0');
+    console.log("Edit Button in test: ", editButton0)
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Bicycles",
+      category : "Shop",
+      category2 : "Bicycles",
+      category3 : "",
+      amount : "200",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(0);
+
+    // Reset
+    var count = component.budgets.length - 1;
+    var list = fixture.debugElement.nativeElement.querySelector('.budgetList');
+    console.log(list)
+    while (count >= 0) {
+      var currBudget = component.budgets[count];
+      console.log(currBudget)
+
+      component.onDeleteBudgetClicked(currBudget)
     
-  // // })
-  // it("when new budget category is not new, and category was not present on graph, and result total > 0, should add to graph and update list accordingly", () => {
+      component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+      count = count - 1;
+    }
+    expect(component.budgets.length).toEqual(0);
+  }))
 
-  // })
-  // it("when new budget category is not new, and category was not present on graph, and result total = 0, should not add to graph and update list accordingly", () => {
+  it("when new budget category is new, and old category still in list, and current graph total for old category = total for old category, should not update old category on graph and update list accordingly", () => {
+    var currBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Restaurants",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "",
+      amount : "500",
+      total : 0
+    }
+
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(350);
+
+    fixture.detectChanges();
+
+    var currBudget: Budget = {
+      _id : "2",
+      userId : "1",
+      mainCategory : "Fast Food",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Fast Food",
+      amount : "50",
+      total : 0
+    }
+
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(350);
+
+    fixture.detectChanges();
+
+    var editButton1 = fixture.debugElement.nativeElement.querySelector('#editButton1');
+    console.log("Edit Button in test: ", editButton1)
+    editButton1.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "2",
+      userId : "1",
+      mainCategory : "Bicycles",
+      category : "Shop",
+      category2 : "Bicycles",
+      category3 : "",
+      amount : "200",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[1]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(component.budgets[0].category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(350);
+
+    // Reset to 1
+    var count = component.budgets.length - 1;
+    var list = fixture.debugElement.nativeElement.querySelector('.budgetList');
+    console.log(list)
+    while (count >= 1) {
+      var currBudget = component.budgets[count];
+      console.log(currBudget)
+
+      component.onDeleteBudgetClicked(currBudget)
     
-  // })
+      component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+      count = count - 1;
+    }
+    expect(component.budgets.length).toEqual(1);
+  })
+
+  it("when new budget category is new, and old category not still in list, should delete old category from graph and update list accordingly", () => {
+    var editButton0 = fixture.debugElement.nativeElement.querySelector('#editButton0');
+    console.log("Edit Button in test: ", editButton0)
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Bicycles",
+      category : "Shop",
+      category2 : "Bicycles",
+      category3 : "",
+      amount : "200",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(0);
+  })
+
+  // E - G (additions)
+  it("when new budget category is new (changed), and handled deletions, and parent budget for new category already present on graph, and graph total for new category < total for budgets on highest level in new category (includes new budget), should overwrite graph total and update list accordingly", () => {
+    var currBudget: Budget = {
+      _id : "2",
+      userId : "1",
+      mainCategory : "Fast Food",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Fast Food",
+      amount : "50",
+      total : 0
+    }
+
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(50);
+
+    var editButton0 = fixture.debugElement.nativeElement.querySelector('#editButton0');
+    console.log("Edit Button in test: ", editButton0)
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Restaurants",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "",
+      amount : "500",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(350);
+
+    // Reset 
+    var count = component.budgets.length - 1;
+    var list = fixture.debugElement.nativeElement.querySelector('.budgetList');
+    console.log(list)
+    while (count >= 0) {
+      var currBudget = component.budgets[count];
+      console.log(currBudget)
+
+      component.onDeleteBudgetClicked(currBudget)
+    
+      component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+      count = count - 1;
+    }
+    expect(component.budgets.length).toEqual(0);
+  })
+
+  it("when new budget category is new, and handled deletions, and parent budget for new category already present on graph, and graph total for new category >= total for budgets on highest level in new category (includes new budget), should not update graph total and update list accordingly", () => {
+    var currBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Bicycles",
+      category : "Shop",
+      category2 : "Bicycles",
+      category3 : "",
+      amount : "200",
+      total : 0
+    }
+
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(0);
+
+    var currBudget: Budget = {
+      _id : "2",
+      userId : "1",
+      mainCategory : "Restaurants",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "",
+      amount : "500",
+      total : 0
+    }
+
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(350);
+
+    fixture.detectChanges();
+
+    var editButton0 = fixture.debugElement.nativeElement.querySelector('#editButton0');
+    console.log("Edit Button in test: ", editButton0)
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Fast Food",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Fast Food",
+      amount : "50",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(350);
+    
+  })
+
+  it("when new budget category is new, and handled deletions, and parent budget for new category not already present on graph, and new budget total > 0, should add budget to graph and update list accordingly", () => {
+    var editButton0 = fixture.debugElement.nativeElement.querySelector('#editButton0');
+    console.log("Edit Button in test: ", editButton0)
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Shops",
+      category : "Shops",
+      category2 : "",
+      category3 : "",
+      amount : "400",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(2);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(nextBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(200);
+
+    // Reset to 1
+    var count = component.budgets.length - 1;
+    var list = fixture.debugElement.nativeElement.querySelector('.budgetList');
+    console.log(list)
+    while (count >= 1) {
+      var currBudget = component.budgets[count];
+      console.log(currBudget)
+
+      component.onDeleteBudgetClicked(currBudget)
+    
+      component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+      count = count - 1;
+    }
+    expect(component.budgets.length).toEqual(1);
+  })
+
+  it("when new budget category is new, and handled deletions, and parent budget for new category not already present on graph, and new budget total = 0, should not add budget to graph and update list accordingly", () => {
+    var editButton0 = fixture.debugElement.nativeElement.querySelector('#editButton0');
+    console.log("Edit Button in test: ", editButton0)
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Australian",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Australian",
+      amount : "40",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(0);
+  })
+  // H - J (not a new category)
+  it("when new budget category is not new, and category not on graph, and result total > 0, should add to graph and update list accordingly", () => {
+    var editButton0 = fixture.debugElement.nativeElement.querySelector('#editButton0');
+    console.log("Edit Button in test: ", editButton0)
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "American",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "American",
+      amount : "100",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(nextBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(50);
+  })
+
+  it("when new budget category is not new, and category not on graph, and result total = 0, should not add to graph and update list accordingly", () => {
+    var editButton0 = fixture.debugElement.nativeElement.querySelector('#editButton0');
+    console.log("Edit Button in test: ", editButton0)
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Australian",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Australian",
+      amount : "40",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(0);
+
+    fixture.detectChanges();
+
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Bar",
+      category : "Food and Drink",
+      category2 : "Bar",
+      category3 : "",
+      amount : "100",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(0);
+  })
+
+  it("when new budget category is not new, and total on graph != total from highest budgets, and total from highest budgets > 0, should overwrite graph total and update list accordingly", () => {
+    var editButton0 = fixture.debugElement.nativeElement.querySelector('#editButton0');
+    console.log("Edit Button in test: ", editButton0)
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "American",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "American",
+      amount : "100",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(nextBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(50);
+    
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Restaurants",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "",
+      amount : "500",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(nextBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(350);
+  })
+  
+  it("when new budget category is not new, and total on graph != total from highest budgets, and total from highest budgets = 0, should remove category from graph and update list accordingly", () => {
+    var editButton0 = fixture.debugElement.nativeElement.querySelector('#editButton0');
+    console.log("Edit Button in test: ", editButton0)
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Australian",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Australian",
+      amount : "40",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(0);
+  })
+
+  it("when new budget category is not new, and total on graph == total from highest budgets, should update nothing on graph and update list accordingly", () => {
+    var editButton0 = fixture.debugElement.nativeElement.querySelector('#editButton0');
+    console.log("Edit Button in test: ", editButton0)
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "American",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "American",
+      amount : "100",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(nextBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(50);
+
+    editButton0.dispatchEvent(new Event('click'));
+
+    var nextBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Fast Food",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Fast Food",
+      amount : "100",
+      total : 0
+    }
+  
+    component.editBudgetRef.componentInstance.onEdit.emit(nextBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[0]._id).toEqual(nextBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(nextBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(50);
+  })
 
 
 
-  // // Deleting
-  // it("when deleted budget category has no budgets left, should delete category from graph and list", () => {
+  // Deleting
+  it("when deleted budget category has no budgets left, should delete category from graph and list", () => {
+    var currBudget = component.budgets[0];
+    console.log(currBudget)
 
-  // })
-  // // Could probably rework code so this test isn't needed, same wth adding
-  // it("when deleted budget category has budgets left, and those budgets are on the same level as deleted budget, and remaining total > 0, should update category total on graph and delete from list", () => {
+    component.onDeleteBudgetClicked(currBudget)
+  
+    component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+    expect(component.budgets.length).toEqual(0);
+    expect(component.pieData.length).toEqual(0);
+  })
 
-  // })
-  // it("when deleted budget category has budgets left, and those budgets are on the same level as deleted budget, and remaining total = 0, should delete category from graph and list", () => {
+  // Could probably rework code so this test isn't needed, same wth adding
+  it("when deleted budget category has budgets left, and those budgets are on the same level as deleted budget, and remaining total > 0, should update category total on graph and delete from list", () => {
+    var currBudget: Budget = {
+      _id : "1",
+      userId : "1",
+      mainCategory : "Fast Food",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Fast Food",
+      amount : "100",
+      total : 0
+    }
 
-  // })
-  // it("when deleted budget category has budgets left, and those budgets are not on the same level as deleted budget, and category total on graph != remaining total for category from list, and remaining total > 0, should overwrite graph total and delete from list", () => {
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
 
-  // })
-  // it("when deleted budget category has budgets left, and those budgets are not on the same level as deleted budget, and category total on graph != remaining total for category from list, and remaining total = 0, should delete category from graph and list", () => {
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(50);
 
-  // })
+    var currBudget: Budget = {
+      _id : "2",
+      userId : "1",
+      mainCategory : "American",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "American",
+      amount : "500",
+      total : 0
+    }
+
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(100);
+
+    fixture.detectChanges();
+
+    var currBudget = component.budgets[1];
+    console.log(currBudget)
+
+    component.onDeleteBudgetClicked(currBudget)
+  
+    component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(component.budgets[0]._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(50);
+  })
+
+  it("when deleted budget category has budgets left, and those budgets are on the same level as deleted budget, and remaining total = 0, should delete category from graph and list", () => {
+    var currBudget: Budget = {
+      _id : "2",
+      userId : "1",
+      mainCategory : "Australian",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Australian",
+      amount : "100",
+      total : 0
+    }
+
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(50);
+
+    var currBudget = component.budgets[0];
+    console.log(currBudget)
+
+    component.onDeleteBudgetClicked(currBudget)
+  
+    component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(component.budgets[0]._id);
+    expect(component.pieData.length).toEqual(0);
+  })
+
+  it("when deleted budget category has budgets left, and those budgets are not on the same level as deleted budget, and category total on graph != remaining total for category from list, and remaining total > 0, should overwrite graph total and delete from list", () => {
+    var currBudget: Budget = {
+      _id : "2",
+      userId : "1",
+      mainCategory : "Fast Food",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "Fast Food",
+      amount : "100",
+      total : 0
+    }
+
+    var addNewButton = fixture.debugElement.nativeElement.querySelector('#addButton');
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(50);
+
+    var currBudget: Budget = {
+      _id : "3",
+      userId : "1",
+      mainCategory : "Restaurants",
+      category : "Food and Drink",
+      category2 : "Restaurants",
+      category3 : "",
+      amount : "500",
+      total : 0
+    }
+
+    addNewButton.dispatchEvent(new Event('click'));
+
+    component.addBudgetRef.componentInstance.onAdd.emit(currBudget);
+    expect(component.budgets.length).toEqual(3);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(currBudget._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(350);
+
+    var currBudget = component.budgets[2];
+    console.log(currBudget)
+
+    component.onDeleteBudgetClicked(currBudget)
+  
+    component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+    expect(component.budgets.length).toEqual(2);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(component.budgets[0]._id);
+    expect(component.pieData.length).toEqual(1);
+    expect(component.pieData[component.pieData.length-1].mainCategory).toEqual(currBudget.category);
+    expect(component.pieData[component.pieData.length-1].total).toEqual(50);
+  })
+
+  it("when deleted budget category has budgets left, and those budgets are not on the same level as deleted budget, and category total on graph != remaining total for category from list, and remaining total = 0, should delete category from graph and list", () => {
+    var currBudget = component.budgets[1];
+    console.log(currBudget)
+
+    component.onDeleteBudgetClicked(currBudget)
+  
+    component.deleteBudgetRef.componentInstance.onDelete.emit(currBudget);
+    expect(component.budgets.length).toEqual(1);
+    expect(component.budgets[component.budgets.length-1]._id).toEqual(component.budgets[0]._id);
+    expect(component.pieData.length).toEqual(0);
+  })
 });
 
 

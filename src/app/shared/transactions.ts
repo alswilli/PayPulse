@@ -91,6 +91,15 @@ export const LESSTHAN30TRANSACTIONS: any[] = [
         account_id: "8wefiwef"
     },
     {
+        amount: 1,
+        category: ["Food and Drink", "Nightlife"],
+        date: "2020-07-14",
+        transactionName: "CREDIT CARD 3333 PAYMENT *//",
+        accountName: "Checking",
+        _id: "K75d11MPvAHzaaddl9zqraBJLsW8m3Xz3JKTVbwVJ4",
+        account_id: "8wefiwef"
+    },
+    {
         amount: 250,
         category: ["Food and Drink", "Restaurants"],
         date: "2020-07-14",
@@ -115,6 +124,51 @@ export const LESSTHAN30TRANSACTIONS: any[] = [
         transactionName: "CREDIT CARD 3333 PAYMENT *//",
         accountName: "Checking",
         _id: "K75d11MPwerrvAHwwez9zqraBJLsW8m3Xz3JKTVbwVJ4",
+        account_id: "8wefiwef"
+    },
+    {
+        amount: 0,
+        category: ["Food and Drink", "Restaurants", "Australian"],
+        date: "2020-07-14",
+        transactionName: "CREDIT CARD 3333 PAYMENT *//",
+        accountName: "Checking",
+        _id: "K75d11MPwerrvAHwwez9zqraddBJLsW8m3Xz3JKTVbwVJ4",
+        account_id: "8wefiwef"
+    },
+    {
+        amount: 0,
+        category: ["Food and Drink", "Bar"],
+        date: "2020-07-14",
+        transactionName: "CREDIT CARD 3333 PAYMENT *//",
+        accountName: "Checking",
+        _id: "K75d11MPwerrvAHwwez9zqr5656addBJLsW8m3Xz3JKTVbwVJ4",
+        account_id: "8wefiwef"
+    },
+    {
+        amount: 0,
+        category: ["Travel"],
+        date: "2020-07-14",
+        transactionName: "CREDIT CARD 3333 PAYMENT *//",
+        accountName: "Checking",
+        _id: "K75d11MPwerrvAHwwez9zqraddBJL2W8m3Xz3J668KTVbwVJ4",
+        account_id: "8wefiwef"
+    },
+    {
+        amount: 200,
+        category: ["Shops"],
+        date: "2020-07-14",
+        transactionName: "CREDIT CARD 3333 PAYMENT *//",
+        accountName: "Checking",
+        _id: "K75d11MPwerrvAHwwez9zqraddBJLsW8m3Xz3J668KTVbwVJ4",
+        account_id: "8wefiwef"
+    },
+    {
+        amount: 0,
+        category: ["Shops", "Bicycles"],
+        date: "2020-07-14",
+        transactionName: "CREDIT CARD 3333 PAYMENT *//",
+        accountName: "Checking",
+        _id: "K75d11MPwerrvAHwwez9zqraddBJLsW8m3Xz3J668KTVbwVJ4",
         account_id: "8wefiwef"
     }
 ];
