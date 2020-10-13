@@ -12,7 +12,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   // email: string = undefined;
   username: string = undefined;
-  subscription: Subscription;
+  tokenTimer: number = undefined;
+  usernameSubscription: Subscription;
+  tokenSubscription: Subscription;
   opened: boolean;
   loggingIn: boolean;
 
@@ -41,12 +43,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.authService.loadUserCredentials();
       // this.subscription = this.authService.getEmail()
         // .subscribe(email => { console.log(email); this.email = email; });
-    this.subscription = this.authService.getUsername()
+    this.usernameSubscription = this.authService.getUsername()
       .subscribe(username => { console.log(username); this.username = username; });
+    this.tokenSubscription = this.authService.getTokenTimer()
+      .subscribe(tokenTimer => { console.log(tokenTimer); this.tokenTimer = tokenTimer; });
   }
 
   ngOnDestroy() {
-    this.subscription.unsubscribe();
+    this.usernameSubscription.unsubscribe();
+    this.tokenSubscription.unsubscribe();
   }
 
   onMenuClick() {

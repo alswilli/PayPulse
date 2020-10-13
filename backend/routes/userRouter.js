@@ -73,7 +73,7 @@ router.post('/login', cors.corsWithOptions, (req, res, next) => {
       var token = authenticate.getToken({_id: req.user._id});
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      res.json({success: true, status: 'Login Successful!', token: token});
+      res.json({success: true, status: 'Login Successful!', token: token, exp: Math.floor(Date.now() / 1000) + 30});
     }); 
   }) (req, res, next);
 });
@@ -96,7 +96,7 @@ router.post('/facebook/token', cors.corsWithOptions, passport.authenticate('face
     var token = authenticate.getToken({_id: req.user._id});
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    res.json({success: true, username: req.user.username, token: token, status: 'You are successfully logged in!'});
+    res.json({success: true, username: req.user.username, token: token, status: 'You are successfully logged in!', exp: Math.floor(Date.now() / 1000) + 30});
   }
 });
 

@@ -16,7 +16,7 @@ const tokenSecretKey = process.env.TOKEN_SECRET_KEY;
 
 exports.getToken = function(user) {
     return jwt.sign(user, tokenSecretKey,
-        {expiresIn: 3600});
+        {expiresIn: 36000});
 };
 
 var opts = {};

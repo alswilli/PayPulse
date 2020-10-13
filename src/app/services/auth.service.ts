@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { timer } from 'rxjs';
 
 import { baseURL } from '../shared/baseurl';
 import { ProcessHTTPMsgService } from './process-httpmsg.service';
@@ -10,6 +11,7 @@ interface AuthResponse {
   status: string;
   success: string;
   token: string;
+  exp: number;
 }
 
 interface FbAuthResponse {
@@ -17,6 +19,7 @@ interface FbAuthResponse {
   success: string;
   token: string;
   username: string;
+  exp: number;
 }
 
 interface JWTResponse {
@@ -34,6 +37,9 @@ export class AuthService {
   accountsKey = 'User Accounts Details';
   isAuthenticated: Boolean = false;
   username: Subject<string> = new Subject<string>();
+  tokenTimer: Subject<number> = new Subject<number>();
+  // tokenTimer: any;
+  timeLeft: number = 30;
   authToken: string = undefined;
 
    constructor(private http: HttpClient,
@@ -112,7 +118,9 @@ export class AuthService {
      return this.http.post<AuthResponse>(baseURL + 'users/login',
        {'username': user.username, 'password': user.password})
        .pipe( map(res => {
+         console.log(res)
            this.storeUserCredentials({username: user.username, token: res.token});
+           this.startTimer(res.exp);
            return {'success': true, 'username': user.username };
        }),
         // catchError(error => this.processHTTPMsgService.handleError(error))
@@ -125,6 +133,7 @@ export class AuthService {
        .pipe( map(res => {
         console.log(res)
            this.storeUserCredentials({username: res.username, token: res.token});
+           this.startTimer(res.exp);
            return {'success': true, 'username': res.username };
        }), map(res2 => {
            console.log("Test: ", res2);
@@ -149,6 +158,37 @@ export class AuthService {
 
    getToken(): string {
      return this.authToken;
+   }
+
+   startTimer(expTime) {
+    //  // repeat with the interval of 2 seconds
+    //  let timerId = setInterval(() => console.log("tick"), 2000);
+
+    //  // after 5 seconds stop
+    //  setTimeout(() => { clearInterval(timerId); console.log('stop'); }, 10000);
+
+
+
+    // const source = timer(1000, 1000);
+    // const abc = source.subscribe(val => {
+    //   console.log(val, '-');
+    //   var tokenTimer = this.timeLeft - val;
+    //   if (tokenTimer < 15) {
+    //     this.sendTokenTimer(tokenTimer)
+    //   }
+    // });
+   }
+
+   getTokenTimer(): Observable<number>  {
+     return this.tokenTimer.asObservable();
+   }
+
+   sendTokenTimer(tokenTimer: number) {
+     this.tokenTimer.next(tokenTimer);
+   }
+
+   clearTokenTimer() {
+     this.tokenTimer.next(undefined);
    }
 }
 
