@@ -1,7 +1,7 @@
 <div fxFlex fxLayout="row">
   <div fxFlex='1'></div> 
   <div fxFlex='18'>
-    <h4 matSubheader class="toggleHeader">Accounts</h4>
+    <h4 matSubheader class="toggleHeader">Sub Accounts</h4>
     <div style="border-style: solid; border-width: 1px;">
       <mat-selection-list>
         <mat-list-option class="mat-primary" *ngFor="let list of listValue" (click)="onSubAccountChanged(list);" 
@@ -15,7 +15,7 @@
   </div>
   <div fxFlex='1'></div> 
   <div fxFlex='79'>
-    <h2>Account Selected: <p style="color: rgb(76, 0, 255); display: inline;">{{subAccount}}</p></h2>
+    <h2>Sub Account Selected: <p style="color: rgb(76, 0, 255); display: inline;">{{subAccount}}</p></h2>
     <h4>Current Balance: <p style="color: green; display: inline;">$ {{balancesCurrentDict[subAccount]}}</p></h4>
 
     <mat-form-field *ngIf="!errMess">
@@ -30,7 +30,7 @@
     
           <!-- Account Column -->
           <ng-container matColumnDef="accountName">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header style="background-color: grey; color: black;"> <b>Account Name</b> </th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header style="background-color: grey; color: white;"> <b>Sub Account Name</b> </th>
             <!-- <div *ngIf="!isLoading">
               <td mat-cell *matCellDef="let row"> {{row.accountName}} </td>
             </div> -->
@@ -39,7 +39,7 @@
       
           <!-- Amount Column -->
           <ng-container matColumnDef="amount">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header style="background-color: grey; color: black;"> <b>Amount</b> </th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header style="background-color: grey; color: white;"> <b>Amount</b> </th>
             <!-- <div *ngIf="!isLoading">
               <td mat-cell *matCellDef="let row"> $ {{row.amount}} </td>
             </div> -->
@@ -48,7 +48,7 @@
       
           <!-- Transaction Column -->
           <ng-container matColumnDef="transactionName">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header style="background-color: grey; color: black;"> <b>Transaction Name</b> </th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header style="background-color: grey; color: white;"> <b>Transaction Name</b> </th>
             <!-- <div *ngIf="!isLoading">
               <td mat-cell *matCellDef="let row"> {{row.transactionName}} </td>
             </div> -->
@@ -57,7 +57,7 @@
       
           <!-- Category Column -->
           <ng-container matColumnDef="category">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header style="background-color: grey; color: black;"> <b>Category</b> </th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header style="background-color: grey; color: white;"> <b>Category</b> </th>
             <!-- <div *ngIf="!isLoading">
               <td mat-cell *matCellDef="let row"> {{row.category}} </td>
             </div> -->
@@ -66,7 +66,7 @@
       
           <!-- Date Column -->
           <ng-container matColumnDef="date">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header style="background-color: grey; color: black;"> <b>Date</b> </th>
+            <th mat-header-cell *matHeaderCellDef mat-sort-header style="background-color: grey; color: white;"> <b>Date</b> </th>
             <!-- <div *ngIf="!isLoading">
               <td mat-cell *matCellDef="let row"> {{row.date}} </td>
             </div> -->

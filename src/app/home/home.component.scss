@@ -22,11 +22,32 @@ $manage-button-text-color: white;
 
 .mainCardTitle {
     font-weight: bold;
-    font-size: 20px;
+    font-size: 40px;
 }
+
+// ::ng-deep .mat-card-header-text {
+//     /* CSS styles go here */
+//     font-size: 30px!important;
+//   }
 
 .card {
     margin: 10px;
+    margin-bottom: 30px;
+    background-color: rgb(245, 244, 244);
+}
+
+mat-list-option[aria-selected="true"] {
+    background: rgb(202, 202, 202);
+}
+
+// mat-list-option[aria-selected="false"] {
+//     border: solid black;
+// }
+
+mat-selection-list {
+    border: 1px solid rgb(173, 173, 173);
+    padding-top: 0px;
+    margin-bottom: 10px;
 }
 
 .addAccountDiv {

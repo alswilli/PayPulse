@@ -1,20 +1,26 @@
 table {
-    width: 100%;
-  }
+  width: 100%;
+}
   
-  .mat-form-field {
-    font-size: 14px;
-    width: 100%;
-  }
-  
-  td, th {
-    width: 25%;
-  }
+.mat-form-field {
+  font-size: 14px;
+  width: 100%;
+}
 
-  .toggleHeader {
-    background-color: gray;
-    margin-bottom: 0px;
-    border-style: solid;
-    border-bottom: 0px;
-    border-width: 1px;
-  }
+td, th {
+  width: 25%;
+}
+
+.toggleHeader {
+  background-color: grey;
+  color: white;
+  margin-bottom: 0px;
+  border: solid black;
+  border-bottom: 0px;
+  border-width: 1px;
+}
+
+::ng-deep .mat-sort-header-arrow {
+  // color: #fff;
+  color: #fff
+}

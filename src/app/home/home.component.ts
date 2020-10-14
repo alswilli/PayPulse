@@ -274,6 +274,7 @@ export class HomeComponent implements OnInit {
   onAccountChanged(accountName) {
     if (!this.removeAccounts) {
       console.log(accountName);
+      this.currentAccountName = accountName;
       this.isLoading = true;
       var nextId;
       for (let account of this.userAccountsDetails.accounts) {
