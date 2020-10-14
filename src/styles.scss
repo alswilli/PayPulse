@@ -1,5 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import './customTheme.scss';
+@import 'variables';
+@import '../node_modules/font-awesome/scss/font-awesome';
 
 body { 
     padding: 0; 

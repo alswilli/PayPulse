@@ -19,12 +19,11 @@
          mat-button [disabled]="loginForm.invalid">Log in</button>
       </div>
       <div fxLayoutAlign="center">
-        <button type="button" class="btn" (click)="facebookLogin();">Login with facebook</button>
+        <button mat-button type="button" class="btn" (click)="facebookLogin();"><i id="fbicon" class="fa fa-facebook fa-lg"></i>Login with Facebook</button>
       </div>
       <p>
         <span fxFlex fxLayoutAlign="center"><a class="createAccountLink" routerLink='/createAccount'>Need to create an account?</a></span>
       </p>
-      <div id="fb-root"></div>
     </form>
   </mat-card>
 </div>
