@@ -17,6 +17,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   tokenSubscription: Subscription;
   opened: boolean;
   loggingIn: boolean;
+  bgColor: string;
 
   constructor(private router: Router,
     private activatedRoute: ActivatedRoute, 
@@ -28,13 +29,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
         console.log(event.url);
         if (event.url === '/login') {
           this.loggingIn = true;
+          this.bgColor = 'f7fbff'
           console.log("Log in screen opened!");
         }
         else if (event.url === '/createAccount' || event.url === '/linkAccount') {
           this.loggingIn = true;
+          this.bgColor = 'f7fbff'
         } 
         else {
           this.loggingIn = false;
+          this.bgColor = 'FFFFFF'
         }
         // this.loggingIn = false;
       }
