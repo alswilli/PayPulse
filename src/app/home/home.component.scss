@@ -45,13 +45,15 @@ mat-list-option[aria-selected="true"] {
 // }
 
 mat-selection-list {
-    border: 1px solid rgb(173, 173, 173);
+    border: 1px solid rgb(224, 224, 224);
     padding-top: 0px;
     margin-bottom: 10px;
 }
 
 .addAccountDiv {
-    margin: 10px;
+    // margin: 10px;
+    // border: 1px solid rgb(209, 209, 209);
+    margin-bottom: 30px;
 }
 
 .addDeleteButtons {

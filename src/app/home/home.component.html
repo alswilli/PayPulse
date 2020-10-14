@@ -1,10 +1,10 @@
 <mat-spinner *ngIf="fullLoad" style="margin: auto"></mat-spinner>
 <!-- <div style="position: fixed; height: 100px; margin-top: 100px;"></div> -->
 <div *ngIf="!fullLoad">
-  <div class="addAccountDiv">
+  <div class="addAccountDiv" [ngStyle]="{'margin': marginVal + 'px', 'border': borderVal}">
     <!-- <form [formGroup]="clientForm"> -->
     <form>
-      <h2 *ngIf="listValue.length > 0">Linked Accounts:</h2>
+      <h2 *ngIf="listValue.length > 0" style="margin:10px;">Linked Accounts:</h2>
     
       <!-- <pre>
         {{ clientForm.get('myOtherControl').value }}
@@ -12,7 +12,7 @@
     
       <!-- <mat-selection-list formControlName="myOtherControl"> -->
       <mat-spinner *ngIf="firstLoad" style="margin: auto"></mat-spinner>
-      <mat-selection-list *ngIf="!firstLoad">
+      <mat-selection-list *ngIf="!firstLoad" style="margin:10px;">
         <mat-list-option class="mat-primary" *ngFor="let list of listValue" (click)="onAccountChanged(list);" 
         [selected]="preSelection.indexOf(list) > -1" [value]="list" [disabled]="removeAccounts">
           <div fxFlex fxLayout="row">
@@ -27,7 +27,7 @@
       </mat-selection-list>
     </form>
     <!-- <p>Bank Account Selected: {{currentAccountName}}</p> -->
-    <div>
+    <div style="margin:10px;">
       <!-- <button mat-raised-button class="addDeleteButtons" routerLink='/linkAccount' color="primary">Add Account</button> -->
       <mr-ngx-plaid-link-button env="sandbox" publicKey="ea1ee62219264cf290c12041f96bba" (Success)="onPlaidSuccess($event)" 
       (Exit)="onPlaidExit($event)" (Load)="onPlaidLoad($event)" (Event)="onPlaidEvent($event)" 
@@ -54,11 +54,19 @@
     </div>
   </div>
   
-  <div *ngIf="listValue.length === 0">
+  <div *ngIf="listValue.length === 0" style="margin: 10px;">
     <p>No accounts added! Please add an account using the 'Add Account' button above</p>
   </div>
-  
-  <div *ngIf="listValue.length > 0">
+  <div style="margin: 10px;">
+    <p><b>Note:</b> When adding new accounts, enter the following fields:</p>
+    <ul>
+      <li>Username: <b>user_good</b></li>
+      <li>Password: <b>pass_good</b></li>
+    </ul>
+    <p>I have limited functionality to simulated accounts in sandbox mode for now.</p>
+    <p>All accounts in sandbox mode will have the same transactions!</p>
+  </div>
+  <div *ngIf="listValue.length > 0" style="border: 1px solid rgb(209, 209, 209); margin: 10px;">
     <h2 *ngIf="listValue.length > 0" style="margin: 10px;"><span style="color: rgb(3, 192, 3)">{{currentAccountName}}</span> - Account Summary:</h2>
     <mat-card class="card" *ngFor="let component of majorComponents">
       <mat-card-header>

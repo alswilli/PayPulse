@@ -14,6 +14,7 @@ import { DeleteAccountComponent } from '../delete-account/delete-account.compone
 import { ErrorComponent } from '../error/error.component';
 import { BudgetService } from '../services/budget.service';
 import { Budget } from '../shared/budget';
+import { Stringifiable } from 'd3';
 // import 'rxjs/add/operator/switchMap';
 
 @Component({
@@ -46,6 +47,8 @@ export class HomeComponent implements OnInit {
   subdays = 0;
   transactions: any[];
   top3Budgets = [];
+  marginVal: string;
+  borderVal: string;
 
   clientForm: FormGroup;
   listValue: any = [];
@@ -135,10 +138,13 @@ export class HomeComponent implements OnInit {
       // this.clientForm = this.fb.group({
       //   myOtherControl: new FormControl(this.preSelection),
       // });
+      this.marginVal = '10';
+      this.borderVal = '1px solid rgb(209, 209, 209)';
     }
     else {
       // May need something here later
-
+      this.marginVal = '0';
+      this.borderVal = '';
       // this.isLoading = false;
 
       // this.firstLoad = false;
@@ -374,6 +380,8 @@ export class HomeComponent implements OnInit {
     if (this.listValue.length === 0) {
       this.isLoading = true;
       this.fullLoad = false;
+      this.marginVal = '10';
+      this.borderVal = '1px solid rgb(209, 209, 209)';
 
       for (let account of this.userAccountsDetails.accounts) {
         this.listValue.push(account.institutionName);
@@ -571,6 +579,8 @@ export class HomeComponent implements OnInit {
           this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
           // this.onRemoveAccountClicked();
           this.removeAccounts = !this.removeAccounts;
+          this.marginVal = '0';
+          this.borderVal = '';
         }
     });
   }
