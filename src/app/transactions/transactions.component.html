@@ -1,4 +1,7 @@
-<div fxFlex fxLayout="row">
+<div *ngIf="userAccountsDetails.accounts.length === 0">
+  <p>No accounts added! Please add an account to see transactions</p>
+</div>
+<div *ngIf="userAccountsDetails.accounts.length > 0" fxFlex fxLayout="row">
   <div fxFlex='1'></div> 
   <div fxFlex='18'>
     <h4 matSubheader class="toggleHeader">Sub Accounts</h4>

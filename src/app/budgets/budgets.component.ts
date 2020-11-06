@@ -41,6 +41,7 @@ export class BudgetsComponent implements OnInit {
   addBudgetRef: any;
   editBudgetRef: any;
   deleteBudgetRef: any;
+  initialLoad: boolean;
   // dataEmpty = true;
   dates = {
     "01":["January", 31],
@@ -78,9 +79,13 @@ export class BudgetsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.initialLoad = true;
     this.budgets = [];
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
     this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id;
+    if (this.userAccountsDetails.accounts.length > 0) {
+      this.initialLoad = false;
+    }
 
     var today = new Date();
     var currMonth = today.getMonth() + 1;

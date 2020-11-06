@@ -1,5 +1,8 @@
 <!-- <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner> -->
-<div>
+<div *ngIf="initialLoad">
+  <p>No accounts added! Please add an account to see budgets</p>
+</div>
+<div [hidden]="initialLoad">
   <!-- <div fxLayoutAlign="center bottom">
     <mat-form-field>
       <mat-label>From:</mat-label>
