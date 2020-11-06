@@ -137,6 +137,14 @@
                   </div>
                 </div>
               </div>
+              <div *ngIf="component.name === 'Goals' && card.name === 'Completed Goals'">
+                <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+                <div *ngIf="!isLoading"> 
+                  <div *ngIf="randomCompletedGoals.length === 0">
+                    <p>No completed goals for this month yet!</p>
+                  </div>
+                </div>
+              </div>
             </mat-card-content>
           </mat-card>
         </mat-card-content>

@@ -38,7 +38,7 @@ export const MAJORS: MajorComponent[] = [
         cards: [
             {
                 id: '0',
-                name: 'Completed goals',
+                name: 'Completed Goals',
                 data: ['GET MOST RECENT 3 ADDED GOALS'],
             },
             // {

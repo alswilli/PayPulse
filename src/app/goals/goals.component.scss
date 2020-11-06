@@ -1,0 +1,23 @@
+.activeGoals {
+    display: flex;
+    overflow-x: auto;
+    margin: 10px;
+    // max-width: 10%;
+    // overflow-x: scroll;
+}
+
+.activeGoalsCard {
+    // display: flex;
+    min-width: 100px;
+    // overflow-x: scroll;
+}
+
+.completedGoals {
+    display: flex;
+    overflow-x: auto;
+    margin: 10px;
+}
+
+.completedGoalsCard {
+    min-width: 100px;
+}

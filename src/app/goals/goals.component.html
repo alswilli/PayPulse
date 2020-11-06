@@ -1,3 +1,27 @@
-<p>
-  Coming soon!
-</p>
+<h2 style="margin: 10px;">Active Goals:</h2>
+<div class="activeGoals">
+  <div *ngFor="let goal of activeGoals">
+    <mat-card class="activeGoalsCard">
+      <mat-card-header>
+        <h3>{{goal.goalName}}</h3>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Description and image go here</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+<h2 style="margin: 10px;">Completed Goals:</h2>
+<div class="completedGoals">
+  <div *ngFor="let goal of completedGoals">
+    <mat-card class="completedGoalsCard">
+      <mat-card-header>
+        <h3>{{goal.goalName}}</h3>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Description and image go here</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>
+

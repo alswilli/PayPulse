@@ -15,6 +15,8 @@ import { ErrorComponent } from '../error/error.component';
 import { BudgetService } from '../services/budget.service';
 import { Budget } from '../shared/budget';
 import { Stringifiable } from 'd3';
+import { GoalsComponent } from '../goals/goals.component';
+import { Goal } from '../shared/goal';
 // import 'rxjs/add/operator/switchMap';
 
 @Component({
@@ -49,6 +51,7 @@ export class HomeComponent implements OnInit {
   top3Budgets = [];
   marginVal: string;
   borderVal: string;
+  randomCompletedGoals: Goal[];
 
   clientForm: FormGroup;
   listValue: any = [];
@@ -129,6 +132,7 @@ export class HomeComponent implements OnInit {
           s.option.selected = true;
         });
         this.getTopBudgets();
+        this.randomCompletedGoals = [];
         // return this.accountService.getTransactionCategories();
       });
       // this.listValue = ["SOMETHING3", "SOMETHING4"];
