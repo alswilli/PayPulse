@@ -17,7 +17,7 @@ export const MAJORS: MajorComponent[] = [
     {
         id: '1',
         name: 'Budgets',
-        description: "Here is a quick summary of your top budgets from the last 30 days",
+        description: "Here is a summary of your top budgets from the last 30 days",
         cards: [
             {
                 id: '0',
@@ -31,23 +31,23 @@ export const MAJORS: MajorComponent[] = [
             // },
         ]
     },
-    // {
-    //     id: '2',
-    //     name: 'Goals',
-    //     description: "Here is a list of your ongoing and recently completed goals",
-    //     cards: [
-    //         {
-    //             id: '0',
-    //             name: 'Recently added goals',
-    //             data: 'GET MOST RECENT 3 ADDED GOALS',
-    //         },
-    //         {
-    //             id: '1',
-    //             name: 'Recently completed goals',
-    //             data: 'GET MOST RECENT 3 COMPLETED GOALS',
-    //         },
-    //     ]
-    // },
+    {
+        id: '2',
+        name: 'Goals',
+        description: "Here is a summary of your completed goals from the last 30 days",
+        cards: [
+            {
+                id: '0',
+                name: 'Completed goals',
+                data: ['GET MOST RECENT 3 ADDED GOALS'],
+            },
+            // {
+            //     id: '1',
+            //     name: 'Recently completed goals',
+            //     data: 'GET MOST RECENT 3 COMPLETED GOALS',
+            // },
+        ]
+    },
     // {
     //     id: '3',
     //     name: 'Sharing',

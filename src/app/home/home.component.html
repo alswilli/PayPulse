@@ -1,139 +1,152 @@
 <mat-spinner *ngIf="fullLoad" style="margin: auto"></mat-spinner>
 <!-- <div style="position: fixed; height: 100px; margin-top: 100px;"></div> -->
 <div *ngIf="!fullLoad">
-  <div class="addAccountDiv" [ngStyle]="{'margin': marginVal + 'px', 'border': borderVal}">
-    <!-- <form [formGroup]="clientForm"> -->
-    <form>
-      <h2 *ngIf="listValue.length > 0" style="margin:10px;">Linked Accounts:</h2>
-    
-      <!-- <pre>
-        {{ clientForm.get('myOtherControl').value }}
-      </pre> -->
-    
-      <!-- <mat-selection-list formControlName="myOtherControl"> -->
-      <mat-spinner *ngIf="firstLoad" style="margin: auto"></mat-spinner>
-      <mat-selection-list *ngIf="!firstLoad" style="margin:10px;">
-        <mat-list-option class="mat-primary" *ngFor="let list of listValue" (click)="onAccountChanged(list);" 
-        [selected]="preSelection.indexOf(list) > -1" [value]="list" [disabled]="removeAccounts">
-          <div fxFlex fxLayout="row">
-            <div *ngIf="removeAccounts">
-              <mat-icon class="trashIcon" (click)="onDeleteIconClicked(list);">delete</mat-icon> 
+  <div fxLayout.lt-md="column" >
+    <div class="addAccountDiv" fxFlex="50" [ngStyle]="{'margin': marginVal + 'px', 'border': borderVal}">
+      <!-- <form [formGroup]="clientForm"> -->
+      <form *ngIf="listValue.length > 0">
+        <h2 *ngIf="listValue.length > 0" style="margin:10px;">Linked Accounts:</h2>
+      
+        <!-- <pre>
+          {{ clientForm.get('myOtherControl').value }}
+        </pre> -->
+      
+        <!-- <mat-selection-list formControlName="myOtherControl"> -->
+        <mat-spinner *ngIf="firstLoad" style="margin: auto"></mat-spinner>
+        <mat-selection-list *ngIf="!firstLoad" style="margin:10px;">
+          <mat-list-option class="mat-primary" *ngFor="let list of listValue" (click)="onAccountChanged(list);" 
+          [selected]="preSelection.indexOf(list) > -1" [value]="list" [disabled]="removeAccounts">
+            <div fxFlex fxLayout="row">
+              <div *ngIf="removeAccounts">
+                <mat-icon class="trashIcon" (click)="onDeleteIconClicked(list);">delete</mat-icon> 
+              </div>
+              <div style="vertical-align: bottom; padding: 3px;">
+                {{list}}
+              </div>
             </div>
-            <div style="vertical-align: bottom; padding: 3px;">
-              {{list}}
-            </div>
-          </div>
-        </mat-list-option>
-      </mat-selection-list>
-    </form>
-    <!-- <p>Bank Account Selected: {{currentAccountName}}</p> -->
-    <div style="margin:10px;">
-      <!-- <button mat-raised-button class="addDeleteButtons" routerLink='/linkAccount' color="primary">Add Account</button> -->
-      <mr-ngx-plaid-link-button env="sandbox" publicKey="ea1ee62219264cf290c12041f96bba" (Success)="onPlaidSuccess($event)" 
-      (Exit)="onPlaidExit($event)" (Load)="onPlaidLoad($event)" (Event)="onPlaidEvent($event)" 
-      className="launch-plaid-link-button" buttonText="Add Account" 
-      (Click)="onPlaidClick($event)" webhook="https://507ec71083932519eb6c52a27bbe8afd.m.pipedream.net"
-      product="transactions"
-      [style]="{
-        'background-color':'#3f51b5',
-        'border-radius':'2px',
-        'border':'none',
-        'display':'inline-block',
-        'cursor':'pointer',
-        'color':'white',
-        'font-family':'Arial',
-        'padding':'16px 31px',
-        'text-decoration':'none',
-        'text-shadow':'0px 1px 0px #2f6627',
-        'margin':'auto',
-        'padding':'10px',
-        'font-size':'14px'
-      }">
-      </mr-ngx-plaid-link-button>
-      <button mat-flat-button *ngIf="listValue.length > 0" id="removeAccountButton" class="addDeleteButtons" (click)="onRemoveAccountClicked();">Remove Accounts</button>
+          </mat-list-option>
+        </mat-selection-list>
+      </form>
+      <!-- <p>Bank Account Selected: {{currentAccountName}}</p> -->
+      <div style="margin:10px;">
+        <!-- <button mat-raised-button class="addDeleteButtons" routerLink='/linkAccount' color="primary">Add Account</button> -->
+        <div *ngIf="listValue.length === 0">
+          <p>No accounts added! Please add an account using the 'Add Account' button below</p>
+        </div>
+        <mr-ngx-plaid-link-button env="sandbox" publicKey="ea1ee62219264cf290c12041f96bba" (Success)="onPlaidSuccess($event)" 
+        (Exit)="onPlaidExit($event)" (Load)="onPlaidLoad($event)" (Event)="onPlaidEvent($event)" 
+        className="launch-plaid-link-button" buttonText="Add Account" 
+        (Click)="onPlaidClick($event)" webhook="https://507ec71083932519eb6c52a27bbe8afd.m.pipedream.net"
+        product="transactions"
+        [style]="{
+          'background-color':'#3f51b5',
+          'border-radius':'2px',
+          'border':'none',
+          'display':'inline-block',
+          'cursor':'pointer',
+          'color':'white',
+          'font-family':'Arial',
+          'padding':'16px 31px',
+          'text-decoration':'none',
+          'text-shadow':'0px 1px 0px #2f6627',
+          'margin':'auto',
+          'padding':'10px',
+          'font-size':'14px'
+        }">
+        </mr-ngx-plaid-link-button>
+        <button mat-flat-button *ngIf="listValue.length > 0" id="removeAccountButton" class="addDeleteButtons" (click)="onRemoveAccountClicked();">Remove Accounts</button>
+      </div>
     </div>
-  </div>
-  
-  <div *ngIf="listValue.length === 0" style="margin: 10px;">
-    <p>No accounts added! Please add an account using the 'Add Account' button above</p>
-  </div>
-  <div style="margin: 10px;">
-    <p><b>Note:</b> When adding new accounts, enter the following fields:</p>
-    <ul>
-      <li>Username: <b>user_good</b></li>
-      <li>Password: <b>pass_good</b></li>
-    </ul>
-    <p>I have limited functionality to simulated accounts in sandbox mode for now.</p>
-    <p>All accounts in sandbox mode will have the same transactions!</p>
+    <div fxFlex="50" [ngStyle]="{'margin': marginVal + 'px', 'border': borderVal}">
+      <div style="margin:10px;">
+        <p><b>Note:</b> When adding new accounts, enter the following fields:</p>
+        <ul>
+          <li>Username: <b>user_good</b></li>
+          <li>Password: <b>pass_good</b></li>
+        </ul>
+        <p>I have limited functionality to simulated accounts in sandbox mode for now.</p>
+        <p>All accounts in sandbox mode will have the same transactions!</p>
+      </div>
+    </div>
   </div>
   <div *ngIf="listValue.length > 0" style="border: 1px solid rgb(209, 209, 209); margin: 10px;">
     <h2 *ngIf="listValue.length > 0" style="margin: 10px;"><span style="color: rgb(3, 192, 3)">{{currentAccountName}}</span> - Account Summary:</h2>
-    <mat-card class="card" *ngFor="let component of majorComponents">
-      <mat-card-header>
-        <mat-card-title class="mainCardTitle"> <h3>{{component.name}}</h3> </mat-card-title>
-        <!-- <h3 class="mainCardTitle"> {{component.name}} </h3> -->
-        <mat-card-subtitle style="color:rgb(49, 48, 48)"> {{component.description}} </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content fxLayoutAlign="center">
-        <mat-card style="background-color: white" fxFlex *ngFor="let card of component.cards">
-          <mat-card-header>
-            <mat-card-title> {{card.name}} </mat-card-title>
-          </mat-card-header>
-          <mat-card-content style="background-color: white" fxLayoutAlign="center">
-            <div *ngIf="component.name === 'Transactions' && card.name === 'Recent Transactions'">
-              <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
-              <div *ngIf="!isLoading"> 
-                <div *ngIf="parsedTransactions.length === 0">
-                  <p>No recent transactions for this month yet!</p>
-                </div>
-                <p *ngFor="let recentData of parsedTransactions">
-                  <span><b>Sub Account Name:</b> {{recentData.accountName}} </span>
-                  <span><b>Amount:</b> {{recentData.amount}} </span>
-                  <span><b>Transaction Name:</b> {{recentData.transactionName}} </span>
-                  <span><b>Category:</b> {{recentData.category}} </span>
-                  <span><b>Date:</b> {{recentData.date}} </span>
-                </p>
-              </div>
-            </div>
-            <div *ngIf="component.name === 'Budgets' && card.name === 'Top Budgets'">
-              <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
-              <div *ngIf="!isLoading"> 
-                <div *ngIf="top3Budgets.length === 0">
-                  <p>No recent budgets for this month yet!</p>
-                </div>
-                <div *ngFor="let budget of top3Budgets">
-                  <p fxFlex *ngIf="budget.mainCategory === budget.category3">
-                    {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
-                  </p>
-                  <p fxFlex *ngIf="budget.mainCategory === budget.category2">
-                    {{ budget.category }}: <b>{{ budget.category2 }}</b> 
-                  </p>
-                  <p fxFlex *ngIf="budget.mainCategory === budget.category">
-                    <b>{{ budget.category }}</b> 
-                  </p>
-                  <span fxFlex></span>
-                  <p fxLayoutAlign="end center" style="margin-right: 10px;">
-                    <span *ngIf="(budget.total / (budget.amount)) >= 1" style="color: red;">
-                      <b>{{ budget.total }} / {{ (budget.amount) }}</b>
-                    </span>
-                    <span *ngIf="!((budget.total / (budget.amount)) >= 1) && (budget.total / (budget.amount)) >= 0.75" style="color: orange;">
-                      <b>{{ budget.total }} / {{ (budget.amount) }}</b>
-                    </span>
-                    <span *ngIf="!((budget.total / (budget.amount)) >= 0.75) && (budget.total / (budget.amount)) >= 0" style="color: green;">
-                      <b>{{ budget.total }} / {{ (budget.amount) }}</b>
-                    </span>
+    <div fxLayout="row" fxLayout.lt-md="column" class="outerCardDiv"
+    [ngStyle.lt-md]=
+      "{'width': '100%',
+        'height': 'auto'}">
+      <mat-card [ngStyle.lt-md]=
+      "{'margin': '10px', 
+      'margin-bottom': '30px', 
+      'background-color': 'rgb(245, 244, 244)', 
+      'width': 'auto'}" class="card" *ngFor="let component of majorComponents">
+        <mat-card-header class="cardHeader">
+          <mat-card-title class="mainCardTitle"> <h3>{{component.name}}</h3> </mat-card-title>
+          <!-- <h3 class="mainCardTitle"> {{component.name}} </h3> -->
+          <mat-card-subtitle class="cardsubtitle"> {{component.description}} </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content class="cardContent" fxLayoutAlign="center">
+          <mat-card class="innerCard" fxFlex *ngFor="let card of component.cards">
+            <mat-card-header class="innerCardHeader">
+              <mat-card-title> {{card.name}} </mat-card-title>
+            </mat-card-header>
+            <mat-card-content class="innerCardContent" fxLayoutAlign="center">
+              <div *ngIf="component.name === 'Transactions' && card.name === 'Recent Transactions'">
+                <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+                <div *ngIf="!isLoading"> 
+                  <div *ngIf="parsedTransactions.length === 0">
+                    <p>No recent transactions for this month yet!</p>
+                  </div>
+                  <p *ngFor="let recentData of parsedTransactions">
+                    <span><b>Sub Account Name:</b> {{recentData.accountName}} </span>
+                    <span><b>Amount:</b> {{recentData.amount}} </span>
+                    <span><b>Transaction Name:</b> {{recentData.transactionName}} </span>
+                    <span><b>Category:</b> {{recentData.category}} </span>
+                    <span><b>Date:</b> {{recentData.date}} </span>
                   </p>
                 </div>
               </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button *ngIf="component.name === 'Transactions'" class="manageButton" routerLink='/transactions'>Manage {{component.name}}</button>
-        <button mat-button *ngIf="component.name === 'Budgets'" class="manageButton" routerLink='/budgets'>Manage {{component.name}}</button>
-      </mat-card-actions>
-    </mat-card>
+              <div *ngIf="component.name === 'Budgets' && card.name === 'Top Budgets'">
+                <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+                <div *ngIf="!isLoading"> 
+                  <div *ngIf="top3Budgets.length === 0">
+                    <p>No recent budgets for this month yet!</p>
+                  </div>
+                  <div *ngFor="let budget of top3Budgets">
+                    <p fxFlex *ngIf="budget.mainCategory === budget.category3">
+                      {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
+                    </p>
+                    <p fxFlex *ngIf="budget.mainCategory === budget.category2">
+                      {{ budget.category }}: <b>{{ budget.category2 }}</b> 
+                    </p>
+                    <p fxFlex *ngIf="budget.mainCategory === budget.category">
+                      <b>{{ budget.category }}</b> 
+                    </p>
+                    <span fxFlex></span>
+                    <p fxLayoutAlign="end center" style="margin-right: 10px;">
+                      <span *ngIf="(budget.total / (budget.amount)) >= 1" style="color: red;">
+                        <b>{{ budget.total }} / {{ (budget.amount) }}</b>
+                      </span>
+                      <span *ngIf="!((budget.total / (budget.amount)) >= 1) && (budget.total / (budget.amount)) >= 0.75" style="color: orange;">
+                        <b>{{ budget.total }} / {{ (budget.amount) }}</b>
+                      </span>
+                      <span *ngIf="!((budget.total / (budget.amount)) >= 0.75) && (budget.total / (budget.amount)) >= 0" style="color: green;">
+                        <b>{{ budget.total }} / {{ (budget.amount) }}</b>
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </mat-card-content>
+          </mat-card>
+        </mat-card-content>
+        <mat-card-actions class="cardActions">
+          <button mat-button *ngIf="component.name === 'Transactions'" class="manageButton" routerLink='/transactions'>Manage {{component.name}}</button>
+          <button mat-button *ngIf="component.name === 'Budgets'" class="manageButton" routerLink='/budgets'>Manage {{component.name}}</button>
+          <button mat-button *ngIf="component.name === 'Goals'" class="manageButton" routerLink='/goals'>Manage {{component.name}}</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
   </div>
 </div>
 
