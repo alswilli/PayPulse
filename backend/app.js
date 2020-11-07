@@ -13,6 +13,7 @@ const transactionRouter = require('./routes/transactionRouter');
 const plaidRouter = require("./routes/plaidRouter");
 const userRouter = require('./routes/userRouter');
 const budgetRouter = require('./routes/budgetRouter');
+const goalRouter = require('./routes/goalRouter');
 
 const mongoUsername = process.env.MONGODB_USERNAME;
 const mongoUserPassword = process.env.MONGODB_USER_PASSWORD;
@@ -60,6 +61,7 @@ app.use('/transactions', transactionRouter);
 app.use('/plaid', plaidRouter);
 app.use('/users', userRouter);
 app.use('/budgets', budgetRouter);
+app.use('/goals', goalRouter);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '..', 'dist', 'PayPulse')));

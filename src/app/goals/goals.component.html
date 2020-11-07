@@ -12,7 +12,10 @@
   </div>
 </div>
 <h2 style="margin: 10px;">Completed Goals:</h2>
-<div class="completedGoals">
+<div *ngIf="completedGoals.length === 0">
+  <p style="margin: 10px;">No goals completed yet!</p>
+</div>
+<div *ngIf="completedGoals.length > 0" class="completedGoals">
   <div *ngFor="let goal of completedGoals">
     <mat-card class="completedGoalsCard">
       <mat-card-header>
