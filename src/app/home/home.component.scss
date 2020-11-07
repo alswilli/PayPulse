@@ -50,7 +50,7 @@ $outer-Card-Width: 100%;
 .cardsubtitle {
     color:rgb(49, 48, 48);
     height: 30px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .cardContent {
@@ -70,7 +70,7 @@ $outer-Card-Width: 100%;
 
 .innerCardContent {
     height: 85%;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 mat-list-option[aria-selected="true"] {
