@@ -18,7 +18,7 @@ goalRouter.route("/")
 
 });
 
-budgetRouter.route("/:budgetId")
+goalRouter.route("/:budgetId")
 .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
 .put(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
     
