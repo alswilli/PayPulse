@@ -1,4 +1,4 @@
-.activeGoals {
+.monthlyGoals {
     display: flex;
     overflow-x: auto;
     margin: 10px;
@@ -6,18 +6,28 @@
     // overflow-x: scroll;
 }
 
-.activeGoalsCard {
+.monthlyGoalsCard {
     // display: flex;
     min-width: 100px;
     // overflow-x: scroll;
 }
 
-.completedGoals {
+.recentlyCompletedGoals {
     display: flex;
     overflow-x: auto;
     margin: 10px;
 }
 
-.completedGoalsCard {
+.recentlyCompletedGoalsCard {
+    min-width: 100px;
+}
+
+.allGoals {
+    display: flex;
+    overflow-x: auto;
+    margin: 10px;
+}
+
+.allGoalsCard {
     min-width: 100px;
 }

@@ -1,7 +1,9 @@
-<h2 style="margin: 10px;">Active Goals:</h2>
-<div class="activeGoals">
-  <div *ngFor="let goal of activeGoals">
-    <mat-card class="activeGoalsCard">
+<!-- <h2 style="margin: 10px;"></h2> -->
+
+<!-- <h2 style="margin: 10px;">Recently Completed Goals:</h2>
+<div class="recentlyCompletedGoals">
+  <div *ngFor="let goal of recentlyCompletedGoals">
+    <mat-card class="recentlyCompletedGoalsCard">
       <mat-card-header>
         <h3>{{goal.goalName}}</h3>
       </mat-card-header>
@@ -11,13 +13,11 @@
     </mat-card>
   </div>
 </div>
-<h2 style="margin: 10px;">Completed Goals:</h2>
-<div *ngIf="completedGoals.length === 0">
-  <p style="margin: 10px;">No goals completed yet!</p>
-</div>
-<div *ngIf="completedGoals.length > 0" class="completedGoals">
-  <div *ngFor="let goal of completedGoals">
-    <mat-card class="completedGoalsCard">
+
+<h2 style="margin: 10px;">Monthly Goals:</h2>
+<div class="monthlyGoals">
+  <div *ngFor="let goal of monthlyGoals">
+    <mat-card class="monthlyGoalsCard">
       <mat-card-header>
         <h3>{{goal.goalName}}</h3>
       </mat-card-header>
@@ -26,5 +26,41 @@
       </mat-card-content>
     </mat-card>
   </div>
+</div> -->
+
+<!-- <h2 style="margin: 10px;">All Goals:</h2>
+<div class="allGoals">
+  <div *ngFor="let goal of allGoals">
+    <mat-card class="allGoalsCard">
+      <mat-card-header>
+        <h3>{{goal.goalName}}</h3>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Description and image go here</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div> -->
+
+<h2 style="margin: 10px;">Goals:</h2>
+<div>
+  <mat-grid-list cols="4" rowHeight="200px">
+    <mat-grid-tile
+      *ngFor="let goal of allGoals"
+      [colspan]="1"
+      [rowspan]="1"
+    >
+      <mat-card>
+        <mat-card-header>
+          <h3>{{goal.goalName}}</h3>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Description and image go here</p>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
 </div>
+
+
 

@@ -34,7 +34,7 @@ export const MAJORS: MajorComponent[] = [
     {
         id: '2',
         name: 'Goals',
-        description: "Here is a summary of your completed goals from the last 30 days",
+        description: "Here is a summary of your recently completed goals from the last 30 days",
         cards: [
             {
                 id: '0',

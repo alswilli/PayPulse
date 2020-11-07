@@ -20,7 +20,7 @@ import { NgxPlaidLinkModule } from 'ngx-plaid-link';
 import { HttpClientModule } from '@angular/common/http';
 import { MatExpansionModule } from '@angular/material/expansion';
 
-import { MatGridListModule } from '@angular/material/grid-list';;
+import { MatGridListModule } from '@angular/material/grid-list';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatSelectModule } from '@angular/material/select';
@@ -105,7 +105,8 @@ import { TokenExpiredComponent } from './token-expired/token-expired.component';
     NgxPlaidLinkModule,
     MatSelectModule,
     MatDialogModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatGridListModule
   ],
   // exports: [
   //   MatFormFieldModule,
