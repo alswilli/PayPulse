@@ -43,7 +43,7 @@ export class GoalsComponent implements OnInit {
     })
   }
 
-  onBoxResize() {
+  onBoxResize(e) {
     if(this.box) {
       console.log(this.box.nativeElement.clientWidth)
       var currWidth = this.box.nativeElement.clientWidth;
