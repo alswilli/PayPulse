@@ -44,6 +44,31 @@
 
 <div *ngIf="admin">
   <p>You are an admin!</p>
+  <form style="max-width: 500px" novalidate [formGroup]="addGoalForm" #addgoalform="ngForm" (ngSubmit)="onSubmit()" fxLayout="column">
+    <p>
+      <mat-form-field fxLayoutAlign="center">
+        <input matInput formControlName="goalName" placeholder="Goal Name" type="text" required>
+        <mat-error *ngIf="formErrors.email">{{formErrors.goalName}}</mat-error>
+      </mat-form-field>
+    </p>
+    <p>
+      <mat-form-field fxLayoutAlign="center">
+        <input matInput formControlName="goalDescription" placeholder="Goal Description" type="text" required>
+        <mat-error *ngIf="formErrors.email">{{formErrors.goalDescription}}</mat-error>
+      </mat-form-field>
+    </p>
+    <label class="image-upload-container btn btn-bwm">
+      <span>Select Image</span>
+      <input #imageInput
+             type="file"
+             accept="image/*"
+             (change)="processFile(imageInput)">
+    </label>
+    <div fxLayoutAlign="center">
+      <button style="background-color:lightgrey; margin: auto;" type="submit"
+       mat-button [disabled]="createAccountForm.invalid">Create Account</button>
+    </div>
+  </form>
 </div>
 
 <h2 style="margin: 10px;">Goals:</h2>
