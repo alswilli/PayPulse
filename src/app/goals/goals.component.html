@@ -42,6 +42,10 @@
   </div>
 </div> -->
 
+<div *ngIf="admin">
+  <p>You are an admin!</p>
+</div>
+
 <h2 style="margin: 10px;">Goals:</h2>
 <div #box>
   <mat-grid-list [cols]="columns" rowHeight="100px" 
@@ -56,7 +60,7 @@
           <h3>{{goal.goalName}}</h3>
         </mat-card-header>
         <mat-card-content>
-          <p>Description and image go here</p>
+          <p>{{goal.goalDescription}}</p>
         </mat-card-content>
       </mat-card>
     </mat-grid-tile>

@@ -21,6 +21,9 @@ import {
           if (error.error.message) {
             errorMessage = error.error.message;
           }
+          else if (error.error.err.message) {
+            errorMessage = error.error.err.message;
+          }
           this.dialog.open(ErrorComponent, {data: {message: errorMessage}});
           // this.errorService.throwError(errorMessage);
           return throwError(error);

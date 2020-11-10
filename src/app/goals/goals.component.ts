@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Goal } from '../shared/goal';
+import { GoalService } from '../services/goal.service';
+import { mergeMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-goals',
@@ -14,46 +16,31 @@ export class GoalsComponent implements OnInit {
   columns: number = 4;
 
   @ViewChild('box') box: ElementRef;
+  userAccountsDetails: any;
+  currentAccountId: any;
+  jwtDetails: any;
+  admin: any;
 
-  constructor() { }
+  constructor(private goalService: GoalService,) { }
 
   ngOnInit() {
-    this.recentlyCompletedGoals = [
-      {_id: "1", userId: "1", goalName: "a"},
-      {_id: "2", userId: "1", goalName: "b"},
-      {_id: "3", userId: "1", goalName: "c"},
-      {_id: "4", userId: "1", goalName: "d"},
-      {_id: "5", userId: "1", goalName: "e"},
-      {_id: "6", userId: "1", goalName: "f"},
-      {_id: "7", userId: "1", goalName: "g"},
-      {_id: "8", userId: "1", goalName: "h"},
-      {_id: "9", userId: "1", goalName: "i"},
-      {_id: "10", userId: "1", goalName: "j"},
-    ];
-    this.monthlyGoals = [
-      {_id: "1", userId: "1", goalName: "a"},
-      {_id: "2", userId: "1", goalName: "b"},
-      {_id: "3", userId: "1", goalName: "c"},
-      {_id: "4", userId: "1", goalName: "d"},
-      {_id: "5", userId: "1", goalName: "e"},
-      {_id: "6", userId: "1", goalName: "f"},
-      {_id: "7", userId: "1", goalName: "g"},
-      {_id: "8", userId: "1", goalName: "h"},
-      {_id: "9", userId: "1", goalName: "i"},
-      {_id: "10", userId: "1", goalName: "j"},
-    ];
-    this.allGoals = [
-      {_id: "1", userId: "1", goalName: "a"},
-      {_id: "2", userId: "1", goalName: "b"},
-      {_id: "3", userId: "1", goalName: "c"},
-      {_id: "4", userId: "1", goalName: "d"},
-      {_id: "5", userId: "1", goalName: "e"},
-      {_id: "6", userId: "1", goalName: "f"},
-      {_id: "7", userId: "1", goalName: "g"},
-      {_id: "8", userId: "1", goalName: "h"},
-      {_id: "9", userId: "1", goalName: "i"},
-      {_id: "10", userId: "1", goalName: "j"},
-    ];
+    this.allGoals = [];
+    this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
+    this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id;
+
+    this.jwtDetails = JSON.parse(localStorage.getItem('JWT'));
+    this.admin = this.jwtDetails.admin;
+
+    this.goalService.getGoals()
+    .pipe(
+      mergeMap((goals) => {
+        this.allGoals = goals;
+        return goals;
+      })
+    )
+    .subscribe(_ => {
+      
+    })
   }
 
   onBoxResize() {

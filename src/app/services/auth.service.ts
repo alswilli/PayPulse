@@ -15,6 +15,7 @@ interface AuthResponse {
   success: string;
   token: string;
   exp: number;
+  admin: boolean;
 }
 
 interface FbAuthResponse {
@@ -23,6 +24,7 @@ interface FbAuthResponse {
   token: string;
   username: string;
   exp: number;
+  admin: boolean;
 }
 
 interface JWTResponse {
@@ -140,7 +142,7 @@ export class AuthService {
            console.log(res)
            const now = new Date();
            const expirationDate = new Date(now.getTime() + res.exp * 1000);
-           this.storeUserCredentials({username: user.username, token: res.token}, expirationDate);
+           this.storeUserCredentials({username: user.username, token: res.token, admin: res.admin}, expirationDate);
            console.log(expirationDate)
            this.startTimer(res.exp);
            return {'success': true, 'username': user.username };
@@ -156,7 +158,7 @@ export class AuthService {
            console.log(res)
            const now = new Date();
            const expirationDate = new Date(now.getTime() + res.exp * 1000);
-           this.storeUserCredentials({username: res.username, token: res.token}, expirationDate);
+           this.storeUserCredentials({username: res.username, token: res.token, admin: res.admin}, expirationDate);
            this.startTimer(res.exp);
            return {'success': true, 'username': res.username };
        }), map(res2 => {
