@@ -63,8 +63,8 @@ app.use('/users', userRouter);
 app.use('/budgets', budgetRouter);
 app.use('/goals', goalRouter);
 app.use('/usergoals', userGoalRouter);
-// app.use("/images", express.static(path.join("backend", "images")));
-app.use("/images", express.static(path.join("images")));
+app.use("/images", express.static(path.join("backend", "images")));
+// app.use("/images", express.static(path.join("images")));
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '..', 'dist', 'PayPulse')));

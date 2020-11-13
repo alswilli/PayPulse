@@ -26,12 +26,20 @@ goalRouter.route("/")
     });
 })
 .post(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, extractFile, (req, res, next) => {
+//   const url = req.protocol + "://" + req.get("host");
+//   console.log(url)
+//   const goal = new Goal({
+//     goalName: req.body.name,
+//     goalDescription: req.body.description,
+//     imagePath: url + "/images/" + req.file.filename
+//   });
+    console.log("THE FILE: ", req.file)
   const url = req.protocol + "://" + req.get("host");
   console.log(url)
   const goal = new Goal({
     goalName: req.body.name,
     goalDescription: req.body.description,
-    imagePath: url + "/images/" + req.file.filename
+    imagePath: req.file.location
   });
   goal.save()
     .then(createdGoal => {
