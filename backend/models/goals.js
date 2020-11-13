@@ -13,6 +13,10 @@ const GoalSchema = new Schema({
     imagePath: {
         type: String,
         required: true
+    },
+    goalProgress: {
+        type: Number,
+        default: 0
     }
 });
 module.exports = Goal = mongoose.model("goal", GoalSchema);

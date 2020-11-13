@@ -69,7 +69,7 @@
 
 <h2 style="margin: 10px;">Goals:</h2>
 <div #box>
-  <mat-grid-list [cols]="columns" rowHeight="200px" 
+  <mat-grid-list [cols]="columns" rowHeight="300px" 
   width="100%"
   (window:resize)="onBoxResize($event)">
     <mat-grid-tile
@@ -78,11 +78,11 @@
     >
       <mat-spinner *ngIf="isLoading" style="margin: auto;"></mat-spinner>
       <div *ngIf="!isLoading" style="height: 100%; width: 100%">
-        <h3>{{goal.goalName}}</h3>
         <div class="goal-image">
-          <img [src]="goal.imagePath" [alt]="goal.goalName">
+          <img [src]="goal.imagePath" [alt]="goal.goalName" 
+          matTooltip="{{goal.goalDescription}}" matTooltipPosition="above">
         </div>
-        <p>{{goal.goalDescription}}</p>
+        <h3>{{goal.goalName}}</h3>
       </div>
       <!-- <mat-card>
         <mat-card-header>

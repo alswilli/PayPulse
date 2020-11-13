@@ -27,6 +27,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -106,7 +107,8 @@ import { TokenExpiredComponent } from './token-expired/token-expired.component';
     MatSelectModule,
     MatDialogModule,
     MatExpansionModule,
-    MatGridListModule
+    MatGridListModule,
+    MatTooltipModule
   ],
   // exports: [
   //   MatFormFieldModule,

@@ -15,13 +15,13 @@ goalRouter.route("/")
     Goal.find()
     .then(goals => {
       res.status(200).json({
-        message: "Posts fetched successfully!",
+        message: "Goals fetched successfully!",
         goals: goals
       });
     })
     .catch(error => {
       res.status(500).json({
-        message: "Fetching posts failed!"
+        message: "Fetching goals failed!"
       });
     });
 })

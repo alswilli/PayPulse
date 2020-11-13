@@ -14,7 +14,9 @@ const UserGoalSchema = new Schema({
         type: Number,
         required: true
     },
-}, {
-    timestamps: true
+    dateFirstAchieved: { 
+        type: Date, 
+        default: Date.now
+    }
 });
 module.exports = UserGoal = mongoose.model("usergoal", UserGoalSchema);

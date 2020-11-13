@@ -3,4 +3,5 @@ export class UserGoal {
     userId: string;
     goalId: string
     numTimesAcheived: number;
+    dateFirstAchieved: Date;
 }

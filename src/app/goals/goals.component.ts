@@ -16,7 +16,7 @@ export class GoalsComponent implements OnInit {
   allGoals: Goal[];
 
   columns: number = 1;
-  width: number = 150;
+  width: number = 250;
   lowEdge: number;
   highEdge: number;
 

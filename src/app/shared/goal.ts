@@ -3,4 +3,5 @@ export class Goal {
     goalName: string;
     goalDescription: string;
     imagePath: string;
+    goalProgress: number;
 }
