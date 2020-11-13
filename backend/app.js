@@ -18,7 +18,7 @@ const userGoalRouter = require('./routes/userGoalRouter');
 
 const mongoUsername = process.env.MONGODB_USERNAME;
 const mongoUserPassword = process.env.MONGODB_USER_PASSWORD;
-const mongoDatabaseName = process.env.MONGODB_DATABASE_NAME_OLD;
+const mongoDatabaseName = process.env.MONGODB_DATABASE_NAME;
 
 // const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName + "?retryWrites=true&w=majority";
 const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName;
@@ -63,7 +63,8 @@ app.use('/users', userRouter);
 app.use('/budgets', budgetRouter);
 app.use('/goals', goalRouter);
 app.use('/usergoals', userGoalRouter);
-app.use("/images", express.static(path.join("backend", "images")));
+// app.use("/images", express.static(path.join("backend", "images")));
+app.use("/images", express.static(path.join("backend", "images-real")));
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '..', 'dist', 'PayPulse')));

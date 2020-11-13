@@ -30,12 +30,14 @@ export class GoalsComponent implements OnInit {
   isLoading: boolean;
 
   @ViewChild('filePicker') filePicker: ElementRef;
+  initialLoad: boolean;
   
 
   constructor(private goalService: GoalService,) { }
 
   ngOnInit() {
     this.isLoading = true;
+    this.initialLoad = true;
     this.allGoals = [];
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
     this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id;
@@ -69,6 +71,7 @@ export class GoalsComponent implements OnInit {
         this.highEdge = this.lowEdge + this.width;
         console.log(this.columns, this.lowEdge, currWidth, this.highEdge)
         this.isLoading = false;
+        this.initialLoad = false;
         return goalResponse.goals;
       })
     )

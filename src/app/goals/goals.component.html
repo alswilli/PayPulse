@@ -67,7 +67,9 @@
   </mat-card>
 </div>
 
+<p>NOTE: Goals functionality is currently still under construction!</p>
 <h2 style="margin: 10px;">Goals:</h2>
+<mat-spinner *ngIf="initialLoad" style="margin: auto;"></mat-spinner>
 <div #box>
   <mat-grid-list [cols]="columns" rowHeight="300px" 
   width="100%"
