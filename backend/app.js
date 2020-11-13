@@ -14,10 +14,11 @@ const plaidRouter = require("./routes/plaidRouter");
 const userRouter = require('./routes/userRouter');
 const budgetRouter = require('./routes/budgetRouter');
 const goalRouter = require('./routes/goalRouter');
+const userGoalRouter = require('./routes/userGoalRouter');
 
 const mongoUsername = process.env.MONGODB_USERNAME;
 const mongoUserPassword = process.env.MONGODB_USER_PASSWORD;
-const mongoDatabaseName = process.env.MONGODB_DATABASE_NAME;
+const mongoDatabaseName = process.env.MONGODB_DATABASE_NAME_OLD;
 
 // const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName + "?retryWrites=true&w=majority";
 const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName;
@@ -53,7 +54,6 @@ connect.then((db) => {
 //   res.sendFile(path.join(__dirname, '..', 'dist', 'PayPulse', 'index.html'));
 // });
 
-
 app.use(passport.initialize());
 
 // Connecting middleware
@@ -62,6 +62,8 @@ app.use('/plaid', plaidRouter);
 app.use('/users', userRouter);
 app.use('/budgets', budgetRouter);
 app.use('/goals', goalRouter);
+app.use('/usergoals', userGoalRouter);
+app.use("/images", express.static(path.join("backend", "images")));
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '..', 'dist', 'PayPulse')));

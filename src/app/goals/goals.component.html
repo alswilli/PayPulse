@@ -44,50 +44,57 @@
 
 <div *ngIf="admin">
   <p>You are an admin!</p>
-  <form style="max-width: 500px" novalidate [formGroup]="addGoalForm" #addgoalform="ngForm" (ngSubmit)="onSubmit()" fxLayout="column">
-    <p>
-      <mat-form-field fxLayoutAlign="center">
-        <input matInput formControlName="goalName" placeholder="Goal Name" type="text" required>
-        <mat-error *ngIf="formErrors.email">{{formErrors.goalName}}</mat-error>
+  <!-- <mat-spinner *ngIf="isLoading"></mat-spinner> -->
+  <mat-card>
+    <form [formGroup]="form">
+      <mat-form-field>
+        <input matInput type="text" formControlName="name" placeholder="Goal Name">
+        <mat-error *ngIf="form.get('name').invalid">Please enter a goal name.</mat-error>
       </mat-form-field>
-    </p>
-    <p>
-      <mat-form-field fxLayoutAlign="center">
-        <input matInput formControlName="goalDescription" placeholder="Goal Description" type="text" required>
-        <mat-error *ngIf="formErrors.email">{{formErrors.goalDescription}}</mat-error>
+      <div>
+        <button mat-stroked-button type="button" (click)="filePicker.click()">Select Image</button>
+        <input type="file" #filePicker (change)="onImageSelected($event)">
+      </div>
+      <div class="image-preview" *ngIf="imagePreview !== '' && imagePreview && form.get('image').valid">
+        <img [src]="imagePreview" [alt]="form.value.name">
+      </div>
+      <mat-form-field>
+        <textarea matInput rows="4" formControlName="description" placeholder="Goal Description"></textarea>
+        <mat-error *ngIf="form.get('description').invalid">Please enter a goal description.</mat-error>
       </mat-form-field>
-    </p>
-    <label class="image-upload-container btn btn-bwm">
-      <span>Select Image</span>
-      <input #imageInput
-             type="file"
-             accept="image/*"
-             (change)="processFile(imageInput)">
-    </label>
-    <div fxLayoutAlign="center">
-      <button style="background-color:lightgrey; margin: auto;" type="submit"
-       mat-button [disabled]="createAccountForm.invalid">Create Account</button>
-    </div>
-  </form>
+      <button mat-raised-button color="primary" type="button" (click)="onSaveGoal()">Save Goal</button>
+    </form>
+  </mat-card>
 </div>
 
 <h2 style="margin: 10px;">Goals:</h2>
 <div #box>
-  <mat-grid-list [cols]="columns" rowHeight="100px" 
+  <mat-grid-list [cols]="columns" rowHeight="200px" 
   width="100%"
   (window:resize)="onBoxResize($event)">
     <mat-grid-tile
       *ngFor="let goal of allGoals"
-      style="width: 100px;"
+      style="margin: auto;"
     >
-      <mat-card>
+      <mat-spinner *ngIf="isLoading" style="margin: auto;"></mat-spinner>
+      <div *ngIf="!isLoading" style="height: 100%; width: 100%">
+        <h3>{{goal.goalName}}</h3>
+        <div class="goal-image">
+          <img [src]="goal.imagePath" [alt]="goal.goalName">
+        </div>
+        <p>{{goal.goalDescription}}</p>
+      </div>
+      <!-- <mat-card>
         <mat-card-header>
           <h3>{{goal.goalName}}</h3>
         </mat-card-header>
         <mat-card-content>
+          <div class="goal-image">
+            <img [src]="goal.imagePath" [alt]="goal.goalName">
+          </div>
           <p>{{goal.goalDescription}}</p>
         </mat-card-content>
-      </mat-card>
+      </mat-card> -->
     </mat-grid-tile>
   </mat-grid-list>
   <!-- <mat-grid-list *ngIf="lessThanMedium" cols="2" rowHeight="200px">

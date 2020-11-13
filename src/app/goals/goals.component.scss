@@ -31,3 +31,41 @@
 .allGoalsCard {
     min-width: 100px;
 }
+
+input[type="file"] {
+    visibility: hidden;
+}
+
+.image-preview {
+    height: 5rem;
+    margin: 1rem 0;
+}
+
+.image-preview img {
+    height: 100%;
+}
+
+mat-form-field,
+textarea {
+    width: 100%;
+}
+
+.goal-image {
+    // width: 100%;
+    // height: 50%;
+    width: 150px;
+    height: 200px;
+}
+
+.goal-image img {
+    // width: 100%;
+    // height: 100%;
+    width: 100%;
+    height: 100%;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+}
+
+
+// mat-grid-tile {
+//     overflow-y: auto;
+// }
