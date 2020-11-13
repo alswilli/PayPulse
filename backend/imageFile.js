@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
       error = null;
     }
     // cb(error, "backend/images");
-    cb(error, "backend/images");
+    cb(error, "images");
   },
   filename: (req, file, cb) => {
     console.log(file)
