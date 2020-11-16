@@ -24,10 +24,6 @@ var User = new Schema({
         type: Boolean,
         default: false
     }
-    // goals: {
-    //   type: Schema.Types.ObjectId,
-    //   ref: "goals"
-    // }
 });
 
 User.plugin(passportLocalMongoose);

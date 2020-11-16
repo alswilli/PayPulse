@@ -9,6 +9,11 @@ interface GoalResponse {
   goals: Goal[];
 }
 
+interface UserGoalResponse {
+  message: string;
+  usergoals: UserGoal[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -29,15 +34,27 @@ export class GoalService {
   }
 
   getUserGoals() {
-    return this.http.get<UserGoal[]>(baseURL + 'goals');
+    return this.http.get<UserGoalResponse>(baseURL + 'usergoals');
   }
 
   addUserGoal(userGoalData: Object) {
-    return this.http.post<UserGoal>(baseURL + 'goals', userGoalData);
+    return this.http.post<UserGoalResponse>(baseURL + 'usergoals', userGoalData);
   }
 
+  // addUserGoals(userId: string, allGoals: Goal[], allUserGoals: UserGoal[]) {
+  //   for (let goal of allGoals) {
+  //     var found = false;
+  //     for (let userGoal of allUserGoals) {
+  //       if (userGoal.goalId == goal._id) {
+  //         this.http.post(baseURL + 'usergoals/' + userId, userGoalData);
+  //       }
+  //     }
+  //   }
+  //   return true;
+  // }
+
   updateUserGoal(goalId: string, update: object) {
-    return this.http.put(baseURL + 'budgets/' + goalId, update);
+    return this.http.put(baseURL + 'usergoals/' + goalId, update);
   }
 
 }

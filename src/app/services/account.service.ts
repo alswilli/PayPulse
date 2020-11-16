@@ -74,7 +74,7 @@ export class AccountService {
   }
 
   getCurrentAccount() {
-    return this.http.get(baseURL + 'plaid/accounts?current=true');
+    return this.http.get<Account>(baseURL + 'plaid/accounts?current=true');
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 

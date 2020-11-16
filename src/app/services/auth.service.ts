@@ -125,6 +125,15 @@ export class AuthService {
    destroyUserAccountsDetails() {
      localStorage.removeItem(this.accountsKey);
    }
+
+   storeUserGoalsDetails(details: any) {
+    console.log('storeUserGoalsDetails ', details); 
+    localStorage.setItem("User Goals Details", JSON.stringify(details));
+  }
+
+  destroyUserGoalsDetails() {
+    localStorage.removeItem("User Goals Details")
+  }
  
    signUp(user: any): Observable<any> {
      return this.http.post(baseURL + 'users/signup', user)

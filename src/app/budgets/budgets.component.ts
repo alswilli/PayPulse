@@ -664,6 +664,10 @@ export class BudgetsComponent implements OnInit {
           // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
         }
 
+        // if (this.budgets.length == 1) {
+
+        // }
+
         // Close dialogue ref
         this.addBudgetRef.close();
       });

@@ -4,6 +4,7 @@ import { GoalService } from '../services/goal.service';
 import { mergeMap } from 'rxjs/operators';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { mimeType } from "./mime-type.validator";
+import { UserGoal } from '../shared/usergoal';
 
 @Component({
   selector: 'app-goals',
@@ -14,6 +15,8 @@ export class GoalsComponent implements OnInit {
   recentlyCompletedGoals: Goal[];
   monthlyGoals: Goal[];
   allGoals: Goal[];
+  allUserGoals: UserGoal[];
+  matchedGoals: any[] = [];
 
   columns: number = 1;
   width: number = 250;
@@ -57,26 +60,35 @@ export class GoalsComponent implements OnInit {
     });
 
     this.goalService.getGoals()
-    .pipe(
-      mergeMap((goalResponse) => {
-        this.allGoals = goalResponse.goals;
-        console.log(this.allGoals)
-        var currWidth = this.box.nativeElement.clientWidth;
-        this.columns = Math.floor(currWidth / this.width) 
-        console.log(currWidth, this.columns)
-        if (this.columns > this.allGoals.length) {
-          this.columns = this.allGoals.length;
+    .subscribe(goalResponse => {
+      this.allGoals = goalResponse.goals;
+      console.log(this.allGoals)
+      var currWidth = this.box.nativeElement.clientWidth;
+      this.columns = Math.floor(currWidth / this.width) 
+      console.log(currWidth, this.columns)
+      if (this.columns > this.allGoals.length) {
+        this.columns = this.allGoals.length;
+      }
+      this.lowEdge = currWidth - (currWidth % this.width);
+      this.highEdge = this.lowEdge + this.width;
+      console.log(this.columns, this.lowEdge, currWidth, this.highEdge)
+      this.isLoading = false;
+      this.initialLoad = false;
+
+      this.allUserGoals = JSON.parse(localStorage.getItem('User Goals Details'));
+      for (let goal of this.allGoals) {
+        var found = false;
+        for (let usergoal of this.allUserGoals) {
+          if (usergoal.goalId == goal._id) {
+            found = true;
+            this.matchedGoals.push([usergoal, goal])
+            break;
+          }
         }
-        this.lowEdge = currWidth - (currWidth % this.width);
-        this.highEdge = this.lowEdge + this.width;
-        console.log(this.columns, this.lowEdge, currWidth, this.highEdge)
-        this.isLoading = false;
-        this.initialLoad = false;
-        return goalResponse.goals;
-      })
-    )
-    .subscribe(goals => {
-      
+        if (!found) {
+          this.matchedGoals.push([null, goal])
+        }
+      }
     })
   }
 

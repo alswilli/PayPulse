@@ -12,11 +12,15 @@ const UserGoalSchema = new Schema({
     },
     numTimesAchieved: {
         type: Number,
-        required: true
+        default: 0
     },
     dateFirstAchieved: { 
         type: Date, 
         default: Date.now
+    },
+    goalProgress: {
+        type: Number,
+        default: 0
     }
 });
 module.exports = UserGoal = mongoose.model("usergoal", UserGoalSchema);
