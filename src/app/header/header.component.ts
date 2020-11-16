@@ -75,7 +75,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // this.tokenTimer = undefined;
     // this.tokenSubscription.unsubscribe();
     this.ngOnDestroy();
-    this.authService.logOut();
+    this.authService.logOut().subscribe(res => {
+      this.router.navigate(['/login']);
+    });
     // this.router.navigate(['/login']);
   }
 

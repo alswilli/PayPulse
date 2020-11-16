@@ -5,6 +5,7 @@ var passport = require('passport');
 var User = require('../models/users');
 var authenticate = require('../authenticate');
 const cors = require('./corsRoutes');
+const { isError } = require('util');
 
 router.use(bodyParser.json());
 
@@ -77,22 +78,22 @@ router.post('/login', cors.corsWithOptions, (req, res, next) => {
       var token = authenticate.getToken({_id: req.user._id});
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
-      res.json({success: true, status: 'Login Successful!', admin: user.admin, token: token, exp: 3600});
+      res.json({success: true, status: 'Login Successful!', admin: user.admin, token: token, userId: user._id, exp: 3600});
     }); 
   }) (req, res, next);
 });
 
-router.get('/logout', cors.corsWithOptions, (req, res) => {
-  if (req.session) {
-    req.session.destroy();
-    res.clearCookie('session-id');
-    res.redirect('/');
-  }
-  else {
-    var err = new Error('You are not logged in!');
-    err.status = 403;
-    next(err);
-  }
+router.put('/logout', cors.corsWithOptions, (req, res, next) => {
+  User.findByIdAndUpdate(req.body.userId, {
+    $set: { lastLoggedOut: Date.now() }
+    })
+    .then((user) => {
+      console.log(user)
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.json(user);
+    })
+    .catch((err) => next(err));
 });
 
 router.post('/facebook/token', cors.corsWithOptions, passport.authenticate('facebook-token'), (req, res) => {
@@ -100,7 +101,7 @@ router.post('/facebook/token', cors.corsWithOptions, passport.authenticate('face
     var token = authenticate.getToken({_id: req.user._id});
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    res.json({success: true, username: req.user.username, admin: req.user.admin, token: token, status: 'You are successfully logged in!', exp: 3600});
+    res.json({success: true, username: req.user.username, admin: req.user.admin, token: token, userId: req.user._id, status: 'You are successfully logged in!', exp: 3600});
   }
 });
 

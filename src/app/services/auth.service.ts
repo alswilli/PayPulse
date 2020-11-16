@@ -16,6 +16,7 @@ interface AuthResponse {
   token: string;
   exp: number;
   admin: boolean;
+  userId: string;
 }
 
 interface FbAuthResponse {
@@ -25,6 +26,7 @@ interface FbAuthResponse {
   username: string;
   exp: number;
   admin: boolean;
+  userId: string;
 }
 
 interface JWTResponse {
@@ -151,7 +153,7 @@ export class AuthService {
            console.log(res)
            const now = new Date();
            const expirationDate = new Date(now.getTime() + res.exp * 1000);
-           this.storeUserCredentials({username: user.username, token: res.token, admin: res.admin}, expirationDate);
+           this.storeUserCredentials({username: user.username, token: res.token, admin: res.admin, userId: res.userId}, expirationDate);
            console.log(expirationDate)
            this.startTimer(res.exp);
            return {'success': true, 'username': user.username };
@@ -167,7 +169,7 @@ export class AuthService {
            console.log(res)
            const now = new Date();
            const expirationDate = new Date(now.getTime() + res.exp * 1000);
-           this.storeUserCredentials({username: res.username, token: res.token, admin: res.admin}, expirationDate);
+           this.storeUserCredentials({username: res.username, token: res.token, admin: res.admin, userId: res.userId}, expirationDate);
            this.startTimer(res.exp);
            return {'success': true, 'username': res.username };
        }), map(res2 => {
@@ -179,12 +181,21 @@ export class AuthService {
   }
 
    logOut() {
-     this.destroyUserCredentials();
-     this.destroyUserAccountsDetails();
-     this.router.navigate(['/login']);
-     clearTimeout(this.nodeTimer)
-     this.clearTokenTimer();
-     this.abc.unsubscribe();
+     console.log("logging out")
+     //  var userId = JSON.parse(localStorage.getItem(this.accountsKey))["currentAccount"][0]["userId"];
+     var userId = JSON.parse(localStorage.getItem(this.tokenKey))["userId"]
+     console.log(userId)
+     return this.http.put(baseURL + 'users/logout', {userId: userId})
+     .pipe( map(res => {
+        this.destroyUserCredentials();
+        this.destroyUserAccountsDetails();
+        this.destroyUserGoalsDetails();
+        // this.router.navigate(['/login']);
+        clearTimeout(this.nodeTimer)
+        this.clearTokenTimer();
+        this.abc.unsubscribe();
+        return res;
+     }));
    }
 
    isLoggedIn(): Boolean {

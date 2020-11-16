@@ -23,6 +23,10 @@ var User = new Schema({
     admin:   {
         type: Boolean,
         default: false
+    },
+    lastLoggedOut: {
+      type: Date,
+      default: null
     }
 });
 
