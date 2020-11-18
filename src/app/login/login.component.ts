@@ -6,7 +6,6 @@ import {AccountService} from '../services/account.service';
 import {Account} from '../shared/account';
 import { GoalService } from '../services/goal.service';
 import { mergeMap } from 'rxjs/operators';
-import { Observable, forkJoin } from 'rxjs';
 import { Goal } from '../shared/goal';
 import { UserGoal } from '../shared/usergoal';
 
@@ -128,32 +127,8 @@ export class LoginComponent implements OnInit {
                 .subscribe(usergoalResponse => {
                   this.allUserGoals = usergoalResponse.usergoals;
                   console.log(this.allUserGoals)
-                  let observables: Observable<any>[] = [];
-                  // for (let goal of this.allGoals) {
-                  //   for (let usergoal of this.allUserGoals) {
-                  //     if (usergoal.goalId == goal._id) {
-                  //       const userGoalData = {
-                  //         userId: currAccount._id,
-                  //         goalId: goal._id,
-                  //       }
-                  //       observables.push(this.goalService.addUserGoal(userGoalData))
-                  //     }
-                  //   }
-                  // }
-                  if (observables.length == 0) {
-                    this.authService.storeUserGoalsDetails({usergoals: this.allUserGoals});
-                    this.router.navigate(['/home']);
-                  }
-                  // forkJoin(observables)
-                  //     .subscribe(dataArray => {
-                  //         // All observables in `observables` array have resolved and `dataArray` is an array of result of each observable
-                  //         console.log("In fork join")
-                  //         for (let usergoal of dataArray[1]) {
-                  //           this.allUserGoals.push(usergoal);
-                  //         }
-                  //         this.authService.storeUserAccountsDetails({usergoals: this.allUserGoals});
-                  //         this.router.navigate(['/home']);
-                  //       });
+                  this.authService.storeUserGoalsDetails({usergoals: this.allUserGoals});
+                  this.router.navigate(['/home']);
                 });
               });
             }
@@ -204,31 +179,8 @@ export class LoginComponent implements OnInit {
                         )
                         .subscribe(usergoalResponse => {
                           this.allUserGoals = usergoalResponse.usergoals;
-                          let observables: Observable<any>[] = [];
-                          // for (let goal of this.allGoals) {
-                          //   for (let usergoal of this.allUserGoals) {
-                          //     if (usergoal.goalId == goal._id) {
-                          //       const userGoalData = {
-                          //         userId: currAccount._id,
-                          //         goalId: goal._id,
-                          //       }
-                          //       observables.push(this.goalService.addUserGoal(userGoalData))
-                          //     }
-                          //   }
-                          // }
-                          if (observables.length == 0) {
-                            this.authService.storeUserGoalsDetails({usergoals: this.allUserGoals});
-                            this._ngZone.run(() => this.router.navigate(['/home']));
-                          }
-                          // forkJoin(observables)
-                          //     .subscribe(dataArray => {
-                          //         // All observables in `observables` array have resolved and `dataArray` is an array of result of each observable
-                          //         for (let usergoal of dataArray[1]) {
-                          //           this.allUserGoals.push(usergoal);
-                          //         }
-                          //         this.authService.storeUserAccountsDetails({usergoals: this.allUserGoals});
-                          //         this._ngZone.run(() => this.router.navigate(['/home']));
-                          //       });
+                          this.authService.storeUserGoalsDetails({usergoals: this.allUserGoals});
+                          this._ngZone.run(() => this.router.navigate(['/home']));
                         });
                       }, 
                       error => {

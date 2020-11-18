@@ -59,13 +59,18 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.tokenSubscription.unsubscribe();
   }
 
-  onMenuClick() {
+  onMenuClick(e) {
+    console.log(e)
     this.opened = !this.opened;
     if (this.opened) {
       console.log("Sidebar opened!");
     }
     else {
       console.log("Sidebar closed!");
+    }
+
+    if (e.srcElement.innerHTML == " Log Out ") {
+      this.logOut();
     }
   }
 

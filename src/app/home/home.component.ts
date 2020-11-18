@@ -133,7 +133,7 @@ export class HomeComponent implements OnInit {
         });
         this.getTopBudgets();
         this.randomCompletedGoals = [];
-        // return this.accountService.getTransactionCategories();
+        
       });
       // this.listValue = ["SOMETHING3", "SOMETHING4"];
       
@@ -159,6 +159,8 @@ export class HomeComponent implements OnInit {
         s.option.selected = true;
       });
     }
+
+
   }
 
   getTopBudgets() {
@@ -213,6 +215,7 @@ export class HomeComponent implements OnInit {
           this.transactions = transactions;
           this.onGetTransactions();
           this.getTop3Budgets();
+          // this.handleGoals();
           this.isLoading = false;
         });
     }

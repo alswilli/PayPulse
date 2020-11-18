@@ -83,9 +83,9 @@ router.post('/login', cors.corsWithOptions, (req, res, next) => {
   }) (req, res, next);
 });
 
-router.put('/logout', cors.corsWithOptions, (req, res, next) => {
+router.put('/update', cors.corsWithOptions, (req, res, next) => {
   User.findByIdAndUpdate(req.body.userId, {
-    $set: { lastLoggedOut: Date.now() }
+    $set: { lastUpdated: Date.now() }
     })
     .then((user) => {
       console.log(user)

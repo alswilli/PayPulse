@@ -185,7 +185,7 @@ export class AuthService {
      //  var userId = JSON.parse(localStorage.getItem(this.accountsKey))["currentAccount"][0]["userId"];
      var userId = JSON.parse(localStorage.getItem(this.tokenKey))["userId"]
      console.log(userId)
-     return this.http.put(baseURL + 'users/logout', {userId: userId})
+     return this.http.put(baseURL + 'users/update', {userId: userId})
      .pipe( map(res => {
         this.destroyUserCredentials();
         this.destroyUserAccountsDetails();

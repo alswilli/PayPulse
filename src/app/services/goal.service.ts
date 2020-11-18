@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { baseURL } from '../shared/baseurl';
 import { Goal } from '../shared/goal';
 import { UserGoal } from '../shared/usergoal';
+import { Observable, forkJoin } from 'rxjs';
 
 interface GoalResponse {
   message: string;
@@ -39,6 +40,45 @@ export class GoalService {
 
   addUserGoal(userGoalData: Object) {
     return this.http.post<UserGoalResponse>(baseURL + 'usergoals', userGoalData);
+  }
+
+  checkAndUpdateUserGoals() {
+    /*
+    If (prev date is same month and year as current date) {
+      do nothing
+    }
+    Else {
+      Check all the related goals and update progress bar accordingly.
+      If all goal is flagged,
+          - Check to see if it has already been achieved
+    }
+
+    WHEN NEXT DAY OCCURS, CALL THIS FUNCTION ANDDDDD UPDATE the date
+        
+    */
+
+    // let observables: Observable<any>[] = [];
+    // for (let goal of this.allGoals) {
+    //   for (let usergoal of this.allUserGoals) {
+    //     if (usergoal.goalId == goal._id) {
+    //       const userGoalData = {
+    //         userId: currAccount._id,
+    //         goalId: goal._id,
+    //       }
+    //       observables.push(this.goalService.addUserGoal(userGoalData))
+    //     }
+    //   }
+    // }
+    // forkJoin(observables)
+    //     .subscribe(dataArray => {
+    //         // All observables in `observables` array have resolved and `dataArray` is an array of result of each observable
+    //         console.log("In fork join")
+    //         for (let usergoal of dataArray[1]) {
+    //           this.allUserGoals.push(usergoal);
+    //         }
+    //         this.authService.storeUserAccountsDetails({usergoals: this.allUserGoals});
+    //         this.router.navigate(['/home']);
+    //       });
   }
 
   // addUserGoals(userId: string, allGoals: Goal[], allUserGoals: UserGoal[]) {

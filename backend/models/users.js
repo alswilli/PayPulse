@@ -24,7 +24,7 @@ var User = new Schema({
         type: Boolean,
         default: false
     },
-    lastLoggedOut: {
+    lastUpdated: {
       type: Date,
       default: null
     }
