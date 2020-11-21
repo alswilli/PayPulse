@@ -26,8 +26,8 @@ userGoalRouter.route("/")
 })
 .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     const usergoal = new UserGoal({
-        userId: res.body.userId,
-        goalId: res.body.goalId
+        userId: req.body.userId,
+        goalId: req.body.goalId
       });
       usergoal.save()
         .then(createdGoal => {
@@ -46,6 +46,50 @@ userGoalRouter.route("/")
 userGoalRouter.route("/:userGoalId")
 .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
 .put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    if (req.body.done === "Done") {
+        UserGoal.findByIdAndUpdate(req.params.userGoalId, {
+            $set: {
+                    goalProgress: 100,
+                    numTimesAchieved: 1,
+                    dateFirstAchieved: Date.now()
+                  }
+            })
+            .then((user) => {
+              console.log("USER UPDATED DONE: ", user)
+              res.statusCode = 200;
+              res.setHeader('Content-Type', 'application/json');
+              res.json(user);
+            })
+            .catch((err) => next(err));
+    }
+    else if (req.body.done === "Not Done") {
+        UserGoal.findByIdAndUpdate(req.params.userGoalId, {
+            $set: { 
+                    goalProgress: req.body.goalProgression,
+                  }
+            })
+            .then((user) => {
+              console.log("USER UPDATED NOT DONE: ", user)
+              res.statusCode = 200;
+              res.setHeader('Content-Type', 'application/json');
+              res.json(user);
+            })
+            .catch((err) => next(err));
+    }
+    else {
+        UserGoal.findByIdAndUpdate(req.params.userGoalId, {
+            $set: { 
+                    numTimesAchieved: req.body.numTimesAchieved,
+                  }
+            })
+            .then((user) => {
+              console.log("USER UPDATED OTHER: ", user)
+              res.statusCode = 200;
+              res.setHeader('Content-Type', 'application/json');
+              res.json(user);
+            })
+            .catch((err) => next(err));
+    }
     
 })
 .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {

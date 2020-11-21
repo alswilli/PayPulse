@@ -16,7 +16,7 @@ const UserGoalSchema = new Schema({
     },
     dateFirstAchieved: { 
         type: Date, 
-        default: Date.now
+        default: null
     },
     goalProgress: {
         type: Number,

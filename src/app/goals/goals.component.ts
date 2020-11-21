@@ -75,19 +75,19 @@ export class GoalsComponent implements OnInit {
       this.isLoading = false;
       this.initialLoad = false;
 
-      this.allUserGoals = JSON.parse(localStorage.getItem('User Goals Details'));
+      this.allUserGoals = JSON.parse(localStorage.getItem('User Goals Details'))["usergoals"];
       for (let goal of this.allGoals) {
-        var found = false;
+        // var found = false;
         for (let usergoal of this.allUserGoals) {
           if (usergoal.goalId == goal._id) {
-            found = true;
+            // found = true;
             this.matchedGoals.push([usergoal, goal])
             break;
           }
         }
-        if (!found) {
-          this.matchedGoals.push([null, goal])
-        }
+        // if (!found) {
+        //   this.matchedGoals.push([null, goal])
+        // }
       }
     })
   }

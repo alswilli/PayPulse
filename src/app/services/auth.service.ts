@@ -9,6 +9,7 @@ import { ProcessHTTPMsgService } from './process-httpmsg.service';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { TokenExpiredComponent } from '../token-expired/token-expired.component';
+import { User } from '../shared/user';
 
 interface AuthResponse {
   status: string;
@@ -17,6 +18,7 @@ interface AuthResponse {
   exp: number;
   admin: boolean;
   userId: string;
+  lastUpdated: Date;
 }
 
 interface FbAuthResponse {
@@ -27,6 +29,8 @@ interface FbAuthResponse {
   exp: number;
   admin: boolean;
   userId: string;
+  lastUpdated: Date;
+
 }
 
 interface JWTResponse {
@@ -153,7 +157,8 @@ export class AuthService {
            console.log(res)
            const now = new Date();
            const expirationDate = new Date(now.getTime() + res.exp * 1000);
-           this.storeUserCredentials({username: user.username, token: res.token, admin: res.admin, userId: res.userId}, expirationDate);
+           this.storeUserCredentials({username: user.username, token: res.token, 
+            admin: res.admin, userId: res.userId, lastUpdated: res.lastUpdated}, expirationDate);
            console.log(expirationDate)
            this.startTimer(res.exp);
            return {'success': true, 'username': user.username };
@@ -169,7 +174,8 @@ export class AuthService {
            console.log(res)
            const now = new Date();
            const expirationDate = new Date(now.getTime() + res.exp * 1000);
-           this.storeUserCredentials({username: res.username, token: res.token, admin: res.admin, userId: res.userId}, expirationDate);
+           this.storeUserCredentials({username: res.username, token: res.token, 
+            admin: res.admin, userId: res.userId, lastUpdated: res.lastUpdated}, expirationDate);
            this.startTimer(res.exp);
            return {'success': true, 'username': res.username };
        }), map(res2 => {
@@ -183,19 +189,38 @@ export class AuthService {
    logOut() {
      console.log("logging out")
      //  var userId = JSON.parse(localStorage.getItem(this.accountsKey))["currentAccount"][0]["userId"];
-     var userId = JSON.parse(localStorage.getItem(this.tokenKey))["userId"]
-     console.log(userId)
-     return this.http.put(baseURL + 'users/update', {userId: userId})
-     .pipe( map(res => {
-        this.destroyUserCredentials();
-        this.destroyUserAccountsDetails();
-        this.destroyUserGoalsDetails();
-        // this.router.navigate(['/login']);
-        clearTimeout(this.nodeTimer)
-        this.clearTokenTimer();
-        this.abc.unsubscribe();
+    //  var userId = JSON.parse(localStorage.getItem(this.tokenKey))["userId"]
+    //  console.log(userId)
+    //  return this.http.put(baseURL + 'users/update', {userId: userId})
+    //  .pipe( map(res => {
+    //    console.log('inside')
+    //     this.destroyUserCredentials();
+    //     this.destroyUserAccountsDetails();
+    //     this.destroyUserGoalsDetails();
+    //     this.router.navigate(['/login']);
+    //     clearTimeout(this.nodeTimer)
+    //     this.clearTokenTimer();
+    //     this.abc.unsubscribe();
+    //     return res;
+    //  }));
+    this.destroyUserCredentials();
+    this.destroyUserAccountsDetails();
+    this.destroyUserGoalsDetails();
+    this.router.navigate(['/login']);
+    clearTimeout(this.nodeTimer)
+    this.clearTokenTimer();
+    this.abc.unsubscribe();
+   }
+
+   update() {
+    var userId = JSON.parse(localStorage.getItem(this.tokenKey))["userId"];
+    return this.http.put<User>(baseURL + 'users/update', {userId: userId})
+    .pipe( map(res => {
+        var oldValues = JSON.parse(localStorage.getItem(this.tokenKey));
+        oldValues.lastUpdated = res.lastUpdated;
+        localStorage.setItem(this.tokenKey, JSON.stringify(oldValues));
         return res;
-     }));
+    }));
    }
 
    isLoggedIn(): Boolean {
@@ -246,7 +271,8 @@ export class AuthService {
                 this.tokenExpiredRef.close();
                 const now = new Date();
                 const expirationDate = new Date(now.getTime() + res.exp * 1000);
-                this.storeUserCredentials({username: res.username, token: res.token}, expirationDate);
+                this.storeUserCredentials({username: res.username, token: res.token,
+                  admin: res.admin, userId: res.userId, lastUpdated: res.lastUpdated}, expirationDate);
                 this.startTimer(res.exp);
                 return {'success': true, 'username': res.username };
               },

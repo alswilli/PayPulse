@@ -69,20 +69,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
       console.log("Sidebar closed!");
     }
 
-    if (e.srcElement.innerHTML == " Log Out ") {
+    if (e && e.srcElement.innerHTML == " Log Out ") {
       this.logOut();
     }
   }
 
   logOut() {
+    console.log('logout called')
     // this.email = undefined;
     this.username = undefined;
     // this.tokenTimer = undefined;
     // this.tokenSubscription.unsubscribe();
     this.ngOnDestroy();
-    this.authService.logOut().subscribe(res => {
-      this.router.navigate(['/login']);
-    });
+    this.authService.logOut()
+    // this.authService.logOut().subscribe(res => {
+    //   // this.router.navigate(['/login']);
+    // });
     // this.router.navigate(['/login']);
   }
 

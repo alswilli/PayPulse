@@ -349,6 +349,7 @@ plaidRouter.route("/accounts/transactions/:accountId")
             });    
           }
           else if (req.query.recentTransactions) {
+            console.log("IN RECENT TRANSACTIONS")
             var count = 0;
             for (let transaction of response.transactions) {
               if (count == N) { // 1.) May not get most recent so will have to sort AND 2.) '==' could be wrong

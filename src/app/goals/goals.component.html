@@ -80,16 +80,16 @@
     >
       <mat-spinner *ngIf="isLoading" style="margin: auto;"></mat-spinner>
       <div *ngIf="!isLoading" style="height: 100%; width: 100%">
-        <div class="goal-image" *ngIf="!matchedGoal[0]">
+        <div class="goal-image" *ngIf="matchedGoal[0].goalProgress != 100">
           <img [src]="matchedGoal[1].imagePath" [alt]="matchedGoal[1].goalName" 
           matTooltip="{{matchedGoal[1].goalDescription}}" matTooltipPosition="above">
         </div>
-        <div class="goal-image-unlocked" *ngIf="matchedGoal[0]">
+        <div class="goal-image-unlocked" *ngIf="matchedGoal[0].goalProgress == 100">
           <img [src]="matchedGoal[1].imagePath" [alt]="matchedGoal[1].goalName" 
           matTooltip="{{matchedGoal[1].goalDescription}}" matTooltipPosition="above">
         </div>
-        <h3 *ngIf="matchedGoal[0]">{{matchedGoal[1].goalName}}</h3>
-        <p *ngIf="!matchedGoal[0]">{{matchedGoal[1].goalName}}</p>
+        <h3 *ngIf="matchedGoal[0].goalProgress == 100">{{matchedGoal[1].goalName}}</h3>
+        <p *ngIf="matchedGoal[0].goalProgress != 100">{{matchedGoal[1].goalName}}</p>
       </div>
       <!-- <mat-card>
         <mat-card-header>

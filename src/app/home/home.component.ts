@@ -73,6 +73,7 @@ export class HomeComponent implements OnInit {
     this.isLoading = true;
     // this.environment = process.env.PLAID_ENVIRONMENT;
     // this.firstLoad = true;
+    this.randomCompletedGoals = [];
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
     console.log(this.userAccountsDetails)
 
@@ -132,7 +133,6 @@ export class HomeComponent implements OnInit {
           s.option.selected = true;
         });
         this.getTopBudgets();
-        this.randomCompletedGoals = [];
         
       });
       // this.listValue = ["SOMETHING3", "SOMETHING4"];
