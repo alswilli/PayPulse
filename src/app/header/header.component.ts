@@ -69,12 +69,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
       console.log("Sidebar closed!");
     }
 
-    if (e && e.srcElement.innerHTML == " Log Out ") {
-      this.logOut();
-    }
+    // if (e && e.srcElement.innerHTML == " Log Out ") {
+    //   this.logOut();
+    // }
   }
 
   logOut() {
+    this.opened = false;
     console.log('logout called')
     // this.email = undefined;
     this.username = undefined;

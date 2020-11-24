@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, NgZone } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { baseURL } from '../shared/baseurl';
 import { Goal } from '../shared/goal';
@@ -47,7 +47,8 @@ export class GoalService {
     private authService: AuthService,
     private accountService: AccountService,
     private budgetService: BudgetService,
-    private router: Router) { }
+    private router: Router,
+    private _ngZone: NgZone) { }
 
   getGoals() {
     return this.http.get<GoalResponse>(baseURL + 'goals');
@@ -229,7 +230,8 @@ export class GoalService {
               console.log("no user goals progressed")
               this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
               this.authService.update().subscribe(res => {
-                this.router.navigate(['/home']);
+                // this.router.navigate(['/home']);
+                this._ngZone.run(() => this.router.navigate(['/home']));
               });
             }
             else {
@@ -253,7 +255,8 @@ export class GoalService {
                 }
                 this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
                 this.authService.update().subscribe(res => {
-                  this.router.navigate(['/home']);
+                  // this.router.navigate(['/home']);
+                  this._ngZone.run(() => this.router.navigate(['/home']));
                 });
               });
           });  
@@ -264,7 +267,8 @@ export class GoalService {
         console.log("did not pass")
         this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
         this.authService.update().subscribe(res => {
-          this.router.navigate(['/home']);
+          // this.router.navigate(['/home']);
+          this._ngZone.run(() => this.router.navigate(['/home']));
         });
       }
     }))

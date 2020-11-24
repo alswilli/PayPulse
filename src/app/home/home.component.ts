@@ -1,4 +1,4 @@
-import { Component, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, OnInit, SimpleChanges, ViewChild, AfterViewInit } from '@angular/core';
 import { MajorComponent } from '../shared/majorComponent';
 import { MAJORS } from '../shared/majorComponents';
 import {TransactionService} from '../services/transaction.service';
@@ -17,6 +17,10 @@ import { Budget } from '../shared/budget';
 import { Stringifiable } from 'd3';
 import { GoalsComponent } from '../goals/goals.component';
 import { Goal } from '../shared/goal';
+import { baseURL } from '../shared/baseurl';
+import { PlaidLinkHandler } from 'ngx-plaid-link/lib/ngx-plaid-link-handler';
+import { PlaidConfig } from 'ngx-plaid-link/lib/interfaces';
+import { NgxPlaidLinkService } from 'ngx-plaid-link';
 // import 'rxjs/add/operator/switchMap';
 
 @Component({
@@ -24,7 +28,7 @@ import { Goal } from '../shared/goal';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, AfterViewInit {
 
   @ViewChild(MatSelectionList) selectionList: MatSelectionList;
 
@@ -57,13 +61,30 @@ export class HomeComponent implements OnInit {
   listValue: any = [];
   preSelection = [];
   environment: string;
+  linkToken: string;
+
+  private plaidLinkHandler: PlaidLinkHandler;
+
+  private config: PlaidConfig = {
+    apiVersion: "v2",
+    env: "sandbox",
+    token: this.linkToken,
+    webhook: "https://507ec71083932519eb6c52a27bbe8afd.m.pipedream.net",
+    product: ["auth", "transactions"],
+    countryCodes: ['US', 'CA', 'GB'],
+    key: "ea1ee62219264cf290c12041f96bba",
+    onSuccess: this.onSuccess,
+    onExit: this.onExit
+  };
 
   constructor(private transactionService: TransactionService,
     private accountService: AccountService,
     private authService: AuthService,
     public dialog: MatDialog,
     private fb: FormBuilder,
-    private budgetService: BudgetService,) { }
+    private budgetService: BudgetService,
+    private plaidLinkService: NgxPlaidLinkService) { }
+    
 
   ngOnChanges(changes: SimpleChanges) {
     console.log("CHANGE: ", changes)
@@ -71,6 +92,28 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.isLoading = true;
+    console.log("fetching link token")
+    var userId = JSON.parse(localStorage.getItem('JWT'))["userId"]
+    console.log(userId)
+    var data = {userId: userId}
+    this.accountService.getItemLinkToken(data).subscribe(res => {
+      var linkToken = res.link_token;
+      console.log("Link Token: ", linkToken)
+      this.linkToken = linkToken;
+      this.plaidLinkService
+      .createPlaid(
+        Object.assign({}, this.config, {
+          onSuccess: (token, metadata) => this.onSuccess(token, metadata),
+          onExit: (error, metadata) => this.onExit(error, metadata),
+          onEvent: (eventName, metadata) => this.onEvent(eventName, metadata)
+        })
+      )
+      .then((handler: PlaidLinkHandler) => {
+        this.plaidLinkHandler = handler;
+        // this.open();
+      });
+    })
+    // this.fetchLinkToken()
     // this.environment = process.env.PLAID_ENVIRONMENT;
     // this.firstLoad = true;
     this.randomCompletedGoals = [];
@@ -133,7 +176,6 @@ export class HomeComponent implements OnInit {
           s.option.selected = true;
         });
         this.getTopBudgets();
-        
       });
       // this.listValue = ["SOMETHING3", "SOMETHING4"];
       
@@ -149,6 +191,7 @@ export class HomeComponent implements OnInit {
       // May need something here later
       this.marginVal = '0';
       this.borderVal = '';
+      // this.fetchLinkToken();
       // this.isLoading = false;
 
       // this.firstLoad = false;
@@ -668,4 +711,139 @@ export class HomeComponent implements OnInit {
     // Do something when the button is clicked.
     console.log("Plaid click event: " + event);
   }
+
+  // fetchPublicToken() {
+  //   console.log("fetching public token")
+  //   this.accountService.getItemPublicToken().subscribe(res => {
+  //     var publicToken = res.public_token;
+  //     console.log(publicToken)
+  //     // return publicToken
+  //   })
+  // }
+
+  fetchLinkToken() {
+    console.log("fetching link token")
+    var userId = JSON.parse(localStorage.getItem('JWT'))["userId"]
+    console.log(userId)
+    var data = {userId: userId}
+    this.accountService.getItemLinkToken(data).subscribe(res => {
+      var linkToken = res.link_token;
+      console.log("Link Token: ", linkToken)
+      this.linkToken = linkToken;
+      return this.linkToken;
+    })
+  }
+
+  // Create and open programatically once the library is loaded.
+  ngAfterViewInit() {
+    // this.plaidLinkService
+    //   .createPlaid(
+    //     Object.assign({}, this.config, {
+    //       onSuccess: (token, metadata) => this.onSuccess(token, metadata),
+    //       onExit: (error, metadata) => this.onExit(error, metadata),
+    //       onEvent: (eventName, metadata) => this.onEvent(eventName, metadata)
+    //     })
+    //   )
+    //   .then((handler: PlaidLinkHandler) => {
+    //     this.plaidLinkHandler = handler;
+    //     // this.open();
+    //   });
+  }
+
+  open() {
+    this.plaidLinkHandler.open();
+  }
+
+  exit() {
+    this.plaidLinkHandler.exit();
+  }
+
+  onSuccess(token, metadata) {
+    console.log("We got a token:", token);
+    console.log("We got metadata:", metadata);
+    // Send the public token to your server so you can do the token exchange.
+    var event = {token: token, metadata: metadata}
+    console.log("Plaid success event: " + JSON.stringify(event));
+    if (this.listValue.length > 0) {
+      this.firstLoad = true;
+    }
+    else {
+      this.fullLoad = true;
+    }
+    this.accountService.addAccount(event).subscribe(res => {
+      if (res) {
+        console.log("Successfully added account!")
+        if (this.listValue.length === 0) {
+          this.accountService.getAccounts().subscribe(getRes => {
+            if (getRes.success) {
+              // this.router.navigate(['/home']);
+              // this._ngZone.run(() => this.router.navigate(['/home']));
+              // Need to check the accounts array on the user object. Can store in localStorage once got
+              var accountIds = [];
+              for (let account of getRes.accountsData) {
+                console.log(account);
+                accountIds.push(account._id);
+              }
+              console.log(accountIds)
+              this.accountService.getCurrentAccount().subscribe(currAccount => {
+                this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: getRes.accountsData, ids: accountIds});
+                // this.router.navigate(['/home']);
+                this.onAddedAccount();
+                });
+            }
+            else {
+              console.log(res)
+              console.log("Get Accounts method from account service was not a success")
+            }
+          });
+        }
+        else { 
+          // Append new account to accounts array
+          this.accounts.push(res)
+          // Append new account to userAccountsIds array 
+          this.userAccountsIds.push(res._id)
+          // Update local storage
+          this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accounts, ids: this.userAccountsIds});
+          this.onAddedAccount();
+        }
+      }
+      else {
+        console.log(res)
+        console.log("addAccount() method from account service was not a success")
+        this.firstLoad = false;
+        this.fullLoad = false;
+      }
+    });
+  }
+
+  onEvent(eventName, metadata) {
+    console.log("We got an event:", eventName);
+    console.log("We got metadata:", metadata);
+  }
+
+  onExit(error, metadata) {
+    console.log("We exited:", error);
+    console.log("We got metadata:", metadata);
+  }
+
+  // async fetchLinkToken() {
+  //   // this.config: PlaidConfig = {
+  //   //   apiVersion: "v2",
+  //   //   env: "sandbox",
+  //   //   token: await this.fetchLinkToken(),
+  //   //   webhook: "",
+  //   //   product: ["auth", "transactions"],
+  //   //   countryCodes: ['US', 'CA', 'GB'],
+  //   //   key: "ea1ee62219264cf290c12041f96bba"
+  //   // };
+
+  //   console.log("fetching link token")
+  //   var userId = JSON.parse(localStorage.getItem('JWT'))["userId"]
+  //   console.log(userId)
+  //   var data = {userId: userId}
+  //   const response = await fetch(baseURL + 'plaid/accounts/create_link_token', { method: 'POST', body: JSON.stringify(data) });
+  //   const responseJSON = await response.json();
+  //   console.log(responseJSON.link_token)
+  //   return responseJSON.link_token;
+  // };
 }

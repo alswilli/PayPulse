@@ -14,6 +14,10 @@ interface GetAccountsResponse {
   accountsData: Account[];
 }
 
+interface ItemTokenResponse {
+link_token: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -65,6 +69,11 @@ export class AccountService {
 
   deleteAccount(accountId: string) {
     return this.http.delete(baseURL + 'plaid/accounts/' + accountId);
+      // .pipe(catchError(this.processHTTPMsgService.handleError));
+  }
+
+  getItemLinkToken(userData: object) {
+    return this.http.post<ItemTokenResponse>(baseURL + 'plaid/accounts/create_link_token', userData);
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 

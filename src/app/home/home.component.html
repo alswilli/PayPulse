@@ -33,7 +33,8 @@
         <div *ngIf="listValue.length === 0">
           <p>No accounts added! Please add an account using the 'Add Account' button below</p>
         </div>
-        <mr-ngx-plaid-link-button env="sandbox" publicKey="ea1ee62219264cf290c12041f96bba" (Success)="onPlaidSuccess($event)" 
+        <!-- publicKey="ea1ee62219264cf290c12041f96bba" -->
+        <!-- <mr-ngx-plaid-link-button env="sandbox" publicKey="ea1ee62219264cf290c12041f96bba" (Success)="onPlaidSuccess($event)" 
         (Exit)="onPlaidExit($event)" (Load)="onPlaidLoad($event)" (Event)="onPlaidEvent($event)" 
         className="launch-plaid-link-button" buttonText="Add Account" 
         (Click)="onPlaidClick($event)" webhook="https://507ec71083932519eb6c52a27bbe8afd.m.pipedream.net"
@@ -52,8 +53,11 @@
           'margin':'auto',
           'padding':'10px',
           'font-size':'14px'
-        }">
-        </mr-ngx-plaid-link-button>
+        }"
+        token="linkToken"
+        >
+        </mr-ngx-plaid-link-button> -->
+        <button mat-flat-button (click)="open()"> Add Account</button>
         <button mat-flat-button *ngIf="listValue.length > 0" id="removeAccountButton" class="addDeleteButtons" (click)="onRemoveAccountClicked();">Remove Accounts</button>
       </div>
     </div>

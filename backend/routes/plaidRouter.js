@@ -20,15 +20,122 @@ var ACCESS_TOKEN = null;
 var PUBLIC_TOKEN = null;
 var ITEM_ID = null;
 
-const client = new plaid.Client(
-  PLAID_CLIENT_ID,
-  PLAID_SECRET,
-  PLAID_PUBLIC_KEY,
-  plaid.environments.sandbox,
-  { version: "2018-05-22" }
-);
+// const client = new plaid.Client(
+//   PLAID_CLIENT_ID,
+//   PLAID_SECRET,
+//   PLAID_PUBLIC_KEY,
+//   plaid.environments.sandbox,
+//   { version: "2020-09-14" }
+// );
+
+const client = new plaid.Client({
+  clientID: PLAID_CLIENT_ID,
+  secret: PLAID_SECRET,
+  env: plaid.environments.sandbox,
+  options: { version: '2020-09-14' },
+});
 
 plaidRouter.use(bodyParser.json());
+
+// // Create a one-time use public_token for the Item.
+// // This public_token can be used to initialize Link
+// // in update mode for the user
+// plaidRouter.route("/create_public_token")
+// .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
+// .get(cors.corsWithOptions, function(request, response, next) {
+//   client.createPublicToken(ACCESS_TOKEN)
+//     .then(res => {
+//       var PUBLIC_TOKEN = res.public_token;
+//       response.json({public_token: PUBLIC_TOKEN});
+//     })
+//     .catch(err => {
+//       // console.log(msg + "\n" + JSON.stringify(err));
+//       response.json({error: JSON.stringify(err)});
+//     })
+//   // client.createPublicToken(ACCESS_TOKEN, function(err, res) {
+//   //   if(err != null) {
+//   //     console.log(msg + "\n" + JSON.stringify(err));
+//   //     response.json({error: JSON.stringify(err)});
+//   //   } else {
+//   //     // Use the public_token to initialize Link
+//   //     var PUBLIC_TOKEN = res.public_token;
+//   //     response.json({public_token: PUBLIC_TOKEN});
+//   //   }
+//   // });
+// });
+
+plaidRouter.route("/accounts/create_link_token")
+.options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
+.post(cors.corsWithOptions, (request, response, next) => {
+  const clientUserId = request.body.userId;
+  console.log("here: ", clientUserId)
+  // 2. Create a link_token for the given user
+  client.createLinkToken({
+    user: {
+      client_user_id: clientUserId,
+    },
+    client_name: 'PayPulse',
+    products: ['transactions'],
+    country_codes: ['US'],
+    language: 'en',
+    webhook: 'https://sample.webhook.com',
+  })
+  .then(linkRes =>{
+    const link_token = linkRes.link_token;
+    // 3. Send the data to the client
+    response.json({ link_token: link_token });
+  })
+  // // 1. Grab the client_user_id by searching for the current user in your database
+  // console.log(request.body.userId)
+  // User.find({
+  //   _id: request.body.userId
+  // })
+  // .then(user => {
+  //   console.log(user)
+  //   const clientUserId = user['_id'];
+  //   console.log("here: ", clientUserId)
+  //   // 2. Create a link_token for the given user
+  //   client.createLinkToken({
+  //     user: {
+  //       client_user_id: clientUserId,
+  //     },
+  //     client_name: 'PayPulse',
+  //     products: ['transactions'],
+  //     country_codes: ['US'],
+  //     language: 'en',
+  //     webhook: 'https://sample.webhook.com',
+  //   })
+  //   .then(linkRes =>{
+  //     const link_token = linkRes.link_token;
+  //     // 3. Send the data to the client
+  //     response.json({ link_token: link_token });
+  //   })
+  // })
+});
+
+// plaidRouter.route("/create_link_token")
+// .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
+// .post(cors.corsWithOptions, authenticate.verifyUser, async (request, response, next) => {
+//   // 1. Grab the client_user_id by searching for the current user in your database
+//   const user = await User.find({
+//     _id: request.userId
+//   });
+//   const clientUserId = user.id;
+//   // 2. Create a link_token for the given user
+//   const linkTokenResponse = await client.createLinkToken({
+//     user: {
+//       client_user_id: clientUserId,
+//     },
+//     client_name: 'My App',
+//     products: ['transactions'],
+//     country_codes: ['US'],
+//     language: 'en',
+//     webhook: 'https://sample.webhook.com',
+//   });
+//   const link_token = linkTokenResponse.link_token;
+//   // 3. Send the data to the client
+//   response.json({ link_token: link_token });
+// });
 
 // @route POST plaid/accounts/add
 // @desc Trades public token for access token and stores credentials in database
@@ -36,6 +143,7 @@ plaidRouter.use(bodyParser.json());
 plaidRouter.route("/accounts/add")
 .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
 .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+  console.log(req.body)
   PUBLIC_TOKEN = req.body.token;
   const userId = req.user.id;
   const institution = req.body.metadata.institution;
