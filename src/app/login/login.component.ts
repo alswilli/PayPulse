@@ -8,7 +8,7 @@ import { GoalService } from '../services/goal.service';
 import { mergeMap } from 'rxjs/operators';
 import { Goal } from '../shared/goal';
 import { UserGoal } from '../shared/usergoal';
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
 
 declare var FB: any;
 
@@ -216,14 +216,17 @@ export class LoginComponent implements OnInit {
                           this.accountService.getCurrentAccount()
                           .pipe(
                             mergeMap(currAccount => {
+                                console.log("AAAAAAAA")
                                 console.log(currAccount)
                                 if (currAccount != null) {
                                   this.currAccountId = currAccount[0]._id;
                                 }
                                 // this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: res.accountsData, ids: accountIds});
+                                console.log("BBBBBBBB")
                                 return this.goalService.getGoals()
                             }),
                             mergeMap(goalResponse => {
+                                console.log("CCCCCCCC")
                                 this.allGoals = goalResponse.goals;
                                 let accountObservables: Observable<UserGoalResponse>[] = [];
                                 this.userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
@@ -233,16 +236,18 @@ export class LoginComponent implements OnInit {
                                 }
                                 if (accountObservables.length == 0) {
                                   console.log("no accounts")
-                                  return null
+                                  return of(null)
                                   // this._ngZone.run(() => this.router.navigate(['/home']));
                                 }
                                 else {
+                                  console.log("DDDDDDDD")
                                   return forkJoin(accountObservables)
                                 }
                             }),
                             mergeMap(usergoalResponse => {
+                                console.log("EEEEEEEE")
                                 if (usergoalResponse == null) {
-                                  return null
+                                  return of(null)
                                 }
                                 let goalObservables: Observable<any>[] = [];
                                 this.everyAllUserGoals = usergoalResponse;
@@ -270,17 +275,13 @@ export class LoginComponent implements OnInit {
                                   // }
                                   goalObservables.push(this.goalService.addUserGoals(userGoalDatas))  // need to know which account and may be issue if empty
                                 }
-                                if (goalObservables.length == 0) {
-                                  console.log("no user goals added")
-                                  return null
-                                }
-                                else{
-                                  return forkJoin(goalObservables)
-                                }
+                                console.log("FFFFFFFF")
+                                return forkJoin(goalObservables)
                             }),
-                            mergeMap(addedGoalsResponse => {
+                            mergeMap(addedGoalsResponse => { // array with arrays of addUserGoal responses
+                                console.log("GGGGGGGG")  
                                 if (addedGoalsResponse == null) {
-                                  return null
+                                  return of(null)
                                 }
                                 var index = 0
                                 let finalUpdateObservables: Observable<any>[] = [];
@@ -289,16 +290,17 @@ export class LoginComponent implements OnInit {
                                     for (let usergoal of addedGoalsResponse[index]) {
                                       allUserGoals.push(usergoal);
                                     }
-                                    finalUpdateObservables.push(this.goalService.checkAndUpdateUserGoals(this.accountIds[index], this.allGoals, allUserGoals))
                                   }
+                                  finalUpdateObservables.push(this.goalService.checkAndUpdateUserGoals(this.accountIds[index], this.allGoals, allUserGoals))
                                   index += 1
                                 }
+                                console.log("HHHHHHHH")
                                 return forkJoin(finalUpdateObservables)
                             })       
                           )
                           .subscribe(res => {
                             console.log("made it to the end")
-                            this._ngZone.run(() => this.router.navigate(['/home']));
+                            // this._ngZone.run(() => this.router.navigate(['/home']));
                           })
                       }
                     });
