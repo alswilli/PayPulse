@@ -5,7 +5,7 @@ import {
     HttpErrorResponse
   } from "@angular/common/http";
   import { catchError } from "rxjs/operators";
-  import { throwError } from "rxjs";
+  import { throwError, of } from "rxjs";
   import { Injectable } from "@angular/core";
   import { MatDialog } from "@angular/material";
   import { ErrorComponent } from "./error/error.component";
@@ -21,7 +21,14 @@ import {
           if (error.error.message) {
             errorMessage = error.error.message;
           }
-          else if (error.error.err.message) {
+          else if (error.error.error && error.error.error.error_message) {
+            // Item Login error
+            errorMessage = error.error.error.error_message;
+            console.log("Item login error")
+            // return null
+            
+          }
+          else if (error.error.err && error.error.err.message) {
             errorMessage = error.error.err.message;
           }
           this.dialog.open(ErrorComponent, {data: {message: errorMessage}});

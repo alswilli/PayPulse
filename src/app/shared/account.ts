@@ -23,4 +23,5 @@ export class Account {
     accountSubtype: string;
     current: boolean;
     subAccounts: object;
+    itemValid: boolean;
 }

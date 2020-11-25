@@ -10,6 +10,7 @@ import { BudgetService } from './budget.service';
 import { BindingType } from '@angular/compiler';
 import { map } from 'rxjs/operators';
 import { Router } from "@angular/router";
+import { TransactionService } from './transaction.service';
 // import { Observable } from 'rxjs/Observable';
 // import 'rxjs/add/observable/forkJoin';
 
@@ -87,190 +88,199 @@ export class GoalService {
     */
     return this.budgetService.getBudgets()
     .pipe( map(budgets => {
-      var oldDate = new Date(JSON.parse(localStorage.getItem('JWT'))["lastUpdated"])
-      var currDate = new Date();
-      var currDate = new Date("2020-12-21T01:14:54.483Z"); 
-      if (oldDate != null && oldDate.getMonth() != currDate.getMonth() && budgets.length > 0) {
-        // Time to update
-        console.log("passed")
+      return budgets;
+      // var oldDate = new Date(JSON.parse(localStorage.getItem('JWT'))["lastUpdated"])
+      // var currDate = new Date();
+      // var currDate = new Date("2020-12-21T01:14:54.483Z"); 
+      // if (oldDate != null && oldDate.getMonth() != currDate.getMonth() && budgets.length > 0) {
+      //   // Time to update
+      //   console.log("passed")
 
-        // Step 1: Gather total number of months to check + total Budget amount
-        var oldYear = oldDate.getFullYear();
-        var oldMonth = oldDate.getMonth()+1;
-        var currYear = currDate.getFullYear();
-        var currMonth = currDate.getMonth()+1;
-        var remainderMonths = 0
-        if (currMonth > oldMonth) {
-          remainderMonths = (currMonth - oldMonth);
-        }
-        else {
-          remainderMonths = currMonth + (12 - oldMonth);
-        }
-        var numMonthsAhead = (currYear - oldYear)*12 + remainderMonths;
-        // var totalBudgetAmount = 0;
-        // for (let budget of budgets) {
-        //   totalBudgetAmount = totalBudgetAmount + Number(budget.amount);
-        // }
+      //   // Step 1: Gather total number of months to check + total Budget amount
+      //   var oldYear = oldDate.getFullYear();
+      //   var oldMonth = oldDate.getMonth()+1;
+      //   var currYear = currDate.getFullYear();
+      //   var currMonth = currDate.getMonth()+1;
+      //   var remainderMonths = 0
+      //   if (currMonth > oldMonth) {
+      //     remainderMonths = (currMonth - oldMonth);
+      //   }
+      //   else {
+      //     remainderMonths = currMonth + (12 - oldMonth);
+      //   }
+      //   var numMonthsAhead = (currYear - oldYear)*12 + remainderMonths;
+      //   // var totalBudgetAmount = 0;
+      //   // for (let budget of budgets) {
+      //   //   totalBudgetAmount = totalBudgetAmount + Number(budget.amount);
+      //   // }
 
-        console.log("Number of Months ahead: ", numMonthsAhead)
+      //   console.log("Number of Months ahead: ", numMonthsAhead)
         
-        // Step 2: Convert them to pairs (total number of days, days behind current date) + get highest budget categories
-        var pairs = [];
-        var i = 0
-        var days = this.dates[oldMonth][1]
-        var subdays = 0; 
-        var currentMonth = currMonth;
-        while (i != numMonthsAhead) {
-          if (subdays == 0) {
-            subdays = currDate.getDate() // num days elapsed in current month
-          }
-          else {
-            subdays = subdays + this.dates[currentMonth][1]
-          }
-          currentMonth = currentMonth - 1;
-          if (currentMonth == 0) {
-            currentMonth = 12;
-          }
-          i = i + 1;
-        }
-        var currentMonthName = this.dates[currentMonth][0]
-        while (i > 0) {
-          pairs.push([currentMonthName, {days: days, subdays: subdays}])
-          currentMonth = currentMonth + 1;
-          if (currentMonth == 13) {
-            currentMonth = 1;
-          }
-          days = this.dates[currentMonth][1];
-          subdays = subdays - this.dates[currentMonth][1];
-          currentMonthName = this.dates[currentMonth][0]
-          i = i - 1;
-        }
-        var mainBudgets = {}
-        for (let budget of budgets) {
-          if (budget.category in mainBudgets) {
-            var level = 3;
-            if (budget.mainCategory == budget.category) {
-              level = 1
-            }
-            else if (budget.mainCategory == budget.category2) {
-              level = 2
-            }
-            if (mainBudgets[budget.category] == level) {
-              mainBudgets[budget.category] += Number(budget.amount)
-            }
-            else if (mainBudgets[budget.category] < level) {
-              mainBudgets[budget.category] = Number(budget.amount)
-            }
-          }
-          else {
-            mainBudgets[budget.category] = Number(budget.amount)
-          }
-        }
-        var totalBudgetAmount = 0
-        for (let key of Object.keys(mainBudgets)) {
-          totalBudgetAmount += mainBudgets[key]
-        }
+      //   // Step 2: Convert them to pairs (total number of days, days behind current date) + get highest budget categories
+      //   var pairs = [];
+      //   var i = 0
+      //   var days = this.dates[oldMonth][1]
+      //   var subdays = 0; 
+      //   var currentMonth = currMonth;
+      //   while (i != numMonthsAhead) {
+      //     if (subdays == 0) {
+      //       subdays = currDate.getDate() // num days elapsed in current month
+      //     }
+      //     else {
+      //       subdays = subdays + this.dates[currentMonth][1]
+      //     }
+      //     currentMonth = currentMonth - 1;
+      //     if (currentMonth == 0) {
+      //       currentMonth = 12;
+      //     }
+      //     i = i + 1;
+      //   }
+      //   var currentMonthName = this.dates[currentMonth][0]
+      //   while (i > 0) {
+      //     pairs.push([currentMonthName, {days: days, subdays: subdays}])
+      //     currentMonth = currentMonth + 1;
+      //     if (currentMonth == 13) {
+      //       currentMonth = 1;
+      //     }
+      //     days = this.dates[currentMonth][1];
+      //     subdays = subdays - this.dates[currentMonth][1];
+      //     currentMonthName = this.dates[currentMonth][0]
+      //     i = i - 1;
+      //   }
+      //   var mainBudgets = {}
+      //   for (let budget of budgets) {
+      //     if (budget.category in mainBudgets) {
+      //       var level = 3;
+      //       if (budget.mainCategory == budget.category) {
+      //         level = 1
+      //       }
+      //       else if (budget.mainCategory == budget.category2) {
+      //         level = 2
+      //       }
+      //       if (mainBudgets[budget.category] == level) {
+      //         mainBudgets[budget.category] += Number(budget.amount)
+      //       }
+      //       else if (mainBudgets[budget.category] < level) {
+      //         mainBudgets[budget.category] = Number(budget.amount)
+      //       }
+      //     }
+      //     else {
+      //       mainBudgets[budget.category] = Number(budget.amount)
+      //     }
+      //   }
+      //   var totalBudgetAmount = 0
+      //   for (let key of Object.keys(mainBudgets)) {
+      //     totalBudgetAmount += mainBudgets[key]
+      //   }
 
-        console.log("Pairs: ", pairs)
-        console.log("Total Budget Amount: ", totalBudgetAmount)
-        console.log("Current Account ID: ", currAccountId)
+      //   console.log("Pairs: ", pairs)
+      //   console.log("Total Budget Amount: ", totalBudgetAmount)
+      //   console.log("Current Account ID: ", currAccountId)
 
-        // Step 3: Check them and update user goals accordingly
-        let transactionObservables: Observable<any>[] = [];
-        for (let pair of pairs) {
-          transactionObservables.push(this.accountService.getBudgetTransactions(currAccountId, pair[1]['days'], pair[1]['subdays']))
-        }
-        forkJoin(transactionObservables)
-          .subscribe(transactionsDataArray => {
-            // All observables in `observables` array have resolved and `dataArray` is an array of result of each observable
-            console.log("In transactions fork join")
-            let usergoalObservables: Observable<any>[] = [];
-            var index = 0;
-            for (let transactions of transactionsDataArray) {
-              // Per month
-              var monthlyTotal = 0
-              for (let budget of budgets) {
-                var mainCategory = budget.mainCategory;
-                var total = 0;
-                for (let transaction of transactions) {
-                  for (let category of transaction.category) {
-                    if (category === mainCategory) {
-                      total += transaction.amount;
-                      break;
-                    }
-                  }
-                }
-                monthlyTotal += total;
-              }
-              // console.log("Monthly Total: ", monthlyTotal)
-              // Budget Manager monthly goals
-              if (monthlyTotal < totalBudgetAmount) {
-                var usergoal = null;
-                var fullGoalName = "Budget Goal - " + pairs[index][0]
-                for (let goal of allGoals) {
-                  // console.log(goal.goalName, fullGoalName)
-                  if (goal.goalName == fullGoalName) {
-                    for (let usergoal of allUserGoals) {
-                      if (usergoal.goalId == goal._id) {
-                        var retObj = {
-                          done: "Done"
-                        }
-                        usergoalObservables.push(this.updateUserGoal(usergoal._id, retObj))
-                        break
-                      }
-                    }
-                    break;
-                  }
-                }
-              }
-              index += 1
-            }
-            // Step 4: Update local user goals
-            if (usergoalObservables.length == 0) {
-              console.log("no user goals progressed")
-              this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
-              this.authService.update().subscribe(res => {
-                // this.router.navigate(['/home']);
-                this._ngZone.run(() => this.router.navigate(['/home']));
-              });
-            }
-            else {
+      //   // Step 3: Check them and update user goals accordingly
+      //   let transactionObservables: Observable<any>[] = [];
+      //   for (let pair of pairs) {
+      //     transactionObservables.push(this.accountService.getBudgetTransactions(currAccountId, pair[1]['days'], pair[1]['subdays']))
+      //   }
+      //   forkJoin(transactionObservables)
+      //     .subscribe(transactionsDataArray => {
+      //       // All observables in `observables` array have resolved and `dataArray` is an array of result of each observable
+      //       console.log("In transactions fork join")
+      //       console.log(transactionsDataArray)
+      //       let usergoalObservables: Observable<any>[] = [];
+      //       var index = 0;
+      //       for (let transactions of transactionsDataArray) {
+      //         if (transactions.error) {
+      //           console.log("invalid item for account")
+      //           var oldValues = JSON.parse(localStorage.getItem('User Accounts Details'));
+      //           oldValues.currentAccount[0].itemValid = false;
+      //           localStorage.setItem('User Accounts Details', JSON.stringify(oldValues));
+      //           return this._ngZone.run(() => this.router.navigate(['/home']));
+      //         }
+      //         // Per month
+      //         var monthlyTotal = 0
+      //         for (let budget of budgets) {
+      //           var mainCategory = budget.mainCategory;
+      //           var total = 0;
+      //           for (let transaction of transactions) {
+      //             for (let category of transaction.category) {
+      //               if (category === mainCategory) {
+      //                 total += transaction.amount;
+      //                 break;
+      //               }
+      //             }
+      //           }
+      //           monthlyTotal += total;
+      //         }
+      //         // console.log("Monthly Total: ", monthlyTotal)
+      //         // Budget Manager monthly goals
+      //         if (monthlyTotal < totalBudgetAmount) {
+      //           var usergoal = null;
+      //           var fullGoalName = "Budget Goal - " + pairs[index][0]
+      //           for (let goal of allGoals) {
+      //             // console.log(goal.goalName, fullGoalName)
+      //             if (goal.goalName == fullGoalName) {
+      //               for (let usergoal of allUserGoals) {
+      //                 if (usergoal.goalId == goal._id) {
+      //                   var retObj = {
+      //                     done: "Done"
+      //                   }
+      //                   usergoalObservables.push(this.updateUserGoal(usergoal._id, retObj))
+      //                   break
+      //                 }
+      //               }
+      //               break;
+      //             }
+      //           }
+      //         }
+      //         index += 1
+      //       }
+      //       // Step 4: Update local user goals
+      //       if (usergoalObservables.length == 0) {
+      //         console.log("no user goals progressed")
+      //         this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
+      //         this.authService.update().subscribe(res => {
+      //           // this.router.navigate(['/home']);
+      //           this._ngZone.run(() => this.router.navigate(['/home']));
+      //         });
+      //       }
+      //       else {
 
-            }
-            forkJoin(usergoalObservables)
-            .subscribe(dataArray => {
-                // All observables in `observables` array have resolved and `dataArray` is an array of result of each observable
-                console.log("In usergoals fork join")
-                console.log(dataArray)
-                for (let updatedUG of dataArray) {
-                  var j = 0;
-                  for (let ug of allUserGoals) {
-                    if (ug._id == updatedUG._id) {
-                      allUserGoals[j] = updatedUG;
-                      console.log(allUserGoals[j])
-                      break
-                    }
-                    j += 1
-                  }
-                }
-                this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
-                this.authService.update().subscribe(res => {
-                  // this.router.navigate(['/home']);
-                  this._ngZone.run(() => this.router.navigate(['/home']));
-                });
-              });
-          });  
-          console.log("end")
-        // return this.authService.update();
-      }
-      else {
-        console.log("did not pass")
-        this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
-        this.authService.update().subscribe(res => {
-          // this.router.navigate(['/home']);
-          this._ngZone.run(() => this.router.navigate(['/home']));
-        });
-      }
+      //       }
+      //       forkJoin(usergoalObservables)
+      //       .subscribe(dataArray => {
+      //           // All observables in `observables` array have resolved and `dataArray` is an array of result of each observable
+      //           console.log("In usergoals fork join")
+      //           console.log(dataArray)
+      //           for (let updatedUG of dataArray) {
+      //             var j = 0;
+      //             for (let ug of allUserGoals) {
+      //               if (ug._id == updatedUG._id) {
+      //                 allUserGoals[j] = updatedUG;
+      //                 console.log(allUserGoals[j])
+      //                 break
+      //               }
+      //               j += 1
+      //             }
+      //           }
+      //           this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
+      //           this.authService.update().subscribe(res => {
+      //             // this.router.navigate(['/home']);
+      //             this._ngZone.run(() => this.router.navigate(['/home']));
+      //           });
+      //         });
+      //     });  
+      //     console.log("end")
+      //   // return this.authService.update();
+      // }
+      // else {
+      //   console.log("did not pass")
+      //   this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
+      //   this.authService.update().subscribe(res => {
+      //     // this.router.navigate(['/home']);
+      //     this._ngZone.run(() => this.router.navigate(['/home']));
+      //   });
+      // }
     }))
   }
 

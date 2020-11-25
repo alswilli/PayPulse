@@ -36,6 +36,10 @@ const AccountSchema = new Schema({
     },
     subAccounts: {
         type: Object
+    },
+    itemValid: {
+        type: Boolean,
+        default: true
     }
 }, {
     timestamps: true

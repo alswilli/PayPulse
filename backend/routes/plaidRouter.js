@@ -40,29 +40,36 @@ plaidRouter.use(bodyParser.json());
 // // Create a one-time use public_token for the Item.
 // // This public_token can be used to initialize Link
 // // in update mode for the user
-// plaidRouter.route("/create_public_token")
-// .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
-// .get(cors.corsWithOptions, function(request, response, next) {
-//   client.createPublicToken(ACCESS_TOKEN)
-//     .then(res => {
-//       var PUBLIC_TOKEN = res.public_token;
-//       response.json({public_token: PUBLIC_TOKEN});
-//     })
-//     .catch(err => {
-//       // console.log(msg + "\n" + JSON.stringify(err));
-//       response.json({error: JSON.stringify(err)});
-//     })
-//   // client.createPublicToken(ACCESS_TOKEN, function(err, res) {
-//   //   if(err != null) {
-//   //     console.log(msg + "\n" + JSON.stringify(err));
-//   //     response.json({error: JSON.stringify(err)});
-//   //   } else {
-//   //     // Use the public_token to initialize Link
-//   //     var PUBLIC_TOKEN = res.public_token;
-//   //     response.json({public_token: PUBLIC_TOKEN});
-//   //   }
-//   // });
-// });
+
+
+plaidRouter.route("/accounts/create_public_token/:accountId")
+.options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
+.get(cors.corsWithOptions, (req, response, next) => {
+  Account.findById(req.params.accountId)
+    .then(account => {
+      console.log(account.userId)
+      ACCESS_TOKEN = account.accessToken;
+      client.createPublicToken(ACCESS_TOKEN)
+        .then(res => {
+          var PUBLIC_TOKEN = res.public_token;
+          response.json({public_token: PUBLIC_TOKEN});
+        })
+        .catch(err => {
+          // console.log(msg + "\n" + JSON.stringify(err));
+          response.json({error: JSON.stringify(err)});
+        })
+    })
+  // client.createPublicToken(ACCESS_TOKEN, function(err, res) {
+  //   if(err != null) {
+  //     console.log(msg + "\n" + JSON.stringify(err));
+  //     response.json({error: JSON.stringify(err)});
+  //   } else {
+  //     // Use the public_token to initialize Link
+  //     var PUBLIC_TOKEN = res.public_token;
+  //     response.json({public_token: PUBLIC_TOKEN});
+  //   }
+  // });
+});
 
 plaidRouter.route("/accounts/create_link_token")
 .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
@@ -70,6 +77,7 @@ plaidRouter.route("/accounts/create_link_token")
   const clientUserId = request.body.userId;
   console.log("here: ", clientUserId)
   // 2. Create a link_token for the given user
+  
   client.createLinkToken({
     user: {
       client_user_id: clientUserId,
@@ -405,8 +413,9 @@ plaidRouter.route("/accounts/transactions/:accountId")
         if (error != null) {
           // prettyPrintResponse(error);
           console.log(error)
-          return res.json({
-            error: error
+          return res.status(200).json({
+            error: error,
+            account: account
           });
         } else {
           console.log("here");

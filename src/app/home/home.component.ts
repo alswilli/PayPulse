@@ -61,14 +61,16 @@ export class HomeComponent implements OnInit, AfterViewInit {
   listValue: any = [];
   preSelection = [];
   environment: string;
-  linkToken: string;
+  linkToken: string = null;
+  publicToken: string = null;
 
   private plaidLinkHandler: PlaidLinkHandler;
+  private updatePlaidLinkHandler: PlaidLinkHandler;
 
   private config: PlaidConfig = {
     apiVersion: "v2",
     env: "sandbox",
-    token: this.linkToken,
+    token: null,
     webhook: "https://507ec71083932519eb6c52a27bbe8afd.m.pipedream.net",
     product: ["auth", "transactions"],
     countryCodes: ['US', 'CA', 'GB'],
@@ -76,6 +78,20 @@ export class HomeComponent implements OnInit, AfterViewInit {
     onSuccess: this.onSuccess,
     onExit: this.onExit
   };
+
+  private updateConfig: PlaidConfig = {
+    apiVersion: "v2",
+    clientName:"PayPulse",
+    env: "sandbox",
+    token: this.publicToken,
+    webhook: "https://507ec71083932519eb6c52a27bbe8afd.m.pipedream.net",
+    product: ["auth", "transactions"],
+    countryCodes: ['US', 'CA', 'GB'],
+    key: "ea1ee62219264cf290c12041f96bba",
+    onSuccess: this.onUpdateSuccess,
+    onExit: this.onUpdateExit
+  };
+  updateItem: boolean = false;
 
   constructor(private transactionService: TransactionService,
     private accountService: AccountService,
@@ -92,15 +108,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.isLoading = true;
-    console.log("fetching link token")
-    var userId = JSON.parse(localStorage.getItem('JWT'))["userId"]
-    console.log(userId)
-    var data = {userId: userId}
-    this.accountService.getItemLinkToken(data).subscribe(res => {
-      var linkToken = res.link_token;
-      console.log("Link Token: ", linkToken)
-      this.linkToken = linkToken;
-      this.plaidLinkService
+    this.plaidLinkService
       .createPlaid(
         Object.assign({}, this.config, {
           onSuccess: (token, metadata) => this.onSuccess(token, metadata),
@@ -112,7 +120,27 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.plaidLinkHandler = handler;
         // this.open();
       });
-    })
+    // console.log("fetching link token")
+    // var userId = JSON.parse(localStorage.getItem('JWT'))["userId"]
+    // console.log(userId)
+    // var data = {userId: userId}
+    // this.accountService.getItemLinkToken(data).subscribe(res => {
+    //   var linkToken = res.link_token;
+    //   console.log("Link Token: ", linkToken)
+    //   this.linkToken = linkToken;
+    //   this.plaidLinkService
+    //   .createPlaid(
+    //     Object.assign({}, this.config, {
+    //       onSuccess: (token, metadata) => this.onSuccess(token, metadata),
+    //       onExit: (error, metadata) => this.onExit(error, metadata),
+    //       onEvent: (eventName, metadata) => this.onEvent(eventName, metadata)
+    //     })
+    //   )
+    //   .then((handler: PlaidLinkHandler) => {
+    //     this.plaidLinkHandler = handler;
+    //     // this.open();
+    //   });
+    // })
     // this.fetchLinkToken()
     // this.environment = process.env.PLAID_ENVIRONMENT;
     // this.firstLoad = true;
@@ -121,7 +149,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
     console.log(this.userAccountsDetails)
 
     for (let account of this.userAccountsDetails.accounts) {
-      this.listValue.push(account.institutionName);
+      var valid = true;
+      if (account.current && !this.userAccountsDetails.currentAccount[0].itemValid){
+        valid = false;
+      }
+      this.listValue.push([account.institutionName, valid]);
     }
 
     console.log("List Value: ", this.listValue);
@@ -129,8 +161,31 @@ export class HomeComponent implements OnInit, AfterViewInit {
     if (this.listValue.length > 0) {
       this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
       this.currentAccountName = this.userAccountsDetails.currentAccount[0].institutionName;
-      this.currentAccount = this.userAccountsDetails.currentAccount[0];
+      this.currentAccount = this.userAccountsDetails.currentAccount[0]; 
       this.accounts = this.userAccountsDetails.accounts;
+      if (!this.currentAccount.itemValid) {
+        this.updateItem = true;
+        console.log("Need to update item")
+        this.accountService.getItemPublicToken(this.currentAccountId).subscribe(res => {
+          var publicToken = res.public_token;
+          console.log("Public Token: ", publicToken)
+          this.publicToken = publicToken;
+          this.updateConfig.token = this.publicToken;
+          console.log(this.updateConfig)
+          this.plaidLinkService
+          .createPlaid(
+            Object.assign({}, this.updateConfig, {
+              onSuccess: (token, metadata) => this.onUpdateSuccess(token, metadata),
+              onExit: (error, metadata) => this.onUpdateExit(error, metadata),
+              onEvent: (eventName, metadata) => this.onUpdateEvent(eventName, metadata)
+            })
+          )
+          .then((handler: PlaidLinkHandler) => {
+            this.updatePlaidLinkHandler = handler;
+            // this.open();
+          });
+        })
+      }
       this.userAccountsIds = this.userAccountsDetails.ids
       console.log("Current Account Id: ", this.currentAccountId); 
       console.log("All Accounts: ", this.accounts);
@@ -140,6 +195,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       // Now get the currentAccount transactions
       this.accountService.getRecentTransactions(this.currentAccountId, this.days, this.subdays)
       .subscribe((transactions) => {
+        console.log(transactions)
         // this.isLoading = false;
         // this.firstLoad = false;
         console.log("Inside Transactions")
@@ -327,8 +383,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
     console.log("Top 3 Budgets: ", this.top3Budgets)
   }
 
-  onAccountChanged(accountName) {
-    if (!this.removeAccounts) {
+  onAccountChanged(listItem) {
+    var accountName = listItem[0]
+    var valid = listItem[1]
+    if (!this.removeAccounts && valid) {
       console.log(accountName);
       this.currentAccountName = accountName;
       this.isLoading = true;
@@ -434,7 +492,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
       this.borderVal = '1px solid rgb(209, 209, 209)';
 
       for (let account of this.userAccountsDetails.accounts) {
-        this.listValue.push(account.institutionName);
+        var valid = true;
+        if (account.current && !this.userAccountsDetails.currentAccount[0].itemValid){
+          valid = false;
+        }
+        this.listValue.push([account.institutionName, valid]);
       }
   
       console.log("List Value: ", this.listValue);
@@ -490,7 +552,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
       // });
     }
     else {
-      this.listValue.push(this.userAccountsDetails.accounts[this.userAccountsDetails.accounts.length - 1].institutionName);
+      var valid = true;
+      if (this.userAccountsDetails.accounts[this.userAccountsDetails.accounts.length - 1].current && !this.userAccountsDetails.currentAccount[0].itemValid){
+        valid = false;
+      }
+      this.listValue.push(this.userAccountsDetails.accounts[this.userAccountsDetails.accounts.length - 1].institutionName, valid);
       this.firstLoad = false;
     }
   }
@@ -513,7 +579,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
       .subscribe(result => {
         console.log(result);
         // Delete account from listValue array 
-        const index = this.listValue.indexOf(result.institutionName, 0);
+        var index = this.listValue.indexOf([result.institutionName, true], 0);
+        if (index == -1) {
+          index = this.listValue.indexOf([result.institutionName, false], 0);
+        }
         if (index > -1) {
           this.listValue.splice(index, 1);
         }
@@ -721,21 +790,46 @@ export class HomeComponent implements OnInit, AfterViewInit {
   //   })
   // }
 
-  fetchLinkToken() {
-    console.log("fetching link token")
-    var userId = JSON.parse(localStorage.getItem('JWT'))["userId"]
-    console.log(userId)
-    var data = {userId: userId}
-    this.accountService.getItemLinkToken(data).subscribe(res => {
-      var linkToken = res.link_token;
-      console.log("Link Token: ", linkToken)
-      this.linkToken = linkToken;
-      return this.linkToken;
-    })
-  }
+  // fetchLinkToken() {
+  //   console.log("fetching link token")
+  //   var userId = JSON.parse(localStorage.getItem('JWT'))["userId"]
+  //   console.log(userId)
+  //   var data = {userId: userId}
+  //   this.accountService.getItemLinkToken(data).subscribe(res => {
+  //     var linkToken = res.link_token;
+  //     console.log("Link Token: ", linkToken)
+  //     this.linkToken = linkToken;
+  //     return this.linkToken;
+  //   })
+  // }
 
   // Create and open programatically once the library is loaded.
   ngAfterViewInit() {
+    // console.log("SFHWEAFAFJAF", this.currentAccount)
+    // if (!this.currentAccount.itemValid) {
+    //   this.updateItem = true;
+    //   console.log("Need to update item")
+    //   this.accountService.getItemPublicToken(this.currentAccountId).subscribe(res => {
+    //     var publicToken = res.public_token;
+    //     console.log("Public Token: ", publicToken)
+    //     this.publicToken = publicToken;
+    //     this.updateConfig.token = this.publicToken;
+    //     console.log(this.updateConfig)
+    //     this.plaidLinkService
+    //     .createPlaid(
+    //       Object.assign({}, this.updateConfig, {
+    //         onSuccess: (token, metadata) => this.onUpdateSuccess(token, metadata),
+    //         onExit: (error, metadata) => this.onUpdateExit(error, metadata),
+    //         onEvent: (eventName, metadata) => this.onUpdateEvent(eventName, metadata)
+    //       })
+    //     )
+    //     .then((handler: PlaidLinkHandler) => {
+    //       this.updatePlaidLinkHandler = handler;
+    //       this.updateOpen();
+    //     });
+    //   })
+    // }
+
     // this.plaidLinkService
     //   .createPlaid(
     //     Object.assign({}, this.config, {
@@ -755,7 +849,17 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   exit() {
+    console.log("a")
     this.plaidLinkHandler.exit();
+  }
+
+  updateOpen() {
+    this.updatePlaidLinkHandler.open();
+  }
+
+  updateExit() {
+    console.log("b")
+    this.updatePlaidLinkHandler.exit();
   }
 
   onSuccess(token, metadata) {
@@ -822,6 +926,21 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   onExit(error, metadata) {
+    console.log("We exited:", error);
+    console.log("We got metadata:", metadata);
+  }
+
+  onUpdateSuccess(token, metadata) {
+    console.log("We got a token:", token);
+    console.log("We got metadata:", metadata);
+  }
+
+  onUpdateEvent(eventName, metadata) {
+    console.log("We got an event:", eventName);
+    console.log("We got metadata:", metadata);
+  }
+
+  onUpdateExit(error, metadata) {
     console.log("We exited:", error);
     console.log("We got metadata:", metadata);
   }

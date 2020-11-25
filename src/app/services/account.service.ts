@@ -15,7 +15,7 @@ interface GetAccountsResponse {
 }
 
 interface ItemTokenResponse {
-link_token: string;
+  public_token: string;
 }
 
 @Injectable({
@@ -77,6 +77,11 @@ export class AccountService {
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
+  getItemPublicToken(accountId: string) {
+    return this.http.get<ItemTokenResponse>(baseURL + 'plaid/accounts/create_public_token/' + accountId);
+      // .pipe(catchError(this.processHTTPMsgService.handleError));
+  }
+
   getAccounts() {
     return this.http.get<GetAccountsResponse>(baseURL + 'plaid/accounts');
       // .pipe(catchError(this.processHTTPMsgService.handleError));
@@ -106,7 +111,7 @@ export class AccountService {
 
   getTransactions(accountId: string, postsPerPage: number, currentPage: number, subAccount: string, subAccountId: string) {
     const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}&subAccount=${subAccount}&subAccountId=${subAccountId}`;
-    return this.http.get<{transactions: any[], maxTransactions: number}>(baseURL + 'plaid/accounts/transactions/' + accountId + queryParams);
+    return this.http.get<{success: boolean, transactions: any[], maxTransactions: number}>(baseURL + 'plaid/accounts/transactions/' + accountId + queryParams);
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
