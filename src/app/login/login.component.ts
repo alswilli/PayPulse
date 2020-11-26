@@ -34,6 +34,8 @@ export class LoginComponent implements OnInit {
   userId: any;
   everyAllUserGoals: any;
   accountIds: any;
+  accountsData: Account[];
+  currentAccount: Account;
 
   constructor(private fb: FormBuilder,
     private router: Router,
@@ -119,26 +121,53 @@ export class LoginComponent implements OnInit {
       if (res.success) {
         this.accountService.getAccounts().subscribe(res => {
           if (res.success) {
-              var accountIds = [];
-              for (let account of res.accountsData) {
-                console.log(account);
-                accountIds.push(account._id);
-              }
-              console.log(accountIds)
-              this.accountService.getCurrentAccount().subscribe(currAccount => {
-                if (currAccount != null) {
-                  this.currAccountId = currAccount[0]._id;
-                }
-                this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: res.accountsData, ids: accountIds});
-                this.goalService.getGoals()
-                .pipe(
-                  mergeMap((goalResponse) => {
-                    this.allGoals = goalResponse.goals;
-                    return this.goalService.getUserGoals()
-                  }),
-                  mergeMap((usergoalResponse) => {
-                    this.allUserGoals = usergoalResponse.usergoals;
-                    let observables: Observable<any>[] = [];
+            this.accountIds = [];
+            for (let account of res.accountsData) {
+              console.log(account);
+              this.accountIds.push(account._id);
+            }
+            console.log(this.accountIds)
+            this.accountService.getCurrentAccount()
+            .pipe(
+              mergeMap(currAccount => {
+                  console.log("AAAAAAAA")
+                  console.log(currAccount)
+                  if (currAccount != null) {
+                    this.currAccountId = currAccount[0]._id;
+                  }
+                  // this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: res.accountsData, ids: accountIds});
+                  console.log("BBBBBBBB")
+                  return this.goalService.getGoals()
+              }),
+              mergeMap(goalResponse => {
+                  console.log("CCCCCCCC")
+                  this.allGoals = goalResponse.goals;
+                  let accountObservables: Observable<UserGoalResponse>[] = [];
+                  this.userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
+                  console.log(this.userId)
+                  for (let account of res.accountsData) {
+                    accountObservables.push(this.goalService.getUserGoals()) // update to have accountId
+                  }
+                  if (accountObservables.length == 0) {
+                    console.log("no accounts")
+                    return of(null)
+                    // this._ngZone.run(() => this.router.navigate(['/home']));
+                  }
+                  else {
+                    console.log("DDDDDDDD")
+                    return forkJoin(accountObservables)
+                  }
+              }),
+              mergeMap(usergoalResponse => {
+                  console.log("EEEEEEEE")
+                  if (usergoalResponse == null) {
+                    return of(null)
+                  }
+                  let goalObservables: Observable<any>[] = [];
+                  this.everyAllUserGoals = usergoalResponse;
+                  for (let userGoals of usergoalResponse) {
+                    this.allUserGoals = userGoals.usergoals;
+                    var userGoalDatas = []
                     for (let goal of this.allGoals) {
                       var found = false;
                       for (let usergoal of this.allUserGoals) {
@@ -147,38 +176,48 @@ export class LoginComponent implements OnInit {
                           break;
                         }
                       }
-                      var userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
-                      console.log(userId)
                       if (!found) {
                         const userGoalData = {
-                          userId: userId,
+                          userId: this.userId,
                           goalId: goal._id,
                         }
-                        observables.push(this.goalService.addUserGoal(userGoalData))
+                        userGoalDatas.push(userGoalData)
                       }
                     }
-                    // return this.goalService.addUserGoal(userGoalData)
-                    if (observables.length == 0) {
-                      var retVal =  this.goalService.checkAndUpdateUserGoals(this.currAccountId, this.allGoals, this.allUserGoals)
-                      console.log("BACK")
-                      return retVal
+                    // if (userGoalDatas.length > 0) {
+                    //   goalObservables.push(this.goalService.addUserGoals(userGoalDatas))  // need to know which account
+                    // }
+                    goalObservables.push(this.goalService.addUserGoals(userGoalDatas))  // need to know which account and may be issue if empty
+                  }
+                  console.log("FFFFFFFF")
+                  return forkJoin(goalObservables)
+              }),
+              mergeMap(addedGoalsResponse => { // array with arrays of addUserGoal responses
+                  console.log("GGGGGGGG")  
+                  if (addedGoalsResponse == null) {
+                    return of(null)
+                  }
+                  var index = 0
+                  let finalUpdateObservables: Observable<any>[] = [];
+                  for (let allUserGoals of this.everyAllUserGoals) {
+                    if (addedGoalsResponse[index] != null) { // need to return null if empty inside addUserGoals
+                      for (let usergoal of addedGoalsResponse[index]) {
+                        allUserGoals.push(usergoal);
+                      }
                     }
-                    forkJoin(observables)
-                        .subscribe(dataArray => {
-                            // All observables in `observables` array have resolved and `dataArray` is an array of result of each observable
-                            console.log("In fork join")
-                            for (let usergoal of dataArray[1]) {
-                              this.allUserGoals.push(usergoal);
-                            }
-                            return this.goalService.checkAndUpdateUserGoals(this.currAccountId, this.allGoals, this.allUserGoals)
-                        });
-                  }),
-                )
-                .subscribe(checkResponse => {
-                  // this.router.navigate(['/home']);
-                });
-              });
-            }
+                    finalUpdateObservables.push(this.goalService.checkAndUpdateUserGoals(this.accountIds[index], this.allGoals, allUserGoals))
+                    index += 1
+                  }
+                  console.log("HHHHHHHH")
+                  return forkJoin(finalUpdateObservables)
+              })       
+            )
+            .subscribe(res => {
+              console.log("made it to the end")
+              // this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: res.accountsData, ids: accountIds});
+              // this._ngZone.run(() => this.router.navigate(['/home']));
+            })
+         }
         });
       }
     });
@@ -205,105 +244,141 @@ export class LoginComponent implements OnInit {
               if (res.success) {
                 this.accountService.getAccounts().subscribe(res => {
                   if (res.success) {
-                    this.accountService.getAccounts().subscribe(res => {
-                      if (res.success) {
-                          this.accountIds = [];
-                          for (let account of res.accountsData) {
-                            console.log(account);
-                            this.accountIds.push(account._id);
-                          }
-                          console.log(this.accountIds)
-                          this.accountService.getCurrentAccount()
-                          .pipe(
-                            mergeMap(currAccount => {
-                                console.log("AAAAAAAA")
-                                console.log(currAccount)
-                                if (currAccount != null) {
-                                  this.currAccountId = currAccount[0]._id;
-                                }
-                                // this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: res.accountsData, ids: accountIds});
-                                console.log("BBBBBBBB")
-                                return this.goalService.getGoals()
-                            }),
-                            mergeMap(goalResponse => {
-                                console.log("CCCCCCCC")
-                                this.allGoals = goalResponse.goals;
-                                let accountObservables: Observable<UserGoalResponse>[] = [];
-                                this.userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
-                                console.log(this.userId)
-                                for (let account of res.accountsData) {
-                                  accountObservables.push(this.goalService.getUserGoals()) // update to have accountId
-                                }
-                                if (accountObservables.length == 0) {
-                                  console.log("no accounts")
-                                  return of(null)
-                                  // this._ngZone.run(() => this.router.navigate(['/home']));
-                                }
-                                else {
-                                  console.log("DDDDDDDD")
-                                  return forkJoin(accountObservables)
-                                }
-                            }),
-                            mergeMap(usergoalResponse => {
-                                console.log("EEEEEEEE")
-                                if (usergoalResponse == null) {
-                                  return of(null)
-                                }
-                                let goalObservables: Observable<any>[] = [];
-                                this.everyAllUserGoals = usergoalResponse;
-                                for (let userGoals of usergoalResponse) {
-                                  this.allUserGoals = userGoals.usergoals;
-                                  var userGoalDatas = []
-                                  for (let goal of this.allGoals) {
-                                    var found = false;
-                                    for (let usergoal of this.allUserGoals) {
-                                      if (usergoal.goalId == goal._id) {
-                                        found = true;
-                                        break;
-                                      }
-                                    }
-                                    if (!found) {
-                                      const userGoalData = {
-                                        userId: this.userId,
-                                        goalId: goal._id,
-                                      }
-                                      userGoalDatas.push(userGoalData)
-                                    }
-                                  }
-                                  // if (userGoalDatas.length > 0) {
-                                  //   goalObservables.push(this.goalService.addUserGoals(userGoalDatas))  // need to know which account
-                                  // }
-                                  goalObservables.push(this.goalService.addUserGoals(userGoalDatas))  // need to know which account and may be issue if empty
-                                }
-                                console.log("FFFFFFFF")
-                                return forkJoin(goalObservables)
-                            }),
-                            mergeMap(addedGoalsResponse => { // array with arrays of addUserGoal responses
-                                console.log("GGGGGGGG")  
-                                if (addedGoalsResponse == null) {
-                                  return of(null)
-                                }
-                                var index = 0
-                                let finalUpdateObservables: Observable<any>[] = [];
-                                for (let allUserGoals of this.everyAllUserGoals) {
-                                  if (addedGoalsResponse[index] != null) { // need to return null if empty inside addUserGoals
-                                    for (let usergoal of addedGoalsResponse[index]) {
-                                      allUserGoals.push(usergoal);
-                                    }
-                                  }
-                                  finalUpdateObservables.push(this.goalService.checkAndUpdateUserGoals(this.accountIds[index], this.allGoals, allUserGoals))
-                                  index += 1
-                                }
-                                console.log("HHHHHHHH")
-                                return forkJoin(finalUpdateObservables)
-                            })       
-                          )
-                          .subscribe(res => {
-                            console.log("made it to the end")
-                            // this._ngZone.run(() => this.router.navigate(['/home']));
-                          })
+                      this.accountIds = [];
+                      this.accountsData = res.accountsData
+                      for (let account of res.accountsData) {
+                        console.log(account);
+                        this.accountIds.push(account._id);
                       }
-                    });
+                      console.log(this.accountIds)
+                      this.accountService.getCurrentAccount()
+                      .pipe(
+                        mergeMap(currAccount => {
+                            console.log("AAAAAAAA")
+                            console.log(currAccount)
+                            this.currentAccount = currAccount
+                            if (currAccount != null) {
+                              this.currAccountId = currAccount[0]._id;
+                            }
+                            // this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: res.accountsData, ids: accountIds});
+                            console.log("BBBBBBBB")
+                            return this.goalService.getGoals()
+                        }),
+                        mergeMap(goalResponse => {
+                            console.log("CCCCCCCC")
+                            this.allGoals = goalResponse.goals;
+                            let accountObservables: Observable<UserGoalResponse>[] = [];
+                            this.userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
+                            console.log(this.userId)
+                            for (let account of res.accountsData) {
+                              accountObservables.push(this.goalService.getUserGoals()) // update to have accountId
+                            }
+                            if (accountObservables.length == 0) {
+                              console.log("no accounts")
+                              return of(null)
+                              // this._ngZone.run(() => this.router.navigate(['/home']));
+                            }
+                            else {
+                              console.log("DDDDDDDD")
+                              return forkJoin(accountObservables)
+                            }
+                        }),
+                        mergeMap(usergoalResponse => {
+                            console.log("EEEEEEEE")
+                            if (usergoalResponse == null) {
+                              return of(null)
+                            }
+                            let goalObservables: Observable<any>[] = [];
+                            this.everyAllUserGoals = usergoalResponse;
+                            for (let userGoals of usergoalResponse) {
+                              this.allUserGoals = userGoals.usergoals;
+                              var userGoalDatas = []
+                              for (let goal of this.allGoals) {
+                                var found = false;
+                                for (let usergoal of this.allUserGoals) {
+                                  if (usergoal.goalId == goal._id) {
+                                    found = true;
+                                    break;
+                                  }
+                                }
+                                if (!found) {
+                                  const userGoalData = {
+                                    userId: this.userId,
+                                    goalId: goal._id,
+                                  }
+                                  userGoalDatas.push(userGoalData)
+                                }
+                              }
+                              // if (userGoalDatas.length > 0) {
+                              //   goalObservables.push(this.goalService.addUserGoals(userGoalDatas))  // need to know which account
+                              // }
+                              goalObservables.push(this.goalService.addUserGoals(userGoalDatas))  // need to know which account and may be issue if empty
+                            }
+                            console.log("FFFFFFFF")
+                            return forkJoin(goalObservables)
+                        }),
+                        mergeMap(addedGoalsResponse => { // array with arrays of addUserGoal responses
+                            console.log("GGGGGGGG")  
+                            if (addedGoalsResponse == null) {
+                              return of(null)
+                            }
+                            var index = 0
+                            let finalUpdateObservables: Observable<any>[] = [];
+                            for (let allUserGoals of this.everyAllUserGoals) {
+                              if (addedGoalsResponse[index] != null) { // need to return null if empty inside addUserGoals
+                                for (let usergoal of addedGoalsResponse[index]) {
+                                  allUserGoals.push(usergoal);
+                                }
+                              }
+                              finalUpdateObservables.push(this.goalService.checkAndUpdateUserGoals(this.accountIds[index], this.allGoals, allUserGoals))
+                              index += 1
+                            }
+                            console.log("HHHHHHHH")
+                            return forkJoin(finalUpdateObservables)
+                        }),
+                        mergeMap(checkRes => {
+                          console.log("IIIIIIII")
+                          var index = 0;
+                          let itemValidObservables: Observable<any>[] = [];
+                          var foundInvalid = false;
+                          console.log(checkRes)
+                          for (let res of checkRes) {
+                            if (res != null && res == "item invalid") {
+                              foundInvalid = true;
+                              var update = {itemValid: false};
+                              itemValidObservables.push(this.accountService.updateItemInvalidAccount(this.accountIds[index], update))
+                            }
+                            else {
+                              itemValidObservables.push(of(null))
+                            }
+                          }
+                          if (foundInvalid) {
+                            console.log("JJJJJJJJ")
+                            return forkJoin(itemValidObservables)
+                          }
+                          else {
+                            return of(null)
+                          } 
+                        })
+                      )
+                      .subscribe(validRes => {
+                        console.log("made it to the end")
+                        if (validRes != null) {
+                          var index = 0
+                          for (let updatedAccount of validRes) {
+                            if (updatedAccount != null) {
+                              this.accountsData[index].itemValid = false;
+                            }
+                            if (this.accountsData[index].current == true) {
+                              this.authService.storeUserGoalsDetails({usergoals: this.everyAllUserGoals[index]});
+                              this.currentAccount = this.accountsData[index]
+                            }
+                            index += 1
+                          }
+                        }
+                        this.authService.storeUserAccountsDetails({currentAccount: this.currentAccount, accounts: this.accountsData, ids: this.accountIds});
+                        // this._ngZone.run(() => this.router.navigate(['/home']));
+                      })
                   }
                 });
               }              

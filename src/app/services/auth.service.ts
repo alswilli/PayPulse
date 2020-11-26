@@ -219,6 +219,7 @@ export class AuthService {
         var oldValues = JSON.parse(localStorage.getItem(this.tokenKey));
         oldValues.lastUpdated = res.lastUpdated;
         localStorage.setItem(this.tokenKey, JSON.stringify(oldValues));
+        console.log("updated")
         return res;
     }));
    }

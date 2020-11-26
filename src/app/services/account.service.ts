@@ -109,6 +109,11 @@ export class AccountService {
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
+  updateItemInvalidAccount(accountId: string, update: object) {
+    return this.http.put(baseURL + 'plaid/accounts/' + accountId, update);
+      // .pipe(catchError(this.processHTTPMsgService.handleError));
+  }
+
   getTransactions(accountId: string, postsPerPage: number, currentPage: number, subAccount: string, subAccountId: string) {
     const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}&subAccount=${subAccount}&subAccountId=${subAccountId}`;
     return this.http.get<{success: boolean, transactions: any[], maxTransactions: number}>(baseURL + 'plaid/accounts/transactions/' + accountId + queryParams);

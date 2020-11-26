@@ -218,13 +218,14 @@ export class GoalService {
         let usergoalObservables: Observable<any>[] = [];
         var index = 0;
         for (let transactions of transactionsDataArray) {
-          // if (transactions.error) {
-          //   console.log("invalid item for account")
-          //   var oldValues = JSON.parse(localStorage.getItem('User Accounts Details'));
-          //   oldValues.currentAccount[0].itemValid = false;
-          //   localStorage.setItem('User Accounts Details', JSON.stringify(oldValues));
-          //   return this._ngZone.run(() => this.router.navigate(['/home']));
-          // }
+          if (transactions.error) {
+            console.log("invalid item for account")
+            // var oldValues = JSON.parse(localStorage.getItem('User Accounts Details'));
+            // oldValues.currentAccount[0].itemValid = false;
+            // localStorage.setItem('User Accounts Details', JSON.stringify(oldValues));
+            // return this._ngZone.run(() => this.router.navigate(['/home']));
+            return of("item invalid")
+          }
           // Per month
           var monthlyTotal = 0
           for (let budget of this.budgets) {
@@ -276,6 +277,9 @@ export class GoalService {
       }),
       mergeMap(dataArray => {
         console.log("5555555")
+        if (dataArray == "item invalid") {
+          return of("item invalid")
+        }
         if (dataArray != null) {
           console.log("In usergoals fork join")
           console.log(dataArray)
@@ -291,8 +295,9 @@ export class GoalService {
             }
           }
         }
-        this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
-        return this.authService.update()
+        // this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
+        // return this.authService.update()
+        return of(null)
       }))  
   }
 
