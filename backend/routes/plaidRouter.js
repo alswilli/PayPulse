@@ -48,11 +48,14 @@ plaidRouter.route("/accounts/create_public_token/:accountId")
   Account.findById(req.params.accountId)
     .then(account => {
       console.log(account.userId)
+      console.log("hola")
       ACCESS_TOKEN = account.accessToken;
       client.createPublicToken(ACCESS_TOKEN)
         .then(res => {
+          console.log("here")
           var PUBLIC_TOKEN = res.public_token;
-          response.json({public_token: PUBLIC_TOKEN});
+          console.log(+req.query.index)
+          response.json({public_token: PUBLIC_TOKEN, index: +req.query.index});
         })
         .catch(err => {
           // console.log(msg + "\n" + JSON.stringify(err));

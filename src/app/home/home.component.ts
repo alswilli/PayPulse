@@ -8,7 +8,7 @@ import {Account} from '../shared/account';
 import { MatSelectionList, MatSelectionListChange, MatListOption, MatDialog } from '@angular/material';
 import { ViewEncapsulation } from '@angular/compiler/src/core';
 import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
-import { switchMap, flatMap, mergeMap } from 'rxjs/operators';
+import { switchMap, flatMap, mergeMap, subscribeOn } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { DeleteAccountComponent } from '../delete-account/delete-account.component';
 import { ErrorComponent } from '../error/error.component';
@@ -21,6 +21,7 @@ import { baseURL } from '../shared/baseurl';
 import { PlaidLinkHandler } from 'ngx-plaid-link/lib/ngx-plaid-link-handler';
 import { PlaidConfig } from 'ngx-plaid-link/lib/interfaces';
 import { NgxPlaidLinkService } from 'ngx-plaid-link';
+import { Observable, forkJoin, of } from 'rxjs';
 // import 'rxjs/add/operator/switchMap';
 
 @Component({
@@ -65,7 +66,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   publicToken: string = null;
 
   private plaidLinkHandler: PlaidLinkHandler;
-  private updatePlaidLinkHandler: PlaidLinkHandler;
+  private updatePlaidLinkHandlers: PlaidLinkHandler[] = [];
 
   private config: PlaidConfig = {
     apiVersion: "v2",
@@ -78,20 +79,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     onSuccess: this.onSuccess,
     onExit: this.onExit
   };
-
-  private updateConfig: PlaidConfig = {
-    apiVersion: "v2",
-    clientName:"PayPulse",
-    env: "sandbox",
-    token: this.publicToken,
-    webhook: "https://507ec71083932519eb6c52a27bbe8afd.m.pipedream.net",
-    product: ["auth", "transactions"],
-    countryCodes: ['US', 'CA', 'GB'],
-    key: "ea1ee62219264cf290c12041f96bba",
-    onSuccess: this.onUpdateSuccess,
-    onExit: this.onUpdateExit
-  };
-  updateItem: boolean = false;
+  i: any;
 
   constructor(private transactionService: TransactionService,
     private accountService: AccountService,
@@ -149,11 +137,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
     console.log(this.userAccountsDetails)
 
     for (let account of this.userAccountsDetails.accounts) {
-      var valid = true;
-      if (account.current && !this.userAccountsDetails.currentAccount[0].itemValid){
-        valid = false;
-      }
-      this.listValue.push([account.institutionName, valid]);
+      this.listValue.push([account.institutionName, account.itemValid]);
+      this.updatePlaidLinkHandlers.push(null)
     }
 
     console.log("List Value: ", this.listValue);
@@ -163,85 +148,111 @@ export class HomeComponent implements OnInit, AfterViewInit {
       this.currentAccountName = this.userAccountsDetails.currentAccount[0].institutionName;
       this.currentAccount = this.userAccountsDetails.currentAccount[0]; 
       this.accounts = this.userAccountsDetails.accounts;
-      if (!this.currentAccount.itemValid) {
-        this.updateItem = true;
-        console.log("Need to update item")
-        this.accountService.getItemPublicToken(this.currentAccountId).subscribe(res => {
-          var publicToken = res.public_token;
-          console.log("Public Token: ", publicToken)
-          this.publicToken = publicToken;
-          this.updateConfig.token = this.publicToken;
-          console.log(this.updateConfig)
-          this.plaidLinkService
-          .createPlaid(
-            Object.assign({}, this.updateConfig, {
-              onSuccess: (token, metadata) => this.onUpdateSuccess(token, metadata),
-              onExit: (error, metadata) => this.onUpdateExit(error, metadata),
-              onEvent: (eventName, metadata) => this.onUpdateEvent(eventName, metadata)
-            })
-          )
-          .then((handler: PlaidLinkHandler) => {
-            this.updatePlaidLinkHandler = handler;
-            // this.open();
-          });
-        })
+      let linkObservables: Observable<any>[] = [];
+      for (var i = 0; i < (this.userAccountsDetails.accounts).length; i++) {
+        if (!this.userAccountsDetails.accounts[i].itemValid) {
+          console.log("Need to update item")
+          linkObservables.push(this.accountService.getItemPublicToken(this.userAccountsDetails.accounts[i]._id, i))
+        }
+        else {
+          linkObservables.push(of(null))
+        }
       }
-      this.userAccountsIds = this.userAccountsDetails.ids
-      console.log("Current Account Id: ", this.currentAccountId); 
-      console.log("All Accounts: ", this.accounts);
-      var today = new Date();
-      // this.days = today.getDate() - 1;
+      forkJoin(linkObservables).subscribe(resArray => {
+        console.log(resArray)
+        for (let res of resArray) {
+          console.log(res)
+          if (res != null) {
+            this.i = res.index
+            console.log(this.i)
+            var publicToken = res.public_token;
+            console.log("Public Token: ", publicToken)
+            var updateConfig: PlaidConfig = {
+              apiVersion: "v2",
+              clientName:"PayPulse",
+              env: "sandbox",
+              token: publicToken,
+              webhook: "https://507ec71083932519eb6c52a27bbe8afd.m.pipedream.net",
+              product: ["auth", "transactions"],
+              countryCodes: ['US', 'CA', 'GB'],
+              key: "ea1ee62219264cf290c12041f96bba",
+              onSuccess: this.onUpdateSuccess,
+              onExit: this.onUpdateExit
+            };
+            console.log(updateConfig)
+            this.plaidLinkService
+            .createPlaid(
+              Object.assign({}, updateConfig, {
+                onSuccess: (token, metadata) => this.onUpdateSuccess(token, metadata),
+                onExit: (error, metadata) => this.onUpdateExit(error, metadata),
+                onEvent: (eventName, metadata) => this.onUpdateEvent(eventName, metadata)
+              })
+            )
+            .then((handler: PlaidLinkHandler) => {
+              console.log(res.index)
+              this.updatePlaidLinkHandlers[res.index] = handler;
+              console.log(this.updatePlaidLinkHandlers)
+              // this.open();
+            });
+          }
+        }
+        this.userAccountsIds = this.userAccountsDetails.ids
+        console.log("Current Account Id: ", this.currentAccountId); 
+        console.log("All Accounts: ", this.accounts);
+        var today = new Date();
+        // this.days = today.getDate() - 1;
 
-      // Now get the currentAccount transactions
-      this.accountService.getRecentTransactions(this.currentAccountId, this.days, this.subdays)
-      .subscribe((transactions) => {
-        console.log(transactions)
-        // this.isLoading = false;
-        // this.firstLoad = false;
-        console.log("Inside Transactions")
-        this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
-        this.recentTransactions.forEach(element => {
-          console.log(element);
-        });
-        var currAccountName;
-        this.parsedTransactions = [];
-        for (let entry of this.recentTransactions) {
-          // Translate account_id to account name
-          for (let account of this.userAccountsDetails.currentAccount) {
-            for (let subAcc of account.subAccounts) {
-              if (subAcc.account_id === entry.account_id) {
-                currAccountName = subAcc.name;
-                break;
+        // Now get the currentAccount transactions
+        this.accountService.getRecentTransactions(this.currentAccountId, this.days, this.subdays)
+        .subscribe((transactions) => {
+          console.log(transactions)
+          // this.isLoading = false;
+          // this.firstLoad = false;
+          console.log("Inside Transactions")
+          this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
+          this.recentTransactions.forEach(element => {
+            console.log(element);
+          });
+          var currAccountName;
+          this.parsedTransactions = [];
+          for (let entry of this.recentTransactions) {
+            // Translate account_id to account name
+            for (let account of this.userAccountsDetails.currentAccount) {
+              for (let subAcc of account.subAccounts) {
+                if (subAcc.account_id === entry.account_id) {
+                  currAccountName = subAcc.name;
+                  break;
+                }
               }
             }
+            const newTransaction = {
+              amount: entry.amount,
+              transactionName: entry.transactionName,
+              category: entry.category,
+              date: entry.date,
+              accountName: currAccountName
+            };
+            this.parsedTransactions.push(newTransaction);
           }
-          const newTransaction = {
-            amount: entry.amount,
-            transactionName: entry.transactionName,
-            category: entry.category,
-            date: entry.date,
-            accountName: currAccountName
-          };
-          this.parsedTransactions.push(newTransaction);
-        }
-        console.log("Parsed transactions: "+ this.parsedTransactions);
-        this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
-          console.log("yup")
-          this.selectionList.deselectAll();
-          console.log(s);
-          s.option.selected = true;
+          console.log("Parsed transactions: "+ this.parsedTransactions);
+          this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
+            console.log("yup")
+            this.selectionList.deselectAll();
+            console.log(s);
+            s.option.selected = true;
+          });
+          this.getTopBudgets();
         });
-        this.getTopBudgets();
-      });
-      // this.listValue = ["SOMETHING3", "SOMETHING4"];
-      
-      this.preSelection.push(this.currentAccountName)
-      console.log(this.preSelection);
-      // this.clientForm = this.fb.group({
-      //   myOtherControl: new FormControl(this.preSelection),
-      // });
-      this.marginVal = '10';
-      this.borderVal = '1px solid rgb(209, 209, 209)';
+        // this.listValue = ["SOMETHING3", "SOMETHING4"];
+        
+        this.preSelection.push(this.currentAccountName)
+        console.log(this.preSelection);
+        // this.clientForm = this.fb.group({
+        //   myOtherControl: new FormControl(this.preSelection),
+        // });
+        this.marginVal = '10';
+        this.borderVal = '1px solid rgb(209, 209, 209)';
+      })
     }
     else {
       // May need something here later
@@ -383,7 +394,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     console.log("Top 3 Budgets: ", this.top3Budgets)
   }
 
-  onAccountChanged(listItem) {
+  onAccountChanged(event, listItem) {
     var accountName = listItem[0]
     var valid = listItem[1]
     if (!this.removeAccounts && valid) {
@@ -853,14 +864,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.plaidLinkHandler.exit();
   }
 
-  updateOpen() {
-    this.updatePlaidLinkHandler.open();
+  updateOpen(index) {
+    console.log(this.updatePlaidLinkHandlers)
+    this.updatePlaidLinkHandlers[index].open();
   }
 
-  updateExit() {
-    console.log("b")
-    this.updatePlaidLinkHandler.exit();
-  }
+  // updateExit() {
+  //   console.log("b")
+  //   this.updatePlaidLinkHandler.exit();
+  // }
 
   onSuccess(token, metadata) {
     console.log("We got a token:", token);

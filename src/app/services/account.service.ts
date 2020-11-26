@@ -16,6 +16,7 @@ interface GetAccountsResponse {
 
 interface ItemTokenResponse {
   public_token: string;
+  index: number;
 }
 
 @Injectable({
@@ -77,8 +78,9 @@ export class AccountService {
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
-  getItemPublicToken(accountId: string) {
-    return this.http.get<ItemTokenResponse>(baseURL + 'plaid/accounts/create_public_token/' + accountId);
+  getItemPublicToken(accountId: string, index: number) {
+    const queryParams = `?index=${index}`
+    return this.http.get<ItemTokenResponse>(baseURL + 'plaid/accounts/create_public_token/' + accountId + queryParams);
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
