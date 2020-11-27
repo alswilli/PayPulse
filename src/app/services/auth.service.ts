@@ -287,8 +287,9 @@ export class AuthService {
     console.log("EXP TIME: ", expTime)
     this.nodeTimer = setTimeout(() => {
       console.log("Inside the log out block")
-      this.tokenExpiredRef.close();
       this.logOut();
+      this.tokenExpiredRef.close();
+      // this.logOut();
       // this.tokenTimer.unsubscribe();
       // abc.unsubscribe();
     }, expTime*1000)

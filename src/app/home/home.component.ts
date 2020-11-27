@@ -585,7 +585,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   onDeleteIconClicked(accountName) {
     console.log(accountName);
-    const deleteAccountRef = this.dialog.open(DeleteAccountComponent, {data: {accountName: accountName, userAccountsDetails: this.userAccountsDetails}});
+    const deleteAccountRef = this.dialog.open(DeleteAccountComponent, {data: {accountName: accountName[0], userAccountsDetails: this.userAccountsDetails}});
     deleteAccountRef.componentInstance.onDelete
       .subscribe(result => {
         console.log(result);
