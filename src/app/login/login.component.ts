@@ -133,7 +133,7 @@ export class LoginComponent implements OnInit {
                 mergeMap(currAccount => {
                     console.log("AAAAAAAA")
                     console.log(currAccount)
-                    if (currAccount != null) {
+                    if (currAccount[0] != null) {
                       this.currAccountId = currAccount[0]._id;
                     }
                     // this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: res.accountsData, ids: accountIds});
@@ -143,12 +143,13 @@ export class LoginComponent implements OnInit {
                 mergeMap(goalResponse => {
                     console.log("CCCCCCCC")
                     this.allGoals = goalResponse.goals;
+                    console.log(this.allGoals)
                     let accountObservables: Observable<UserGoalResponse>[] = [];
                     this.userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
                     console.log(this.userId)
                     for (let account of res.accountsData) {
                       if (this.currAccountId != null && account._id == this.currAccountId) {
-                        accountObservables.push(this.goalService.getUserGoals())
+                        accountObservables.push(this.goalService.getUserGoals(this.userId))
                       } 
                     }
                     if (accountObservables.length == 0) {
@@ -163,6 +164,7 @@ export class LoginComponent implements OnInit {
                 }),
                 mergeMap(usergoalResponse => {
                     console.log("EEEEEEEE")
+                    console.log(usergoalResponse)
                     if (usergoalResponse == null) {
                       return of(null)
                     }
@@ -173,6 +175,7 @@ export class LoginComponent implements OnInit {
                     var index = 0
                     for (let userGoals of usergoalResponse) {
                       this.allUserGoals = userGoals.usergoals;
+                      console.log(this.allUserGoals)
                       var userGoalDatas = []
                       for (let goal of this.allGoals) {
                         var found = false;
@@ -190,14 +193,16 @@ export class LoginComponent implements OnInit {
                           userGoalDatas.push(userGoalData)
                         }
                       }
+                      console.log(userGoalDatas)
                       // if (userGoalDatas.length > 0) {
                       //   goalObservables.push(this.goalService.addUserGoals(userGoalDatas))  // need to know which account
                       // }
                       // goalObservables.push(this.goalService.addUserGoals(userGoalDatas))  // need to know which account and may be issue if empty
-                      goalObservables.push(this.goalService.addUserGoal(userGoalDatas))
+                      goalObservables.push(this.goalService.addUserGoals(userGoalDatas, this.userId))
                       index += 1
                     }
                     console.log("FFFFFFFF")
+                    console.log(goalObservables)
                     return forkJoin(goalObservables)
                 }),
                 mergeMap(addedGoalsResponse => { // arrays of addUserGoal responses
@@ -205,16 +210,18 @@ export class LoginComponent implements OnInit {
                     if (addedGoalsResponse == null) {
                       return of(null)
                     }
+                    var index = 0
+                    console.log(addedGoalsResponse)
                     let finalUpdateObservables: Observable<any>[] = [];
                     for (let allUserGoals of this.everyAllUserGoals) {
-                      // if (addedGoalsResponse[index] != null) { // need to return null if empty inside addUserGoals
-                      //   for (let usergoal of addedGoalsResponse[index]) {
-                      //     allUserGoals.push(usergoal.usergoals);
-                      //   }
-                      // }
-                      for (let usergoal of addedGoalsResponse) {
-                        allUserGoals.push(usergoal.usergoals);
+                      if (addedGoalsResponse[index] != null) { // need to return null if empty inside addUserGoals
+                        for (let usergoal of addedGoalsResponse[index]) {
+                          allUserGoals.push(usergoal.usergoals);
+                        }
                       }
+                      // for (let usergoal of addedGoalsResponse) {
+                      //   allUserGoals.push(usergoal.usergoals);
+                      // }
                       finalUpdateObservables.push(this.goalService.checkAndUpdateUserGoals(this.accountIds, this.allGoals, allUserGoals))
                     }
                     console.log("HHHHHHHH")
@@ -305,7 +312,7 @@ export class LoginComponent implements OnInit {
                         mergeMap(currAccount => {
                             console.log("AAAAAAAA")
                             console.log(currAccount)
-                            if (currAccount != null) {
+                            if (currAccount[0] != null) {
                               this.currAccountId = currAccount[0]._id;
                             }
                             // this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: res.accountsData, ids: accountIds});
@@ -315,12 +322,13 @@ export class LoginComponent implements OnInit {
                         mergeMap(goalResponse => {
                             console.log("CCCCCCCC")
                             this.allGoals = goalResponse.goals;
+                            console.log(this.allGoals)
                             let accountObservables: Observable<UserGoalResponse>[] = [];
                             this.userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
                             console.log(this.userId)
                             for (let account of res.accountsData) {
                               if (this.currAccountId != null && account._id == this.currAccountId) {
-                                accountObservables.push(this.goalService.getUserGoals())
+                                accountObservables.push(this.goalService.getUserGoals(this.userId))
                               } 
                             }
                             if (accountObservables.length == 0) {
@@ -335,6 +343,7 @@ export class LoginComponent implements OnInit {
                         }),
                         mergeMap(usergoalResponse => {
                             console.log("EEEEEEEE")
+                            console.log(usergoalResponse)
                             if (usergoalResponse == null) {
                               return of(null)
                             }
@@ -345,6 +354,7 @@ export class LoginComponent implements OnInit {
                             var index = 0
                             for (let userGoals of usergoalResponse) {
                               this.allUserGoals = userGoals.usergoals;
+                              console.log(this.allUserGoals)
                               var userGoalDatas = []
                               for (let goal of this.allGoals) {
                                 var found = false;
@@ -362,14 +372,16 @@ export class LoginComponent implements OnInit {
                                   userGoalDatas.push(userGoalData)
                                 }
                               }
+                              console.log(userGoalDatas)
                               // if (userGoalDatas.length > 0) {
                               //   goalObservables.push(this.goalService.addUserGoals(userGoalDatas))  // need to know which account
                               // }
                               // goalObservables.push(this.goalService.addUserGoals(userGoalDatas))  // need to know which account and may be issue if empty
-                              goalObservables.push(this.goalService.addUserGoal(userGoalDatas))
+                              goalObservables.push(this.goalService.addUserGoals(userGoalDatas, this.userId))
                               index += 1
                             }
                             console.log("FFFFFFFF")
+                            console.log(goalObservables)
                             return forkJoin(goalObservables)
                         }),
                         mergeMap(addedGoalsResponse => { // arrays of addUserGoal responses
@@ -377,16 +389,18 @@ export class LoginComponent implements OnInit {
                             if (addedGoalsResponse == null) {
                               return of(null)
                             }
+                            var index = 0
+                            console.log(addedGoalsResponse)
                             let finalUpdateObservables: Observable<any>[] = [];
                             for (let allUserGoals of this.everyAllUserGoals) {
-                              // if (addedGoalsResponse[index] != null) { // need to return null if empty inside addUserGoals
-                              //   for (let usergoal of addedGoalsResponse[index]) {
-                              //     allUserGoals.push(usergoal.usergoals);
-                              //   }
-                              // }
-                              for (let usergoal of addedGoalsResponse) {
-                                allUserGoals.push(usergoal.usergoals);
+                              if (addedGoalsResponse[index] != null) { // need to return null if empty inside addUserGoals
+                                for (let usergoal of addedGoalsResponse[index]) {
+                                  allUserGoals.push(usergoal.usergoals);
+                                }
                               }
+                              // for (let usergoal of addedGoalsResponse) {
+                              //   allUserGoals.push(usergoal.usergoals);
+                              // }
                               finalUpdateObservables.push(this.goalService.checkAndUpdateUserGoals(this.accountIds, this.allGoals, allUserGoals))
                             }
                             console.log("HHHHHHHH")

@@ -8,11 +8,16 @@ const cors = require('./corsRoutes');
 
 userGoalRouter.use(bodyParser.json());
 
-userGoalRouter.route("/")
+userGoalRouter.route("/:userId")
 .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
 .get(cors.corsWithOptions, authenticate.verifyUser, function(req, res, next) {
-    UserGoal.find({userId: req.user._id})
+    UserGoal.find({userId : req.params.userId})
+    // UserGoal.find({ userId : req.params.userId })
     .then(usergoals => {
+      console.log('GET USER GOALS: ', usergoals)
+      if (usergoals == null) {
+        usergoals = []
+      }
       res.status(200).json({
         message: "User Goals fetched successfully!",
         usergoals: usergoals
@@ -53,7 +58,7 @@ userGoalRouter.route("/:userGoalId")
                     numTimesAchieved: 1,
                     dateFirstAchieved: Date.now()
                   }
-            })
+            }, { new: true })
             .then((user) => {
               console.log("USER UPDATED DONE: ", user)
               res.statusCode = 200;
@@ -67,7 +72,7 @@ userGoalRouter.route("/:userGoalId")
             $set: { 
                     goalProgress: req.body.goalProgression,
                   }
-            })
+            }, { new: true })
             .then((user) => {
               console.log("USER UPDATED NOT DONE: ", user)
               res.statusCode = 200;
@@ -81,7 +86,7 @@ userGoalRouter.route("/:userGoalId")
             $set: { 
                     numTimesAchieved: req.body.numTimesAchieved,
                   }
-            })
+            }, { new: true })
             .then((user) => {
               console.log("USER UPDATED OTHER: ", user)
               res.statusCode = 200;

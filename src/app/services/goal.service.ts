@@ -66,21 +66,22 @@ export class GoalService {
     return this.http.post<GoalResponse>(baseURL + 'goals', goalData);
   }
 
-  getUserGoals() {
-    return this.http.get<UserGoalResponse>(baseURL + 'usergoals');
+  getUserGoals(userId: string) {
+    console.log('get')
+    return this.http.get<UserGoalResponse>(baseURL + 'usergoals/' + userId);
   }
 
-  addUserGoal(userGoalData: Object) {
+  addUserGoal(userGoalData: Object, userId: string) {
     console.log("adding user goals")
-    return this.http.post<UserGoalResponse>(baseURL + 'usergoals', userGoalData);
+    return this.http.post<UserGoalResponse>(baseURL + 'usergoals/' + userId, userGoalData);
   }
 
-  addUserGoals(userGoalDatas) {
+  addUserGoals(userGoalDatas, userId) {
     console.log("adding multiple user goals")
     console.log(userGoalDatas)
     let addObservables: Observable<any>[] = [];
     for (let userGoalData of userGoalDatas) {
-      addObservables.push(this.addUserGoal(userGoalData))
+      addObservables.push(this.addUserGoal(userGoalData, userId))
     }
     if (addObservables.length == 0) {
       return of(null)
@@ -248,6 +249,7 @@ export class GoalService {
         var accountsIndex = 0;
         var monthlyTotal = 0
         for (let transactions of transactionsDataArray) {
+          console.log("inside transactions loop")
           if (accountsIndex < accountIds.length) {
             // Per month
             for (let budget of this.budgets) {
@@ -264,15 +266,17 @@ export class GoalService {
               monthlyTotal += total;
             }
             accountsIndex += 1
-            continue
+            if (accountsIndex < accountIds.length) {
+              continue
+            }
           }
-          // console.log("Monthly Total: ", monthlyTotal)
+          console.log("Monthly Total: ", monthlyTotal)
 
           // BUDGET MANAGER MONTHLY GOALS
           if (monthlyTotal < this.totalBudgetAmount) {
             var fullGoalName = "Budget Goal - " + this.pairs[index][0]
             for (let goal of allGoals) {
-              // console.log(goal.goalName, fullGoalName)
+              console.log(goal.goalName, fullGoalName)
               if (goal.goalName == fullGoalName) {
                 for (let usergoal of allUserGoals) {
                   if (usergoal.goalId == goal._id) {

@@ -4,11 +4,13 @@ const Schema = mongoose.Schema;
 const UserGoalSchema = new Schema({
     userId: {
         type: Schema.Types.ObjectId, 
-        ref: "users"
+        ref: "users",
+        required: true
     },
     goalId: {
         type: Schema.Types.ObjectId, 
-        ref: "goals"
+        ref: "goals",
+        required: true
     },
     numTimesAchieved: {
         type: Number,
