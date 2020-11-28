@@ -88,7 +88,7 @@ export class GoalService {
     return forkJoin(addObservables)
   }
 
-  checkAndUpdateUserGoals(currAccountId, allGoals, allUserGoals) {
+  checkAndUpdateUserGoals(accountIds, allGoals, allUserGoals) {
     /*
     If (prev date is same month and year as current date) {
       do nothing
@@ -103,6 +103,11 @@ export class GoalService {
            map(data => this.getBest(data))
         );
     */
+
+    var accountsItemStatus = []
+    for (let accountId in accountIds) {
+      accountsItemStatus.push(null)
+    }
 
     return this.budgetService.getBudgets()
       .pipe( mergeMap(budgets => {
@@ -194,12 +199,13 @@ export class GoalService {
 
           console.log("Pairs: ", this.pairs)
           console.log("Total Budget Amount: ", this.totalBudgetAmount)
-          console.log("Current Account ID: ", currAccountId)
 
           // Step 3: Check them and update user goals accordingly
           let transactionObservables: Observable<any>[] = [];
           for (let pair of this.pairs) {
-            transactionObservables.push(this.accountService.getBudgetTransactions(currAccountId, pair[1]['days'], pair[1]['subdays']))
+            for (let accountId of accountIds) {
+              transactionObservables.push(this.accountService.getBudgetTransactions(accountId, pair[1]['days'], pair[1]['subdays']))
+            }
           }
           console.log("22222222")
           return forkJoin(transactionObservables)
@@ -216,7 +222,8 @@ export class GoalService {
         }
         console.log(transactionsDataArray)
         let usergoalObservables: Observable<any>[] = [];
-        var index = 0;
+        var accountsIndex = 0;
+        var foundInvalid = false;
         for (let transactions of transactionsDataArray) {
           if (transactions.error) {
             console.log("invalid item for account")
@@ -224,22 +231,40 @@ export class GoalService {
             // oldValues.currentAccount[0].itemValid = false;
             // localStorage.setItem('User Accounts Details', JSON.stringify(oldValues));
             // return this._ngZone.run(() => this.router.navigate(['/home']));
-            return of("item invalid")
+
+            // return of("item invalid")
+            accountsItemStatus[accountsIndex] = "item invalid"
+            foundInvalid = true;
+            accountsIndex += 1
+            if (accountsIndex == accountIds.length) {
+              accountsIndex = 0
+            }
           }
-          // Per month
-          var monthlyTotal = 0
-          for (let budget of this.budgets) {
-            var mainCategory = budget.mainCategory;
-            var total = 0;
-            for (let transaction of transactions) {
-              for (let category of transaction.category) {
-                if (category === mainCategory) {
-                  total += transaction.amount;
-                  break;
+        }
+        if (foundInvalid) {
+            return of("item invalid")
+        }
+        var index = 0;
+        var accountsIndex = 0;
+        var monthlyTotal = 0
+        for (let transactions of transactionsDataArray) {
+          if (accountsIndex < accountIds.length) {
+            // Per month
+            for (let budget of this.budgets) {
+              var mainCategory = budget.mainCategory;
+              var total = 0;
+              for (let transaction of transactions) {
+                for (let category of transaction.category) {
+                  if (category === mainCategory) {
+                    total += transaction.amount;
+                    break;
+                  }
                 }
               }
+              monthlyTotal += total;
             }
-            monthlyTotal += total;
+            accountsIndex += 1
+            continue
           }
           // console.log("Monthly Total: ", monthlyTotal)
 
@@ -263,6 +288,8 @@ export class GoalService {
             }
           }
           // need to check for more goals here
+          accountsIndex = 0;
+          monthlyTotal = 0
           index += 1
         }
         // Step 4: Update local user goals
@@ -278,7 +305,7 @@ export class GoalService {
       mergeMap(dataArray => {
         console.log("5555555")
         if (dataArray == "item invalid") {
-          return of("item invalid")
+          return of(accountsItemStatus)
         }
         if (dataArray != null) {
           console.log("In usergoals fork join")

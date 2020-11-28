@@ -27,7 +27,7 @@ export class BudgetService {
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
-  deleteBudget(budgetId: string, budget) {
+  deleteBudget(budgetId: string) {
     return this.http.delete(baseURL + 'budgets/' + budgetId);
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }

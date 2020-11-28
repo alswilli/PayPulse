@@ -275,60 +275,58 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   getTopBudgets() {
     console.log(this.categories)
-    if (this.categories == null) {
-      this.accountService.getTransactionCategories()
-      .pipe(
-        mergeMap((categories) => {
-          console.log(categories);
-          this.categories = {};
-          for (let row of categories) {
-            var i = 0;
-            var currStr = "";
-            var curr = this.categories;
-            while (i < row.hierarchy.length) {
-              currStr = row.hierarchy[i];
-              if (currStr in curr) {
-                curr = curr[currStr];
-              }
-              else {
-                curr[currStr] = {};
-                curr = curr[currStr];
-              }
-              i += 1;
+    this.accountService.getTransactionCategories()
+    .pipe(
+      mergeMap((categories) => {
+        console.log(categories);
+        this.categories = {};
+        for (let row of categories) {
+          var i = 0;
+          var currStr = "";
+          var curr = this.categories;
+          while (i < row.hierarchy.length) {
+            currStr = row.hierarchy[i];
+            if (currStr in curr) {
+              curr = curr[currStr];
             }
+            else {
+              curr[currStr] = {};
+              curr = curr[currStr];
+            }
+            i += 1;
           }
-          console.log(this.categories);
-          return this.budgetService.getBudgets()
-        }),
-        mergeMap(budgets => {
-          console.log("made it");
-          this.budgets = budgets;
-          // var today = new Date();
+        }
+        console.log(this.categories);
+        return this.budgetService.getBudgets()
+      }),
+      mergeMap(budgets => {
+        console.log("made it");
+        this.budgets = budgets;
+        // var today = new Date();
 
-          // this.days = today.getDate()-1;
-          // this.subdays = 0;
+        // this.days = today.getDate()-1;
+        // this.subdays = 0;
 
-          // console.log("Days: ", this.days);
-          return this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays);
-        })
-      )
-      .subscribe(transactions => {
-        this.transactions = transactions;
-        this.onGetTransactions();
-        this.getTop3Budgets();
-        this.isLoading = false;
-      });
-    }
-    else {
-      this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays)
-        .subscribe(transactions => {
-          this.transactions = transactions;
-          this.onGetTransactions();
-          this.getTop3Budgets();
-          // this.handleGoals();
-          this.isLoading = false;
-        });
-    }
+        // console.log("Days: ", this.days);
+        return this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays);
+      })
+    )
+    .subscribe(transactions => {
+      this.transactions = transactions;
+      this.onGetTransactions();
+      this.getTop3Budgets();
+      this.isLoading = false;
+    });
+    // else {
+    //   this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays)
+    //     .subscribe(transactions => {
+    //       this.transactions = transactions;
+    //       this.onGetTransactions();
+    //       this.getTop3Budgets();
+    //       // this.handleGoals();
+    //       this.isLoading = false;
+    //     });
+    // }
   }
 
   onGetTransactions() {

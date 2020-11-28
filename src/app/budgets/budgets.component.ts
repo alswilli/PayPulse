@@ -517,7 +517,7 @@ export class BudgetsComponent implements OnInit {
 
   onAddBudgetClicked() {
     console.log("add clicked")
-    this.addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: false}});
+    this.addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: false, accountId: this.currentAccountId}});
     this.addBudgetRef.componentInstance.onAdd
     // this.addBudgetRef.close()
       .subscribe(result => {

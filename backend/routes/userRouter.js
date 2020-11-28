@@ -79,7 +79,7 @@ router.post('/login', cors.corsWithOptions, (req, res, next) => {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
       res.json({success: true, status: 'Login Successful!', admin: user.admin, 
-      token: token, userId: user._id, lastUpdated: user.lastUpdated, exp: 75});
+      token: token, userId: user._id, lastUpdated: user.lastUpdated, exp: 3600});
     }); 
   }) (req, res, next);
 });

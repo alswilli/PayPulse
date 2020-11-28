@@ -11,7 +11,7 @@ userGoalRouter.use(bodyParser.json());
 userGoalRouter.route("/")
 .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
 .get(cors.corsWithOptions, authenticate.verifyUser, function(req, res, next) {
-    UserGoal.find()
+    UserGoal.find({userId: req.user._id})
     .then(usergoals => {
       res.status(200).json({
         message: "User Goals fetched successfully!",
@@ -33,7 +33,7 @@ userGoalRouter.route("/")
         .then(createdGoal => {
           res.status(201).json({
             message: "User Goal added successfully",
-            usergoals: [createdGoal]
+            usergoals: createdGoal
           });
         })
         .catch(error => {
