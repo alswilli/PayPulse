@@ -106,7 +106,7 @@
                 <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
                 <div *ngIf="!isLoading"> 
                   <div *ngIf="parsedTransactions.length === 0">
-                    <p>No recent transactions for this month yet!</p>
+                    <p>No recent transactions in the last 30 days!</p>
                   </div>
                   <p *ngFor="let recentData of parsedTransactions">
                     <span><b>Sub Account Name:</b> {{recentData.accountName}} </span>
@@ -121,7 +121,7 @@
                 <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
                 <div *ngIf="!isLoading"> 
                   <div *ngIf="top3Budgets.length === 0">
-                    <p>No recent budgets for this month yet!</p>
+                    <p>No recent budgets in the last 30 days!</p>
                   </div>
                   <div *ngFor="let budget of top3Budgets">
                     <p fxFlex *ngIf="budget.mainCategory === budget.category3">
@@ -151,8 +151,13 @@
               <div *ngIf="component.name === 'Goals' && card.name === 'Completed Goals'">
                 <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
                 <div *ngIf="!isLoading"> 
-                  <div *ngIf="randomCompletedGoals.length === 0">
-                    <p>No completed goals for this month yet!</p>
+                  <div *ngIf="recentlyCompletedGoals.length === 0">
+                    <p>No completed goals in the last 30 days!</p>
+                  </div>
+                  <div *ngIf="recentlyCompletedGoals.length > 0">
+                    <div *ngFor="let goal of recentlyCompletedGoals">
+                      <p>{{goal.goalName}}</p>
+                    </div>
                   </div>
                 </div>
               </div>

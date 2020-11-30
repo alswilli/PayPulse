@@ -267,7 +267,7 @@ export class LoginComponent implements OnInit {
                     this.currentAccount = account
                   }
                 }
-                this.authService.storeUserGoalsDetails({usergoals: this.everyAllUserGoals[0]});
+                this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.everyAllUserGoals[0]});
                 this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accountsData, ids: this.accountIds});
                 this.router.navigate(['/home']);
               })
@@ -444,7 +444,7 @@ export class LoginComponent implements OnInit {
                             this.currentAccount = account
                           }
                         }
-                        this.authService.storeUserGoalsDetails({usergoals: this.everyAllUserGoals[0]});
+                        this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.everyAllUserGoals[0]});
                         this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accountsData, ids: this.accountIds});
                         this._ngZone.run(() => this.router.navigate(['/home']));
                       })

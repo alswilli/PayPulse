@@ -4,5 +4,6 @@ export class UserGoal {
     goalId: string;
     numTimesAcheived: number;
     dateFirstAchieved: Date;
+    dateLastAchieved: Date;
     goalProgression: number;
 }

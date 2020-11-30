@@ -288,8 +288,13 @@ export class GoalService {
               if (goal.goalName == fullGoalName) {
                 for (let usergoal of allUserGoals) {
                   if (usergoal.goalId == goal._id) {
-                    var retObj = {
-                      done: "Done"
+                    var retObj = {}
+                    if (usergoal.goalProgress == 0) {
+                      retObj['done'] = "Done"
+                    }
+                    else {
+                      retObj['done'] = "Already Done"
+                      retObj["numTimesAchieved"] = usergoal.numTimesAchieved+1 //needs to be years since last achieved
                     }
                     usergoalObservables.push(this.updateUserGoal(usergoal._id, retObj))
                     break

@@ -22,6 +22,8 @@ import { PlaidLinkHandler } from 'ngx-plaid-link/lib/ngx-plaid-link-handler';
 import { PlaidConfig } from 'ngx-plaid-link/lib/interfaces';
 import { NgxPlaidLinkService } from 'ngx-plaid-link';
 import { Observable, forkJoin, of } from 'rxjs';
+import { GoalService } from '../services/goal.service';
+import { UserGoal } from '../shared/usergoal';
 // import 'rxjs/add/operator/switchMap';
 
 @Component({
@@ -56,7 +58,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
   top3Budgets = [];
   marginVal: string;
   borderVal: string;
-  randomCompletedGoals: Goal[];
+  recentlyCompletedUserGoals: UserGoal[];
+  recentlyCompletedGoals: Goal[];
 
   clientForm: FormGroup;
   listValue: any = [];
@@ -80,6 +83,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
     onExit: this.onExit
   };
   i: any;
+  userGoalsDetails: any;
+  allGoals: any;
+  allUserGoals: any;
 
   constructor(private transactionService: TransactionService,
     private accountService: AccountService,
@@ -87,7 +93,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
     public dialog: MatDialog,
     private fb: FormBuilder,
     private budgetService: BudgetService,
-    private plaidLinkService: NgxPlaidLinkService) { }
+    private plaidLinkService: NgxPlaidLinkService,
+    private goalService: GoalService) { }
     
 
   ngOnChanges(changes: SimpleChanges) {
@@ -132,9 +139,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
     // this.fetchLinkToken()
     // this.environment = process.env.PLAID_ENVIRONMENT;
     // this.firstLoad = true;
-    this.randomCompletedGoals = [];
+    this.recentlyCompletedUserGoals = [];
+    this.recentlyCompletedGoals = [];
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
     console.log(this.userAccountsDetails)
+    this.userGoalsDetails = JSON.parse(localStorage.getItem('User Goals Details'));
+    this.allGoals = this.userGoalsDetails.goals;
+    this.allUserGoals = this.userGoalsDetails.usergoals;
 
     for (let account of this.userAccountsDetails.accounts) {
       this.listValue.push([account.institutionName, account.itemValid]);
@@ -148,6 +159,11 @@ export class HomeComponent implements OnInit, AfterViewInit {
       this.currentAccountName = this.userAccountsDetails.currentAccount[0].institutionName;
       this.currentAccount = this.userAccountsDetails.currentAccount[0]; 
       this.accounts = this.userAccountsDetails.accounts;
+      this.preSelection.push(this.currentAccountName)
+      console.log(this.preSelection);
+      this.marginVal = '10';
+      this.borderVal = '1px solid rgb(209, 209, 209)';
+
       let linkObservables: Observable<any>[] = [];
       for (var i = 0; i < (this.userAccountsDetails.accounts).length; i++) {
         if (!this.userAccountsDetails.accounts[i].itemValid) {
@@ -243,15 +259,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
           });
           this.getTopBudgets();
         });
-        // this.listValue = ["SOMETHING3", "SOMETHING4"];
-        
-        this.preSelection.push(this.currentAccountName)
-        console.log(this.preSelection);
-        // this.clientForm = this.fb.group({
-        //   myOtherControl: new FormControl(this.preSelection),
-        // });
-        this.marginVal = '10';
-        this.borderVal = '1px solid rgb(209, 209, 209)';
+        // this.preSelection.push(this.currentAccountName)
+        // console.log(this.preSelection);
+        // this.marginVal = '10';
+        // this.borderVal = '1px solid rgb(209, 209, 209)';
       })
     }
     else {
@@ -315,6 +326,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       this.transactions = transactions;
       this.onGetTransactions();
       this.getTop3Budgets();
+      this.getRandomCompletedGoals();
       this.isLoading = false;
     });
     // else {
@@ -390,6 +402,37 @@ export class HomeComponent implements OnInit, AfterViewInit {
       i += 1;
     }
     console.log("Top 3 Budgets: ", this.top3Budgets)
+  }
+
+  compare(a,b) {
+    if (a.dateLastAchieved >= b.dateLastAchieved) //push more recent dates to front
+       return -1;
+    if (a.dateLastAchieved < b.dateLastAchieved) //if equal then use one that is further down user goals list
+      return 1;
+  }
+
+  getRandomCompletedGoals() {
+    var today = new Date()
+    var priorDate = new Date(new Date().setDate(today.getDate()-30))
+    console.log(priorDate)
+    for (let usergoal of this.allUserGoals) {
+      if (usergoal.goalProgress === 100 && new Date(usergoal.dateLastAchieved) >= priorDate) {
+        this.recentlyCompletedUserGoals.push(usergoal)
+      }
+    }
+    this.recentlyCompletedUserGoals.sort(this.compare);
+    if (this.recentlyCompletedUserGoals.length > 3) {
+      this.recentlyCompletedUserGoals = this.recentlyCompletedUserGoals.slice(2)
+    }
+    console.log(this.recentlyCompletedUserGoals)
+    for (let usergoal of this.recentlyCompletedUserGoals) {
+      for (let goal of this.allGoals) {
+        if (goal._id == usergoal.goalId) {
+          this.recentlyCompletedGoals.push(goal)
+          break
+        }
+      }
+    }
   }
 
   onAccountChanged(event, listItem) {

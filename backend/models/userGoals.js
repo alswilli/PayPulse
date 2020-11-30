@@ -20,6 +20,10 @@ const UserGoalSchema = new Schema({
         type: Date, 
         default: null
     },
+    dateLastAchieved: { 
+        type: Date, 
+        default: null
+    },
     goalProgress: {
         type: Number,
         default: 0

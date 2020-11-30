@@ -56,7 +56,8 @@ userGoalRouter.route("/:userGoalId")
             $set: {
                     goalProgress: 100,
                     numTimesAchieved: 1,
-                    dateFirstAchieved: Date.now()
+                    dateFirstAchieved: Date.now(),
+                    dateLastAchieved: Date.now()
                   }
             }, { new: true })
             .then((user) => {
@@ -85,6 +86,7 @@ userGoalRouter.route("/:userGoalId")
         UserGoal.findByIdAndUpdate(req.params.userGoalId, {
             $set: { 
                     numTimesAchieved: req.body.numTimesAchieved,
+                    dateLastAchieved: Date.now()
                   }
             }, { new: true })
             .then((user) => {

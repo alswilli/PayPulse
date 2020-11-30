@@ -132,12 +132,12 @@ export class AuthService {
      localStorage.removeItem(this.accountsKey);
    }
 
-   storeUserGoalsDetails(details: any) {
+   storeGoalsDetails(details: any) {
     console.log('storeUserGoalsDetails ', details); 
     localStorage.setItem("User Goals Details", JSON.stringify(details));
   }
 
-  destroyUserGoalsDetails() {
+  destroyGoalsDetails() {
     localStorage.removeItem("User Goals Details")
   }
  
@@ -205,7 +205,7 @@ export class AuthService {
     //  }));
     this.destroyUserCredentials();
     this.destroyUserAccountsDetails();
-    this.destroyUserGoalsDetails();
+    this.destroyGoalsDetails();
     this.router.navigate(['/login']);
     clearTimeout(this.nodeTimer)
     this.clearTokenTimer();
