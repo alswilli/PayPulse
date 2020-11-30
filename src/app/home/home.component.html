@@ -62,6 +62,10 @@
         </mr-ngx-plaid-link-button> -->
         <button mat-flat-button (click)="open()"> Add Account</button>
         <button mat-flat-button *ngIf="listValue.length > 0" id="removeAccountButton" class="addDeleteButtons" (click)="onRemoveAccountClicked();">Remove Accounts</button>
+        <div *ngIf="invalidItem">
+          <p>There are invalid credentials or an expired account token for 1 or more of your accounts! 
+            Please reauthenticate the accounts by pressing the 'Update Account' buttons above to gain back functionality.</p>
+        </div>
       </div>
     </div>
     <div fxFlex="50" [ngStyle]="{'margin': marginVal + 'px', 'border': borderVal}">

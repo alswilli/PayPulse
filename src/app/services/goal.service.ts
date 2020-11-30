@@ -116,7 +116,7 @@ export class GoalService {
         this.budgets = budgets;
         var oldDate = new Date(JSON.parse(localStorage.getItem('JWT'))["lastUpdated"])
         var currDate = new Date();
-        var currDate = new Date("2020-12-21T01:14:54.483Z"); 
+        // var currDate = new Date("2020-12-21T01:14:54.483Z"); 
         if (oldDate != null && oldDate.getMonth() != currDate.getMonth() && budgets.length > 0) {
           // Time to update
           console.log("passed")
@@ -213,7 +213,15 @@ export class GoalService {
         }
         else {
           console.log("did not pass")
-          return of(null);
+          let transactionObservables: Observable<any>[] = [];
+          for (let accountId of accountIds) { // purely to check for invalid items
+            transactionObservables.push(this.accountService.getBudgetTransactions(accountId, 30, 0))
+          }
+          if (transactionObservables.length == 0) {
+            return of(null);
+          }
+          console.log("22222222empty")
+          return forkJoin(transactionObservables)
         }
       }),
       mergeMap(transactionsDataArray => {
@@ -307,7 +315,7 @@ export class GoalService {
         }
       }),
       mergeMap(dataArray => {
-        console.log("5555555")
+        console.log("55555555")
         if (dataArray == "item invalid") {
           return of(accountsItemStatus)
         }
@@ -328,7 +336,8 @@ export class GoalService {
         }
         // this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
         // return this.authService.update()
-        return of(null)
+        // return of(null)
+        return of(accountsItemStatus)
       }))  
   }
 

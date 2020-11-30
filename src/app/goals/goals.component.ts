@@ -43,7 +43,9 @@ export class GoalsComponent implements OnInit {
     this.initialLoad = true;
     this.allGoals = [];
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
-    this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id;
+    if (this.userAccountsDetails.currentAccount[0] != null) {
+      this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id;
+    }
 
     this.jwtDetails = JSON.parse(localStorage.getItem('JWT'));
     this.admin = this.jwtDetails.admin;
