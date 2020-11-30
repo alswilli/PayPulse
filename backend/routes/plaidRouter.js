@@ -309,8 +309,8 @@ plaidRouter.route("/accounts")
   if (req.query.current) {
     console.log("curr");
     Account.find({ userId: req.user.id, current: true })
-    .then(account => {
-      console.log(account)
+    .then(accounts => {
+      console.log(accounts)
       // if (account.length > 0) {
       //   var editedAccount = {
       //     _id: account[0]._id,
@@ -326,11 +326,11 @@ plaidRouter.route("/accounts")
       //   res.json(account);
       // }
       // res.json(accounts);
-      if (account.length > 0) {
-        account[0].accessToken = null;
-        account[0].itemId = null;
+      for (let account of accounts) {
+        account.accessToken = null;
+        account.itemId = null;
       }
-      res.json(account);
+      res.json(accounts);
     })
     .catch(err => console.log(err));
   }

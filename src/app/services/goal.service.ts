@@ -251,7 +251,7 @@ export class GoalService {
           }
         }
         if (foundInvalid) {
-            return of("item invalid")
+            return of("item invalid") // if no budget and no invalid accounts, will have monthlyBudget = 0
         }
         var index = 0;
         var accountsIndex = 0;

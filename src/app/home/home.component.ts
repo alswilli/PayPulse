@@ -147,9 +147,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.allGoals = this.userGoalsDetails.goals;
     this.allUserGoals = this.userGoalsDetails.usergoals;
 
-    if (this.userAccountsDetails.accounts.length > 1) {
-      this.listValue.push(['All', true]);
-    }
+    // if (this.userAccountsDetails.accounts.length > 1) {
+    //   this.listValue.push(['All', true]);
+    // }
 
     for (let account of this.userAccountsDetails.accounts) {
       this.listValue.push([account.institutionName, account.itemValid]);
@@ -255,18 +255,14 @@ export class HomeComponent implements OnInit, AfterViewInit {
             this.parsedTransactions.push(newTransaction);
           }
           console.log("Parsed transactions: "+ this.parsedTransactions);
-          this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
-            console.log("yup")
-            this.selectionList.deselectAll();
-            console.log(s);
-            s.option.selected = true;
-          });
+          // this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
+          //   console.log("yup")
+          //   this.selectionList.deselectAll();
+          //   console.log(s);
+          //   s.option.selected = true;
+          // });
           this.getTopBudgets();
         });
-        // this.preSelection.push(this.currentAccountName)
-        // console.log(this.preSelection);
-        // this.marginVal = '10';
-        // this.borderVal = '1px solid rgb(209, 209, 209)';
       })
     }
     else {
@@ -277,12 +273,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
       // this.isLoading = false;
 
       // this.firstLoad = false;
-      this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
-        console.log("yup")
-        this.selectionList.deselectAll();
-        console.log(s);
-        s.option.selected = true;
-      });
+      // this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
+      //   console.log("yup")
+      //   this.selectionList.deselectAll();
+      //   console.log(s);
+      //   s.option.selected = true;
+      // });
     }
 
 
@@ -529,8 +525,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
               this.getTopBudgets();
             });
 
-          this.preSelection = [];// need to delete and then add
-          this.preSelection.push(this.currentAccountName)  
+          // this.preSelection = [];// need to delete and then add
+          // this.preSelection.push(this.currentAccountName)  
           console.log(this.listValue);
           console.log(this.preSelection);
         });

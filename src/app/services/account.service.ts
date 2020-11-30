@@ -89,10 +89,23 @@ export class AccountService {
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
-  getCurrentAccount() {
-    return this.http.get<Account>(baseURL + 'plaid/accounts?current=true');
+  getCurrentAccounts() {
+    return this.http.get<Account[]>(baseURL + 'plaid/accounts?current=true');
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
+
+  // addUserGoals(userGoalDatas, userId) {
+  //   console.log("adding multiple user goals")
+  //   console.log(userGoalDatas)
+  //   let addObservables: Observable<any>[] = [];
+  //   for (let userGoalData of userGoalDatas) {
+  //     addObservables.push(this.addUserGoal(userGoalData, userId))
+  //   }
+  //   if (addObservables.length == 0) {
+  //     return of(null)
+  //   }
+  //   return forkJoin(addObservables)
+  // }
 
   // updateCurrentAccount(cancelId: string, assignId: string) {
   //   return this.http.put(baseURL + 'plaid/accounts/' + cancelId, {current: false})

@@ -35,7 +35,7 @@ export class LoginComponent implements OnInit {
   everyAllUserGoals = [];
   accountIds: any;
   accountsData: Account[];
-  currentAccount: Account;
+  currentAccounts: Account[];
 
   constructor(private fb: FormBuilder,
     private router: Router,
@@ -128,15 +128,15 @@ export class LoginComponent implements OnInit {
                 this.accountIds.push(account._id);
               }
               console.log(this.accountIds)
-              this.accountService.getCurrentAccount()
+              this.accountService.getCurrentAccounts()
               .pipe(
-                mergeMap(currAccount => {
+                mergeMap(currAccounts => {
                     console.log("AAAAAAAA")
-                    console.log(currAccount)
-                    if (currAccount[0] != null) {
-                      this.currAccountId = currAccount[0]._id;
+                    console.log(currAccounts)
+                    this.currentAccounts = []
+                    if (currAccounts.length > 0) {
+                      this.currentAccounts = currAccounts
                     }
-                    // this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: res.accountsData, ids: accountIds});
                     console.log("BBBBBBBB")
                     return this.goalService.getGoals()
                 }),
@@ -144,34 +144,18 @@ export class LoginComponent implements OnInit {
                     console.log("CCCCCCCC")
                     this.allGoals = goalResponse.goals;
                     console.log(this.allGoals)
-                    let accountObservables: Observable<UserGoalResponse>[] = [];
                     this.userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
                     console.log(this.userId)
-                    for (let account of res.accountsData) {
-                      if (this.currAccountId != null && account._id == this.currAccountId) {
-                        accountObservables.push(this.goalService.getUserGoals(this.userId))
-                      } 
-                    }
-                    if (accountObservables.length == 0) {
-                      console.log("no accounts")
-                      // return of("no accounts")
-                      accountObservables.push(this.goalService.getUserGoals(this.userId))
-                      return forkJoin(accountObservables)
-                      // this._ngZone.run(() => this.router.navigate(['/home']));
-                    }
-                    else {
-                      console.log("DDDDDDDD")
-                      return forkJoin(accountObservables)
-                    }
+                    console.log("DDDDDDDD")
+                    return this.goalService.getUserGoals(this.userId)
                 }),
                 mergeMap(usergoalResponse => {
                     console.log("EEEEEEEE")
                     console.log(usergoalResponse)
-                    let goalObservables: Observable<any>[] = [];
-                    for (let res of usergoalResponse) {
-                      this.everyAllUserGoals.push(res.usergoals);
-                    }
-                    this.allUserGoals = usergoalResponse[0].usergoals;
+                    // for (let res of usergoalResponse) {
+                    //   this.everyAllUserGoals.push(res.usergoals);
+                    // }
+                    this.allUserGoals = usergoalResponse.usergoals;
                     var userGoalDatas = []
                     for (let goal of this.allGoals) {
                       var found = false;
@@ -190,46 +174,31 @@ export class LoginComponent implements OnInit {
                       }
                     }
                     console.log(userGoalDatas)
-                    goalObservables.push(this.goalService.addUserGoals(userGoalDatas, this.userId))
                     console.log("FFFFFFFF")
-                    console.log(goalObservables)
-                    return forkJoin(goalObservables)
+                    return this.goalService.addUserGoals(userGoalDatas, this.userId)
                 }),
                 mergeMap(addedGoalsResponse => { // arrays of addUserGoal responses
                     console.log("GGGGGGGG")  
-                    var index = 0
                     console.log(addedGoalsResponse)
-                    let finalUpdateObservables: Observable<any>[] = [];
-                    for (let allUserGoals of this.everyAllUserGoals) {
-                      if (addedGoalsResponse[index] != null) { // need to return null if empty inside addUserGoals
-                        console.log("added new goals (res not null)")
-                        for (let usergoal of addedGoalsResponse[index]) {
-                          allUserGoals.push(usergoal.usergoals);
-                        }
+                    if (addedGoalsResponse != null) { // need to return null if empty inside addUserGoals
+                      console.log("added new goals (res not null)")
+                      for (let usergoal of addedGoalsResponse) {
+                        this.allUserGoals.push(usergoal.usergoals);
                       }
-                      // for (let usergoal of addedGoalsResponse) {
-                      //   allUserGoals.push(usergoal.usergoals);
-                      // }
-                      finalUpdateObservables.push(this.goalService.checkAndUpdateUserGoals(this.accountIds, this.allGoals, allUserGoals))
                     }
-                    // if (finalUpdateObservables.length == 0) { // only happens when first creating account
-                    //   return of(null)
-                    // }
-                    // else {
                     console.log("HHHHHHHH")
-                    return forkJoin(finalUpdateObservables)
-                    // }
+                    return this.goalService.checkAndUpdateUserGoals(this.accountIds, this.allGoals, this.allUserGoals)
                 }),
                 mergeMap(checkRes => {
                   console.log("IIIIIIII")
-                  if (checkRes == null) {
-                    return of(null)
-                  }
+                  // if (checkRes == null) { // won't happen?
+                  //   return of(null)
+                  // }
                   var index = 0;
                   let itemValidObservables: Observable<any>[] = [];
                   var foundInvalid = false;
                   console.log(checkRes)
-                  for (let res of checkRes[0]) {
+                  for (let res of checkRes) {
                     console.log(res)
                     if (res == "item invalid") { //item invalid
                       foundInvalid = true;
@@ -261,14 +230,14 @@ export class LoginComponent implements OnInit {
                     index += 1
                   }
                 }
-                for (let account of this.accountsData) {
-                  if (account.current == true) {
-                    // this.authService.storeUserGoalsDetails({usergoals: this.everyAllUserGoals[index]});
-                    this.currentAccount = account
-                  }
-                }
-                this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.everyAllUserGoals[0]});
-                this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accountsData, ids: this.accountIds});
+                // for (let account of this.accountsData) {
+                //   if (account.current == true) {
+                //     // this.authService.storeUserGoalsDetails({usergoals: this.everyAllUserGoals[index]});
+                //     this.currentAccount = account
+                //   }
+                // }
+                this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals});
+                this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                 this.router.navigate(['/home']);
               })
           }
@@ -305,15 +274,15 @@ export class LoginComponent implements OnInit {
                         this.accountIds.push(account._id);
                       }
                       console.log(this.accountIds)
-                      this.accountService.getCurrentAccount()
+                      this.accountService.getCurrentAccounts()
                       .pipe(
-                        mergeMap(currAccount => {
+                        mergeMap(currAccounts => {
                             console.log("AAAAAAAA")
-                            console.log(currAccount)
-                            if (currAccount[0] != null) {
-                              this.currAccountId = currAccount[0]._id;
+                            console.log(currAccounts)
+                            this.currentAccounts = []
+                            if (currAccounts.length > 0) {
+                              this.currentAccounts = currAccounts
                             }
-                            // this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: res.accountsData, ids: accountIds});
                             console.log("BBBBBBBB")
                             return this.goalService.getGoals()
                         }),
@@ -321,34 +290,18 @@ export class LoginComponent implements OnInit {
                             console.log("CCCCCCCC")
                             this.allGoals = goalResponse.goals;
                             console.log(this.allGoals)
-                            let accountObservables: Observable<UserGoalResponse>[] = [];
                             this.userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
                             console.log(this.userId)
-                            for (let account of res.accountsData) {
-                              if (this.currAccountId != null && account._id == this.currAccountId) {
-                                accountObservables.push(this.goalService.getUserGoals(this.userId))
-                              } 
-                            }
-                            if (accountObservables.length == 0) {
-                              console.log("no accounts")
-                              // return of("no accounts")
-                              accountObservables.push(this.goalService.getUserGoals(this.userId))
-                              return forkJoin(accountObservables)
-                              // this._ngZone.run(() => this.router.navigate(['/home']));
-                            }
-                            else {
-                              console.log("DDDDDDDD")
-                              return forkJoin(accountObservables)
-                            }
+                            console.log("DDDDDDDD")
+                            return this.goalService.getUserGoals(this.userId)
                         }),
                         mergeMap(usergoalResponse => {
                             console.log("EEEEEEEE")
                             console.log(usergoalResponse)
-                            let goalObservables: Observable<any>[] = [];
-                            for (let res of usergoalResponse) {
-                              this.everyAllUserGoals.push(res.usergoals);
-                            }
-                            this.allUserGoals = usergoalResponse[0].usergoals;
+                            // for (let res of usergoalResponse) {
+                            //   this.everyAllUserGoals.push(res.usergoals);
+                            // }
+                            this.allUserGoals = usergoalResponse.usergoals;
                             var userGoalDatas = []
                             for (let goal of this.allGoals) {
                               var found = false;
@@ -367,46 +320,31 @@ export class LoginComponent implements OnInit {
                               }
                             }
                             console.log(userGoalDatas)
-                            goalObservables.push(this.goalService.addUserGoals(userGoalDatas, this.userId))
                             console.log("FFFFFFFF")
-                            console.log(goalObservables)
-                            return forkJoin(goalObservables)
+                            return this.goalService.addUserGoals(userGoalDatas, this.userId)
                         }),
                         mergeMap(addedGoalsResponse => { // arrays of addUserGoal responses
                             console.log("GGGGGGGG")  
-                            var index = 0
                             console.log(addedGoalsResponse)
-                            let finalUpdateObservables: Observable<any>[] = [];
-                            for (let allUserGoals of this.everyAllUserGoals) {
-                              if (addedGoalsResponse[index] != null) { // need to return null if empty inside addUserGoals
-                                console.log("added new goals (res not null)")
-                                for (let usergoal of addedGoalsResponse[index]) {
-                                  allUserGoals.push(usergoal.usergoals);
-                                }
+                            if (addedGoalsResponse != null) { // need to return null if empty inside addUserGoals
+                              console.log("added new goals (res not null)")
+                              for (let usergoal of addedGoalsResponse) {
+                                this.allUserGoals.push(usergoal.usergoals);
                               }
-                              // for (let usergoal of addedGoalsResponse) {
-                              //   allUserGoals.push(usergoal.usergoals);
-                              // }
-                              finalUpdateObservables.push(this.goalService.checkAndUpdateUserGoals(this.accountIds, this.allGoals, allUserGoals))
                             }
-                            // if (finalUpdateObservables.length == 0) { // only happens when first creating account
-                            //   return of(null)
-                            // }
-                            // else {
                             console.log("HHHHHHHH")
-                            return forkJoin(finalUpdateObservables)
-                            // }
+                            return this.goalService.checkAndUpdateUserGoals(this.accountIds, this.allGoals, this.allUserGoals)
                         }),
                         mergeMap(checkRes => {
                           console.log("IIIIIIII")
-                          if (checkRes == null) {
-                            return of(null)
-                          }
+                          // if (checkRes == null) { // won't happen?
+                          //   return of(null)
+                          // }
                           var index = 0;
                           let itemValidObservables: Observable<any>[] = [];
                           var foundInvalid = false;
                           console.log(checkRes)
-                          for (let res of checkRes[0]) {
+                          for (let res of checkRes) {
                             console.log(res)
                             if (res == "item invalid") { //item invalid
                               foundInvalid = true;
@@ -438,14 +376,14 @@ export class LoginComponent implements OnInit {
                             index += 1
                           }
                         }
-                        for (let account of this.accountsData) {
-                          if (account.current == true) {
-                            // this.authService.storeUserGoalsDetails({usergoals: this.everyAllUserGoals[index]});
-                            this.currentAccount = account
-                          }
-                        }
-                        this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.everyAllUserGoals[0]});
-                        this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accountsData, ids: this.accountIds});
+                        // for (let account of this.accountsData) {
+                        //   if (account.current == true) {
+                        //     // this.authService.storeUserGoalsDetails({usergoals: this.everyAllUserGoals[index]});
+                        //     this.currentAccount = account
+                        //   }
+                        // }
+                        this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals});
+                        this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                         this._ngZone.run(() => this.router.navigate(['/home']));
                       })
                   }
