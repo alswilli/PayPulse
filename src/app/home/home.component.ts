@@ -147,6 +147,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
     this.allGoals = this.userGoalsDetails.goals;
     this.allUserGoals = this.userGoalsDetails.usergoals;
 
+    if (this.userAccountsDetails.accounts.length > 1) {
+      this.listValue.push(['All', true]);
+    }
+
     for (let account of this.userAccountsDetails.accounts) {
       this.listValue.push([account.institutionName, account.itemValid]);
       this.updatePlaidLinkHandlers.push(null)
