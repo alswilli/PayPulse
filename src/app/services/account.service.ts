@@ -119,7 +119,7 @@ export class AccountService {
   //     }),
   //       catchError(this.processHTTPMsgService.handleError));
   // }
-  updateCurrentAccount(accountId: string, update: object) {
+  updateCurrentAccounts(accountId: string, update: object) {
     return this.http.put(baseURL + 'plaid/accounts/' + accountId, update);
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }

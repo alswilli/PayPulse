@@ -14,7 +14,7 @@
         <!-- <mat-selection-list formControlName="myOtherControl"> -->
         <mat-spinner *ngIf="firstLoad" style="margin: auto"></mat-spinner>
         <mat-selection-list *ngIf="!firstLoad" style="margin:10px;">
-          <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index" (click)="onAccountChanged($event, list);" 
+          <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index" (click)="onAccountSelected($event, list);" 
           [selected]="preSelection.indexOf(list[0]) > -1" [value]="list" [disabled]="removeAccounts || !list[1]">
             <div fxFlex fxLayout="row">
               <div *ngIf="removeAccounts">
@@ -110,6 +110,7 @@
                     <p>No recent transactions in the last 30 days!</p>
                   </div>
                   <p *ngFor="let recentData of parsedTransactions">
+                    <span><b>Main Account Name:</b> {{recentData.mainAccountName}} </span>
                     <span><b>Sub Account Name:</b> {{recentData.accountName}} </span>
                     <span><b>Amount:</b> {{recentData.amount}} </span>
                     <span><b>Transaction Name:</b> {{recentData.transactionName}} </span>

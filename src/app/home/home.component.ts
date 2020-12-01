@@ -31,7 +31,7 @@ import { UserGoal } from '../shared/usergoal';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit, AfterViewInit {
+export class HomeComponent implements OnInit {
 
   @ViewChild(MatSelectionList) selectionList: MatSelectionList;
 
@@ -253,9 +253,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
             };
             this.parsedTransactions.push(newTransaction);
           }
-          // this.parsedTransactions.forEach(element => {
-          //   console.log(element);
-          // });
+          this.parsedTransactions.sort(this.compareTransactions)
+          if (this.parsedTransactions.length > 3) {
+            this.parsedTransactions = this.parsedTransactions.slice(0, 3)
+          }
+          this.parsedTransactions.forEach(element => {
+            console.log(element);
+          });
           // this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
           //   console.log("yup")
           //   this.selectionList.deselectAll();
@@ -281,8 +285,13 @@ export class HomeComponent implements OnInit, AfterViewInit {
       //   s.option.selected = true;
       // });
     }
+  }
 
-
+  compareTransactions(a,b) {
+    if (new Date(a.date) >= new Date(b.date)) //push more recent dates to front
+       return -1;
+    if (new Date(a.date) < new Date(b.date)) //if equal then use one that is further down user goals list
+      return 1;
   }
 
   getTopBudgets() {
@@ -328,6 +337,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
       })
     )
     .subscribe(transactionsArray => {
+      this.transactions = []
       for (let transactions of transactionsArray) {
         if (transactions != null) {
           for (let transaction of transactions) {
@@ -415,7 +425,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     console.log("Top 3 Budgets: ", this.top3Budgets)
   }
 
-  compare(a,b) {
+  compareGoals(a,b) {
     if (a.dateLastAchieved >= b.dateLastAchieved) //push more recent dates to front
        return -1;
     if (a.dateLastAchieved < b.dateLastAchieved) //if equal then use one that is further down user goals list
@@ -423,6 +433,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
   }
 
   getRandomCompletedGoals() {
+    this.recentlyCompletedUserGoals = []
+    this.recentlyCompletedGoals = []
     var today = new Date()
     var priorDate = new Date(new Date().setDate(today.getDate()-30))
     console.log(priorDate)
@@ -431,9 +443,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.recentlyCompletedUserGoals.push(usergoal)
       }
     }
-    this.recentlyCompletedUserGoals.sort(this.compare);
+    this.recentlyCompletedUserGoals.sort(this.compareGoals);
     if (this.recentlyCompletedUserGoals.length > 3) {
-      this.recentlyCompletedUserGoals = this.recentlyCompletedUserGoals.slice(2)
+      this.recentlyCompletedUserGoals = this.recentlyCompletedUserGoals.slice(0, 3)
     }
     console.log(this.recentlyCompletedUserGoals)
     for (let usergoal of this.recentlyCompletedUserGoals) {
@@ -446,81 +458,102 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
   }
 
-  onAccountChanged(event, listItem) {
+  onAccountSelected(event, listItem) {
     var accountName = listItem[0]
     var valid = listItem[1]
     if (!this.removeAccounts && valid) {
       console.log(accountName);
-      this.currentAccountName = accountName;
-      this.isLoading = true;
-      var nextId;
-      for (let account of this.userAccountsDetails.accounts) {
-        console.log(account)
-        if (account.institutionName === accountName) {
-          nextId = account._id;
-          break;
-        } 
+      var found = false
+      var index = 0
+      for (let account of this.currentAccounts) {
+        if (accountName == account.institutionName) {
+          found = true
+          break
+        }
+        index += 1
       }
-      console.log("Next Id: ", nextId);
+      this.isLoading = true;
       // Need to change current attributes on backend 
-      var update = {current: false};
-      this.accountService.updateCurrentAccount(this.currentAccountId, update)
-        .pipe(
-          mergeMap((account) => {
-            var update = {current: true};
-            return this.accountService.updateCurrentAccount(nextId, update)
-          })
-        )
-        .subscribe(account => {
-          this.currentAccount = account;
-          console.log(this.accounts);
-          // Make old current account = false
-          for (let account of this.accounts) {
-            if (account.current === true) {
-              account.current = false;
-              console.log(account)
-              break;
-            } 
+      var update = {};
+      if (found) {
+        update['current'] = false;
+      }
+      else{
+        update['current'] = true;
+      }
+      var accountId = null
+      var accountsIndex = 0
+      }
+      for (let account of this.accounts) {
+        if (accountName == account.institutionName) {
+          accountId = account._id
+          break
+        }
+        accountsIndex += 1
+      }
+      this.accountService.updateCurrentAccounts(accountId, update)
+        .pipe(mergeMap(account => {
+          // Update everything accordingly
+          if (found) {
+            this.preSelection.splice(index, 1)
+            this.currentAccountNames.splice(index, 1)
+            this.currentAccountIds.splice(index, 1)
+            this.currentAccounts.splice(index, 1)
+            this.accounts[accountsIndex].current = false
           }
-          // Make new current account = true
-          for (let account of this.accounts) {
-            if (account.institutionName === this.currentAccount.institutionName) {
-              account.current = true;
-              console.log(account)
-              break;
-            } 
+          else {
+            this.preSelection.push(accountName)
+            this.currentAccountNames.push(accountName);
+            this.currentAccountIds.push(this.accounts[accountsIndex]._id);
+            this.accounts[accountsIndex].current = true
+            this.currentAccounts.push(this.accounts[accountsIndex]);
           }
           console.log("Updated accounts: ", this.accounts)
-          this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accounts, ids: this.userAccountsIds});
+          console.log("Updated current accounts: ", this.currentAccounts)
+          this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accounts, ids: this.userAccountsIds});
           this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details')); // needs to be setItem instead
           console.log(this.userAccountsDetails)
-          this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
-          this.currentAccountName = this.userAccountsDetails.currentAccount[0].institutionName;
-          console.log(this.currentAccountId); 
-          console.log(this.currentAccountName);
 
+          let accountObservables: Observable<any>[] = [];
+          for (let currAccount of this.currentAccounts) {
+            accountObservables.push(this.accountService.getRecentTransactions(currAccount._id, this.days, this.subdays))
+          }
+          return forkJoin(accountObservables)
+        }))
           // Now get the currentAccount transactions
-          this.accountService.getRecentTransactions(this.currentAccountId, this.days, this.subdays)
-            .subscribe(transactions => {
+            .subscribe(transactionsArray => {
+              console.log(transactionsArray)
               // this.isLoading = false;
-              this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
-              this.recentTransactions.forEach(element => {
-                console.log(element);
-              });
-              var currAccountName;
+              // this.firstLoad = false;
+              console.log("Inside Transactions")
+              this.recentTransactions = []
+              for (let transactions of transactionsArray) {
+                if (transactions != null) {
+                  for (let transaction of transactions) {
+                    this.recentTransactions.push(transaction)
+                  }
+                }
+              } 
+              // this.recentTransactions.forEach(element => {
+              //   console.log(element);
+              // });
               this.parsedTransactions = [];
-              console.log("AHH: ", this.currentAccount)
               for (let entry of this.recentTransactions) {
+                var currAccountName = null;
+                var currMainAccountName = null;
                 // Translate account_id to account name
-                console.log(entry.account_id)
-                for (let account of this.userAccountsDetails.currentAccount) { // this part needs to be different
-                  console.log(account)
+                var found = false
+                for (let account of this.currentAccounts) {
                   for (let subAcc of account.subAccounts) {
                     if (subAcc.account_id === entry.account_id) {
-                      console.log("FOUND A MATCH")
                       currAccountName = subAcc.name;
+                      found = true
                       break;
                     }
+                  }
+                  if (found) {
+                    currMainAccountName = account.institutionName;
+                    break;
                   }
                 }
                 const newTransaction = {
@@ -528,20 +561,17 @@ export class HomeComponent implements OnInit, AfterViewInit {
                   transactionName: entry.transactionName,
                   category: entry.category,
                   date: entry.date,
-                  accountName: currAccountName
+                  accountName: currAccountName,
+                  mainAccountName: currMainAccountName
                 };
                 this.parsedTransactions.push(newTransaction);
               }
-              console.log("Parsed transactions: "+ this.parsedTransactions);
+              this.parsedTransactions.sort(this.compareTransactions)
+              if (this.parsedTransactions.length > 3) {
+                this.parsedTransactions = this.parsedTransactions.slice(0, 3)
+              }
               this.getTopBudgets();
             });
-
-          // this.preSelection = [];// need to delete and then add
-          // this.preSelection.push(this.currentAccountName)  
-          console.log(this.listValue);
-          console.log(this.preSelection);
-        });
-    }
   }
 
   onAddedAccount() {
@@ -842,69 +872,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
   onPlaidClick(event) {
     // Do something when the button is clicked.
     console.log("Plaid click event: " + event);
-  }
-
-  // fetchPublicToken() {
-  //   console.log("fetching public token")
-  //   this.accountService.getItemPublicToken().subscribe(res => {
-  //     var publicToken = res.public_token;
-  //     console.log(publicToken)
-  //     // return publicToken
-  //   })
-  // }
-
-  // fetchLinkToken() {
-  //   console.log("fetching link token")
-  //   var userId = JSON.parse(localStorage.getItem('JWT'))["userId"]
-  //   console.log(userId)
-  //   var data = {userId: userId}
-  //   this.accountService.getItemLinkToken(data).subscribe(res => {
-  //     var linkToken = res.link_token;
-  //     console.log("Link Token: ", linkToken)
-  //     this.linkToken = linkToken;
-  //     return this.linkToken;
-  //   })
-  // }
-
-  // Create and open programatically once the library is loaded.
-  ngAfterViewInit() {
-    // console.log("SFHWEAFAFJAF", this.currentAccount)
-    // if (!this.currentAccount.itemValid) {
-    //   this.updateItem = true;
-    //   console.log("Need to update item")
-    //   this.accountService.getItemPublicToken(this.currentAccountId).subscribe(res => {
-    //     var publicToken = res.public_token;
-    //     console.log("Public Token: ", publicToken)
-    //     this.publicToken = publicToken;
-    //     this.updateConfig.token = this.publicToken;
-    //     console.log(this.updateConfig)
-    //     this.plaidLinkService
-    //     .createPlaid(
-    //       Object.assign({}, this.updateConfig, {
-    //         onSuccess: (token, metadata) => this.onUpdateSuccess(token, metadata),
-    //         onExit: (error, metadata) => this.onUpdateExit(error, metadata),
-    //         onEvent: (eventName, metadata) => this.onUpdateEvent(eventName, metadata)
-    //       })
-    //     )
-    //     .then((handler: PlaidLinkHandler) => {
-    //       this.updatePlaidLinkHandler = handler;
-    //       this.updateOpen();
-    //     });
-    //   })
-    // }
-
-    // this.plaidLinkService
-    //   .createPlaid(
-    //     Object.assign({}, this.config, {
-    //       onSuccess: (token, metadata) => this.onSuccess(token, metadata),
-    //       onExit: (error, metadata) => this.onExit(error, metadata),
-    //       onEvent: (eventName, metadata) => this.onEvent(eventName, metadata)
-    //     })
-    //   )
-    //   .then((handler: PlaidLinkHandler) => {
-    //     this.plaidLinkHandler = handler;
-    //     // this.open();
-    //   });
   }
 
   open() {
