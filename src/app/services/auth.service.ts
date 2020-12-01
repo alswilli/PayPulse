@@ -47,6 +47,7 @@ export class AuthService {
   tokenKey = 'JWT';
   accountsKey = 'User Accounts Details';
   isAuthenticated: Boolean = false;
+  isUpdating: Boolean = false;
   username: Subject<string> = new Subject<string>();
   tokenTimer: Subject<number> = new Subject<number>();
   // tokenTimer: any;
@@ -227,6 +228,18 @@ export class AuthService {
    isLoggedIn(): Boolean {
      return this.isAuthenticated;
    }
+
+   nowUpdatingBackend() {
+    this.isUpdating = true;
+  }
+
+   doneUpdatingBackend() {
+    this.isUpdating = false;
+  }
+
+   isUpdatingBackend(): Boolean {
+    return this.isUpdating;
+  }
 
    getUsername(): Observable<string> {
      return this.username.asObservable();

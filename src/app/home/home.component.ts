@@ -356,6 +356,7 @@ export class HomeComponent implements OnInit {
       this.getTop3Budgets();
       this.getRandomCompletedGoals();
       this.isLoading = false;
+      this.authService.doneUpdatingBackend();
     });
     // else {
     //   this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays)
@@ -480,6 +481,7 @@ export class HomeComponent implements OnInit {
         index += 1
       }
       this.isLoading = true;
+      this.authService.nowUpdatingBackend();
       // Need to change current attributes on backend 
       var update = {};
       if (found) {
@@ -658,128 +660,47 @@ export class HomeComponent implements OnInit {
     deleteAccountRef.componentInstance.onDelete
       .subscribe(result => {
         console.log(result);
-        // Delete account from listValue array 
-        var index = this.listValue.indexOf([result.institutionName, true], 0);
-        if (index == -1) {
-          index = this.listValue.indexOf([result.institutionName, false], 0);
+        // Delete account from all the arrays 
+        var index = 0
+        for (let account of this.accounts) {
+          if (account.institutionName == result.institutionName) {
+            break
+          }
+          index += 1
         }
-        if (index > -1) {
-          this.listValue.splice(index, 1);
+        this.listValue.splice(index, 1);
+        this.accounts.splice(index, 1);
+        this.userAccountsIds.splice(index, 1);
+        if (result.current) {
+          var currIndex = 0
+          for (let currAccount of this.currentAccounts) {
+            if (currAccount.institutionName == result.institutionName) {
+              break
+            }
+            currIndex += 1
+          }
+          this.currentAccounts.splice(currIndex, 1);
+          this.currentAccountNames.splice(currIndex, 1);
+          this.currentAccountIds.splice(currIndex, 1);
+          this.preSelection.splice(currIndex, 1);
         }
+        localStorage.setItem('User Accounts Details', JSON.stringify({currentAccounts: this.currentAccounts, accounts: this.accounts, ids: this.userAccountsIds}));
+        this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
+        this.onRemoveAccountClicked()
         // Close dialogue ref
         deleteAccountRef.close();
 
         // Update current account as needed (updates localStorage in the process)
-        if (this.listValue.length > 0 && result.current) {
-          // this.onAccountChanged(this.listValue[0]) // current becomes one at the top
-          this.isLoading = true;
-          var accountIndex = 0;
-          for (let account of this.accounts) {
-            if (account.institutionName === result.institutionName) {
-              break;
-            } 
-            accountIndex++;
-          } 
-          // Delete old current from account local array
-          if (accountIndex > -1) {
-            this.accounts.splice(accountIndex, 1);
-          }
-          // Delete account from userAccountsIds array 
-          const accountIdIndex = this.userAccountsIds.indexOf(result._id, 0);
-          if (accountIdIndex > -1) {
-            this.userAccountsIds.splice(accountIdIndex, 1);
-          }
-          // Get new account id
-          var newAccountID = this.userAccountsIds[0];
-
-          this.accountService.updateCurrentAccount(newAccountID, {current: true})
-            .subscribe(account => {
-            this.currentAccount = account;
-            console.log(this.accounts);
-            // Make new current account = true
-            for (let account of this.accounts) {
-              if (account.institutionName === this.currentAccount.institutionName) {
-                account.current = true;
-                console.log(account)
-                break;
-              } 
-            }
-            console.log("Updated accounts: ", this.accounts)
-            this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accounts, ids: this.userAccountsIds});
-            this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details')); // needs to be setItem instead
-            console.log(this.userAccountsDetails)
-            this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
-            this.currentAccountName = this.userAccountsDetails.currentAccount[0].institutionName;
-            console.log(this.currentAccountId); 
-            this.preSelection = [];// need to delete and then add
-            this.preSelection.push(this.currentAccountName)  
-
-            // Now get the currentAccount transactions
-            this.accountService.getRecentTransactions(this.currentAccountId, this.days, this.subdays)
-              .subscribe(transactions => {
-                // this.isLoading = false;
-                this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
-                this.recentTransactions.forEach(element => {
-                  console.log(element);
-                });
-                var currAccountName;
-                this.parsedTransactions = [];
-                for (let entry of this.recentTransactions) {
-                  // Translate account_id to account name
-                  for (let account of this.userAccountsDetails.currentAccount) {
-                    for (let subAcc of account.subAccounts) {
-                      if (subAcc.account_id === entry.account_id) {
-                        currAccountName = subAcc.name;
-                        break;
-                      }
-                    }
-                  }
-                  const newTransaction = {
-                    amount: entry.amount,
-                    transactionName: entry.transactionName,
-                    category: entry.category,
-                    date: entry.date,
-                    accountName: currAccountName
-                  };
-                  this.parsedTransactions.push(newTransaction);
-                  this.getTopBudgets();
-                }
-                console.log("Parsed transactions: "+ this.parsedTransactions);
-              });
-            });
-        }
-        else if (this.listValue.length > 0) {
-          // Delete account from accounts array
-          var accountIndex = 0;
-          for (let account of this.accounts) {
-            if (account.institutionName === result.institutionName) {
-              break;
-            } 
-            accountIndex++;
-          } 
-          // const accountIndex = this.accounts.indexOf(result, 0);
-          if (accountIndex > -1) {
-            this.accounts.splice(accountIndex, 1);
-          } 
-
-          // Delete account from userAccountsIds array 
-          const accountIdIndex = this.userAccountsIds.indexOf(result._id, 0);
-          if (accountIdIndex > -1) {
-            this.userAccountsIds.splice(accountIdIndex, 1);
-          }
-          console.log(this.accounts)
-          console.log(this.userAccountsIds)
-          this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accounts, ids: this.userAccountsIds});
-          this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
-          console.log(this.userAccountsDetails)
-        }
-        else if (this.listValue.length === 0) { 
-          localStorage.setItem('User Accounts Details', JSON.stringify({currentAccount: [], accounts: [], ids: []}));
-          this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
-          // this.onRemoveAccountClicked();
-          this.removeAccounts = !this.removeAccounts;
+        if (this.listValue.length === 0) { 
+          // this.removeAccounts = !this.removeAccounts;
           this.marginVal = '0';
           this.borderVal = '';
+        }
+        else if (this.listValue.length > 0 && result.current) {
+          // this.onAccountChanged(this.listValue[0]) // current becomes one at the top
+          this.isLoading = true; 
+          this.authService.nowUpdatingBackend();
+          this.onAddedAccount();
         }
     });
   }
@@ -907,6 +828,7 @@ export class HomeComponent implements OnInit {
       console.log(this.userAccountsDetails)
 
       this.isLoading = true;
+      this.authService.nowUpdatingBackend();
       this.fullLoad = false;
       this.marginVal = '10';
       this.borderVal = '1px solid rgb(209, 209, 209)';
@@ -921,7 +843,6 @@ export class HomeComponent implements OnInit {
   onEvent(eventName, metadata) {
     console.log("We got an event:", eventName);
     console.log("We got metadata:", metadata);
-    if (eventName)
   }
 
   onExit(error, metadata) {

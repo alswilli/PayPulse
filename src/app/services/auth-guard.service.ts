@@ -13,6 +13,9 @@ export class AuthGuardService implements CanActivate {
       this.router.navigate(['login']); 
       return false;
     }
+    if (this.auth.isUpdatingBackend()) {
+      return false;
+    }
     return true;
   }
 }
