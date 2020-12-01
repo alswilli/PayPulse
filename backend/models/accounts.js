@@ -32,7 +32,7 @@ const AccountSchema = new Schema({
     },
     current: {
         type: Boolean,
-        default: false
+        default: true
     },
     subAccounts: {
         type: Object

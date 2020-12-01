@@ -129,6 +129,12 @@ export class HomeComponent implements OnInit {
 
     this.accounts = this.userAccountsDetails.accounts;
     this.currentAccounts = this.userAccountsDetails.currentAccounts;
+    for (let account of this.currentAccounts) {
+      this.currentAccountIds.push(account._id);
+      this.currentAccountNames.push(account.institutionName)
+      this.preSelection.push(account.institutionName)
+    }
+    console.log(this.preSelection);
 
     for (let account of this.accounts) {
       this.listValue.push([account.institutionName, account.itemValid]);
@@ -138,12 +144,7 @@ export class HomeComponent implements OnInit {
     console.log("List Value: ", this.listValue);
     console.log("Current Accounts: ", this.currentAccounts);
 
-    if (this.listValue.length > 0 && this.currentAccounts.length > 0) {
-      for (let account of this.currentAccounts) {
-        this.currentAccountIds.push(account._id);
-        this.currentAccountNames.push(account.institutionName)
-        this.preSelection.push(account.institutionName)
-      } 
+    if (this.listValue.length > 0 && this.currentAccounts.length > 0) { 
       console.log(this.preSelection);
       this.marginVal = '10';
       this.borderVal = '1px solid rgb(209, 209, 209)';
@@ -269,9 +270,15 @@ export class HomeComponent implements OnInit {
           this.getTopBudgets();
         });
     }
+    else if(this.listValue.length > 0 && this.currentAccounts.length == 0) {
+      console.log("no currrent accounts")
+      this.marginVal = '10';
+      this.borderVal = '1px solid rgb(209, 209, 209)';
+      this.isLoading = false;
+    }
     else {
       // May need something here later
-      console.log("no current accounts")
+      console.log("no accounts")
       this.marginVal = '0';
       this.borderVal = '';
       // this.fetchLinkToken();
@@ -461,7 +468,7 @@ export class HomeComponent implements OnInit {
   onAccountSelected(event, listItem) {
     var accountName = listItem[0]
     var valid = listItem[1]
-    if (!this.removeAccounts && valid) {
+    if (!this.removeAccounts && valid && !this.isLoading) {
       console.log(accountName);
       var found = false
       var index = 0
@@ -483,7 +490,6 @@ export class HomeComponent implements OnInit {
       }
       var accountId = null
       var accountsIndex = 0
-      }
       for (let account of this.accounts) {
         if (accountName == account.institutionName) {
           accountId = account._id
@@ -572,86 +578,67 @@ export class HomeComponent implements OnInit {
               }
               this.getTopBudgets();
             });
+          }
   }
 
   onAddedAccount() {
-    this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
-    console.log(this.userAccountsDetails)
-
-    if (this.listValue.length === 0) {
-      this.isLoading = true;
-      this.fullLoad = false;
-      this.marginVal = '10';
-      this.borderVal = '1px solid rgb(209, 209, 209)';
-
-      for (let account of this.userAccountsDetails.accounts) {
-        var valid = true;
-        if (account.current && !this.userAccountsDetails.currentAccount[0].itemValid){
-          valid = false;
-        }
-        this.listValue.push([account.institutionName, valid]);
-      }
-  
-      console.log("List Value: ", this.listValue);
-
-      this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
-      this.currentAccountName = this.userAccountsDetails.currentAccount[0].institutionName;
-      this.currentAccount = this.userAccountsDetails.currentAccount[0];
-      this.accounts = this.userAccountsDetails.accounts;
-      this.userAccountsIds = this.userAccountsDetails.ids
-      console.log("Current Account Id: ", this.currentAccountId); 
-      console.log("All Accounts: ", this.accounts);
-
-      // Now get the currentAccount transactions
-      this.accountService.getRecentTransactions(this.currentAccountId, this.days, this.subdays)
-        .subscribe(transactions => {
-          // this.isLoading = false;
-          // this.firstLoad = false;
-          this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
-          this.recentTransactions.forEach(element => {
-            console.log(element);
-          });
-          var currAccountName;
-          this.parsedTransactions = [];
-          for (let entry of this.recentTransactions) {
-            // Translate account_id to account name
-            for (let account of this.userAccountsDetails.currentAccount) {
-              for (let subAcc of account.subAccounts) {
-                if (subAcc.account_id === entry.account_id) {
-                  currAccountName = subAcc.name;
-                  break;
-                }
+    let accountObservables: Observable<any>[] = [];
+    for (let currAccount of this.currentAccounts) {
+      accountObservables.push(this.accountService.getRecentTransactions(currAccount._id, this.days, this.subdays))
+    }
+    forkJoin(accountObservables)
+    // Now get the currentAccount transactions
+      .subscribe(transactionsArray => {
+        console.log(transactionsArray)
+        // this.isLoading = false;
+        // this.firstLoad = false;
+        console.log("Inside Transactions")
+        this.recentTransactions = []
+        for (let transactions of transactionsArray) {
+          if (transactions != null) {
+            for (let transaction of transactions) {
+              this.recentTransactions.push(transaction)
+            }
+          }
+        } 
+        // this.recentTransactions.forEach(element => {
+        //   console.log(element);
+        // });
+        this.parsedTransactions = [];
+        for (let entry of this.recentTransactions) {
+          var currAccountName = null;
+          var currMainAccountName = null;
+          // Translate account_id to account name
+          var found = false
+          for (let account of this.currentAccounts) {
+            for (let subAcc of account.subAccounts) {
+              if (subAcc.account_id === entry.account_id) {
+                currAccountName = subAcc.name;
+                found = true
+                break;
               }
             }
-            const newTransaction = {
-              amount: entry.amount,
-              transactionName: entry.transactionName,
-              category: entry.category,
-              date: entry.date,
-              accountName: currAccountName
-            };
-            this.parsedTransactions.push(newTransaction);
-            this.getTopBudgets();
+            if (found) {
+              currMainAccountName = account.institutionName;
+              break;
+            }
           }
-          console.log("Parsed transactions: "+ this.parsedTransactions);
-        });
-
-      // this.listValue = ["SOMETHING3", "SOMETHING4"];
-      
-      this.preSelection.push(this.currentAccountName)
-      console.log(this.preSelection);
-      // this.clientForm = this.fb.group({
-      //   myOtherControl: new FormControl(this.preSelection),
-      // });
-    }
-    else {
-      var valid = true;
-      if (this.userAccountsDetails.accounts[this.userAccountsDetails.accounts.length - 1].current && !this.userAccountsDetails.currentAccount[0].itemValid){
-        valid = false;
-      }
-      this.listValue.push(this.userAccountsDetails.accounts[this.userAccountsDetails.accounts.length - 1].institutionName, valid);
-      this.firstLoad = false;
-    }
+          const newTransaction = {
+            amount: entry.amount,
+            transactionName: entry.transactionName,
+            category: entry.category,
+            date: entry.date,
+            accountName: currAccountName,
+            mainAccountName: currMainAccountName
+          };
+          this.parsedTransactions.push(newTransaction);
+        }
+        this.parsedTransactions.sort(this.compareTransactions)
+        if (this.parsedTransactions.length > 3) {
+          this.parsedTransactions = this.parsedTransactions.slice(0, 3)
+        }
+        this.getTopBudgets();
+      });
   }
 
   onRemoveAccountClicked() {
@@ -798,81 +785,81 @@ export class HomeComponent implements OnInit {
   }
 
 
-  // PLAID FUNCTIONS
-  onPlaidSuccess(event) {
-    // Send the public token to your server so you can do the token exchange.
-    console.log("Plaid success event: " + JSON.stringify(event));
-    if (this.listValue.length > 0) {
-      this.firstLoad = true;
-    }
-    else {
-      this.fullLoad = true;
-    }
-    this.accountService.addAccount(event).subscribe(res => {
-      if (res) {
-        console.log("Successfully added account!")
-        if (this.listValue.length === 0) {
-          this.accountService.getAccounts().subscribe(getRes => {
-            if (getRes.success) {
-              // this.router.navigate(['/home']);
-              // this._ngZone.run(() => this.router.navigate(['/home']));
-              // Need to check the accounts array on the user object. Can store in localStorage once got
-              var accountIds = [];
-              for (let account of getRes.accountsData) {
-                console.log(account);
-                accountIds.push(account._id);
-              }
-              console.log(accountIds)
-              this.accountService.getCurrentAccount().subscribe(currAccount => {
-                this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: getRes.accountsData, ids: accountIds});
-                // this.router.navigate(['/home']);
-                this.onAddedAccount();
-                });
-            }
-            else {
-              console.log(res)
-              console.log("Get Accounts method from account service was not a success")
-            }
-          });
-        }
-        else { 
-          // Append new account to accounts array
-          this.accounts.push(res)
-          // Append new account to userAccountsIds array 
-          this.userAccountsIds.push(res._id)
-          // Update local storage
-          this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accounts, ids: this.userAccountsIds});
-          this.onAddedAccount();
-        }
-      }
-      else {
-        console.log(res)
-        console.log("addAccount() method from account service was not a success")
-        this.firstLoad = false;
-        this.fullLoad = false;
-      }
-    });
-  }
+  // // PLAID FUNCTIONS
+  // onPlaidSuccess(event) {
+  //   // Send the public token to your server so you can do the token exchange.
+  //   console.log("Plaid success event: " + JSON.stringify(event));
+  //   if (this.listValue.length > 0) {
+  //     this.firstLoad = true;
+  //   }
+  //   else {
+  //     this.fullLoad = true;
+  //   }
+  //   this.accountService.addAccount(event).subscribe(res => {
+  //     if (res) {
+  //       console.log("Successfully added account!")
+  //       if (this.listValue.length === 0) {
+  //         this.accountService.getAccounts().subscribe(getRes => {
+  //           if (getRes.success) {
+  //             // this.router.navigate(['/home']);
+  //             // this._ngZone.run(() => this.router.navigate(['/home']));
+  //             // Need to check the accounts array on the user object. Can store in localStorage once got
+  //             var accountIds = [];
+  //             for (let account of getRes.accountsData) {
+  //               console.log(account);
+  //               accountIds.push(account._id);
+  //             }
+  //             console.log(accountIds)
+  //             this.accountService.getCurrentAccount().subscribe(currAccount => {
+  //               this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: getRes.accountsData, ids: accountIds});
+  //               // this.router.navigate(['/home']);
+  //               this.onAddedAccount();
+  //               });
+  //           }
+  //           else {
+  //             console.log(res)
+  //             console.log("Get Accounts method from account service was not a success")
+  //           }
+  //         });
+  //       }
+  //       else { 
+  //         // Append new account to accounts array
+  //         this.accounts.push(res)
+  //         // Append new account to userAccountsIds array 
+  //         this.userAccountsIds.push(res._id)
+  //         // Update local storage
+  //         this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accounts, ids: this.userAccountsIds});
+  //         this.onAddedAccount();
+  //       }
+  //     }
+  //     else {
+  //       console.log(res)
+  //       console.log("addAccount() method from account service was not a success")
+  //       this.firstLoad = false;
+  //       this.fullLoad = false;
+  //     }
+  //   });
+  // }
 
-  onPlaidExit(event) {
-    // Get errors or exit reason.
-    console.log("Plaid exit event: " + event);
-  }
+  // onPlaidExit(event) {
+  //   // Get errors or exit reason.
+  //   console.log("Plaid exit event: " + event);
+  // }
 
-  onPlaidEvent(event) {
-    // Log events so you can have insight into how your users are using plaid link.
-    console.log("Plaid event: " + event);
-  }
+  // onPlaidEvent(event) {
+  //   // Log events so you can have insight into how your users are using plaid link.
+  //   console.log("Plaid event: " + event);
+  // }
 
-  onPlaidLoad(event) {
-    // Do something when the iframe loads.
-    console.log("Plaid load event: " + event);
-  }
+  // onPlaidLoad(event) {
+  //   // Do something when the iframe loads.
+  //   console.log("Plaid load event: " + event);
+  // }
 
-  onPlaidClick(event) {
-    // Do something when the button is clicked.
-    console.log("Plaid click event: " + event);
-  }
+  // onPlaidClick(event) {
+  //   // Do something when the button is clicked.
+  //   console.log("Plaid click event: " + event);
+  // }
 
   open() {
     this.plaidLinkHandler.open();
@@ -899,61 +886,42 @@ export class HomeComponent implements OnInit {
     // Send the public token to your server so you can do the token exchange.
     var event = {token: token, metadata: metadata}
     console.log("Plaid success event: " + JSON.stringify(event));
-    if (this.listValue.length > 0) {
-      this.firstLoad = true;
-    }
-    else {
-      this.fullLoad = true;
-    }
     this.accountService.addAccount(event).subscribe(res => {
-      if (res) {
-        console.log("Successfully added account!")
-        if (this.listValue.length === 0) {
-          this.accountService.getAccounts().subscribe(getRes => {
-            if (getRes.success) {
-              // this.router.navigate(['/home']);
-              // this._ngZone.run(() => this.router.navigate(['/home']));
-              // Need to check the accounts array on the user object. Can store in localStorage once got
-              var accountIds = [];
-              for (let account of getRes.accountsData) {
-                console.log(account);
-                accountIds.push(account._id);
-              }
-              console.log(accountIds)
-              this.accountService.getCurrentAccount().subscribe(currAccount => {
-                this.authService.storeUserAccountsDetails({currentAccount: currAccount, accounts: getRes.accountsData, ids: accountIds});
-                // this.router.navigate(['/home']);
-                this.onAddedAccount();
-                });
-            }
-            else {
-              console.log(res)
-              console.log("Get Accounts method from account service was not a success")
-            }
-          });
-        }
-        else { 
-          // Append new account to accounts array
-          this.accounts.push(res)
-          // Append new account to userAccountsIds array 
-          this.userAccountsIds.push(res._id)
-          // Update local storage
-          this.authService.storeUserAccountsDetails({currentAccount: [this.currentAccount], accounts: this.accounts, ids: this.userAccountsIds});
-          this.onAddedAccount();
-        }
+      console.log("Successfully added account!")
+      if (this.listValue.length > 0) {
+        this.firstLoad = true;
       }
       else {
-        console.log(res)
-        console.log("addAccount() method from account service was not a success")
-        this.firstLoad = false;
-        this.fullLoad = false;
+        this.fullLoad = true;
       }
+      this.accounts.push(res) 
+      this.userAccountsIds.push(res._id)
+      this.currentAccounts.push(res)
+      this.currentAccountNames.push(res.institutionName)
+      this.currentAccountIds.push(res._id)
+      this.preSelection.push(res.institutionName)
+      // Update local storage
+      this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accounts, ids: this.userAccountsIds});
+      // Get newly updated details
+      this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
+      console.log(this.userAccountsDetails)
+
+      this.isLoading = true;
+      this.fullLoad = false;
+      this.marginVal = '10';
+      this.borderVal = '1px solid rgb(209, 209, 209)';
+
+      this.listValue.push([res.institutionName, res.itemValid]);
+      this.updatePlaidLinkHandlers.push(null)
+      this.firstLoad = false;
+      this.onAddedAccount();
     });
   }
 
   onEvent(eventName, metadata) {
     console.log("We got an event:", eventName);
     console.log("We got metadata:", metadata);
+    if (eventName)
   }
 
   onExit(error, metadata) {
@@ -975,25 +943,4 @@ export class HomeComponent implements OnInit {
     console.log("We exited:", error);
     console.log("We got metadata:", metadata);
   }
-
-  // async fetchLinkToken() {
-  //   // this.config: PlaidConfig = {
-  //   //   apiVersion: "v2",
-  //   //   env: "sandbox",
-  //   //   token: await this.fetchLinkToken(),
-  //   //   webhook: "",
-  //   //   product: ["auth", "transactions"],
-  //   //   countryCodes: ['US', 'CA', 'GB'],
-  //   //   key: "ea1ee62219264cf290c12041f96bba"
-  //   // };
-
-  //   console.log("fetching link token")
-  //   var userId = JSON.parse(localStorage.getItem('JWT'))["userId"]
-  //   console.log(userId)
-  //   var data = {userId: userId}
-  //   const response = await fetch(baseURL + 'plaid/accounts/create_link_token', { method: 'POST', body: JSON.stringify(data) });
-  //   const responseJSON = await response.json();
-  //   console.log(responseJSON.link_token)
-  //   return responseJSON.link_token;
-  // };
 }
