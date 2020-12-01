@@ -36,15 +36,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
   @ViewChild(MatSelectionList) selectionList: MatSelectionList;
 
   majorComponents: MajorComponent[] = MAJORS;
-  recentTransactions: any[];
+  recentTransactions: any[] = [];
   parsedTransactions: Object[];
   userAccountsDetails: any;
   accounts: any;
-  currentAccount: any;
+  currentAccounts: any[] = [];
   currentAccountOption: MatListOption;
-  currentAccountId: string;
-  currentAccountName: string;
-  userAccountsIds: string[];
+  currentAccountIds: string[] = [];
+  currentAccountNames: string[] = [];
+  userAccountsIds: string[] = [];
   errMess: string;
   isLoading = false;
   removeAccounts = false;
@@ -54,7 +54,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
   budgets: Budget[];
   days = 30;
   subdays = 0;
-  transactions: any[];
+  transactions: any[] = [];
   top3Budgets = [];
   marginVal: string;
   borderVal: string;
@@ -115,30 +115,6 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.plaidLinkHandler = handler;
         // this.open();
       });
-    // console.log("fetching link token")
-    // var userId = JSON.parse(localStorage.getItem('JWT'))["userId"]
-    // console.log(userId)
-    // var data = {userId: userId}
-    // this.accountService.getItemLinkToken(data).subscribe(res => {
-    //   var linkToken = res.link_token;
-    //   console.log("Link Token: ", linkToken)
-    //   this.linkToken = linkToken;
-    //   this.plaidLinkService
-    //   .createPlaid(
-    //     Object.assign({}, this.config, {
-    //       onSuccess: (token, metadata) => this.onSuccess(token, metadata),
-    //       onExit: (error, metadata) => this.onExit(error, metadata),
-    //       onEvent: (eventName, metadata) => this.onEvent(eventName, metadata)
-    //     })
-    //   )
-    //   .then((handler: PlaidLinkHandler) => {
-    //     this.plaidLinkHandler = handler;
-    //     // this.open();
-    //   });
-    // })
-    // this.fetchLinkToken()
-    // this.environment = process.env.PLAID_ENVIRONMENT;
-    // this.firstLoad = true;
     this.recentlyCompletedUserGoals = [];
     this.recentlyCompletedGoals = [];
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
@@ -151,34 +127,38 @@ export class HomeComponent implements OnInit, AfterViewInit {
     //   this.listValue.push(['All', true]);
     // }
 
-    for (let account of this.userAccountsDetails.accounts) {
+    this.accounts = this.userAccountsDetails.accounts;
+    this.currentAccounts = this.userAccountsDetails.currentAccounts;
+
+    for (let account of this.accounts) {
       this.listValue.push([account.institutionName, account.itemValid]);
       this.updatePlaidLinkHandlers.push(null)
     }
 
     console.log("List Value: ", this.listValue);
+    console.log("Current Accounts: ", this.currentAccounts);
 
-    if (this.listValue.length > 0) {
-      this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id; // will have to change later to get selectedAccount
-      this.currentAccountName = this.userAccountsDetails.currentAccount[0].institutionName;
-      this.currentAccount = this.userAccountsDetails.currentAccount[0]; 
-      this.accounts = this.userAccountsDetails.accounts;
-      this.preSelection.push(this.currentAccountName)
+    if (this.listValue.length > 0 && this.currentAccounts.length > 0) {
+      for (let account of this.currentAccounts) {
+        this.currentAccountIds.push(account._id);
+        this.currentAccountNames.push(account.institutionName)
+        this.preSelection.push(account.institutionName)
+      } 
       console.log(this.preSelection);
       this.marginVal = '10';
       this.borderVal = '1px solid rgb(209, 209, 209)';
 
       let linkObservables: Observable<any>[] = [];
-      for (var i = 0; i < (this.userAccountsDetails.accounts).length; i++) {
-        if (!this.userAccountsDetails.accounts[i].itemValid) {
+      for (var i = 0; i < (this.accounts).length; i++) {
+        if (!this.accounts[i].itemValid) {
           console.log("Need to update item")
-          linkObservables.push(this.accountService.getItemPublicToken(this.userAccountsDetails.accounts[i]._id, i))
+          linkObservables.push(this.accountService.getItemPublicToken(this.accounts[i]._id, i))
         }
         else {
           linkObservables.push(of(null))
         }
       }
-      forkJoin(linkObservables).subscribe(resArray => {
+      forkJoin(linkObservables).pipe(mergeMap(resArray => {
         console.log(resArray)
         for (let res of resArray) {
           console.log(res)
@@ -217,32 +197,50 @@ export class HomeComponent implements OnInit, AfterViewInit {
           }
         }
         this.userAccountsIds = this.userAccountsDetails.ids
-        console.log("Current Account Id: ", this.currentAccountId); 
+        console.log("Current Account Ids: ", this.currentAccountIds); 
         console.log("All Accounts: ", this.accounts);
         var today = new Date();
         // this.days = today.getDate() - 1;
 
         // Now get the currentAccount transactions
-        this.accountService.getRecentTransactions(this.currentAccountId, this.days, this.subdays)
-        .subscribe((transactions) => {
-          console.log(transactions)
+        let accountObservables: Observable<any>[] = [];
+        for (let currAccount of this.currentAccounts) {
+          accountObservables.push(this.accountService.getRecentTransactions(currAccount._id, this.days, this.subdays))
+        }
+        return forkJoin(accountObservables)
+      }))
+        .subscribe((transactionsArray) => {
+          console.log(transactionsArray)
           // this.isLoading = false;
           // this.firstLoad = false;
           console.log("Inside Transactions")
-          this.recentTransactions = transactions // ^still need for one above, and change service return type not actually a transaction object -> need to filter backend
-          this.recentTransactions.forEach(element => {
-            console.log(element);
-          });
-          var currAccountName;
+          for (let transactions of transactionsArray) {
+            if (transactions != null) {
+              for (let transaction of transactions) {
+                this.recentTransactions.push(transaction)
+              }
+            }
+          } 
+          // this.recentTransactions.forEach(element => {
+          //   console.log(element);
+          // });
           this.parsedTransactions = [];
           for (let entry of this.recentTransactions) {
+            var currAccountName = null;
+            var currMainAccountName = null;
             // Translate account_id to account name
-            for (let account of this.userAccountsDetails.currentAccount) {
+            var found = false
+            for (let account of this.currentAccounts) {
               for (let subAcc of account.subAccounts) {
                 if (subAcc.account_id === entry.account_id) {
                   currAccountName = subAcc.name;
+                  found = true
                   break;
                 }
+              }
+              if (found) {
+                currMainAccountName = account.institutionName;
+                break;
               }
             }
             const newTransaction = {
@@ -250,11 +248,14 @@ export class HomeComponent implements OnInit, AfterViewInit {
               transactionName: entry.transactionName,
               category: entry.category,
               date: entry.date,
-              accountName: currAccountName
+              accountName: currAccountName,
+              mainAccountName: currMainAccountName
             };
             this.parsedTransactions.push(newTransaction);
           }
-          console.log("Parsed transactions: "+ this.parsedTransactions);
+          // this.parsedTransactions.forEach(element => {
+          //   console.log(element);
+          // });
           // this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
           //   console.log("yup")
           //   this.selectionList.deselectAll();
@@ -263,14 +264,14 @@ export class HomeComponent implements OnInit, AfterViewInit {
           // });
           this.getTopBudgets();
         });
-      })
     }
     else {
       // May need something here later
+      console.log("no current accounts")
       this.marginVal = '0';
       this.borderVal = '';
       // this.fetchLinkToken();
-      // this.isLoading = false;
+      this.isLoading = false;
 
       // this.firstLoad = false;
       // this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
@@ -319,11 +320,21 @@ export class HomeComponent implements OnInit, AfterViewInit {
         // this.subdays = 0;
 
         // console.log("Days: ", this.days);
-        return this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays);
+        let transactionObservables: Observable<any>[] = [];
+        for (let currAccount of this.currentAccounts) {
+          transactionObservables.push(this.accountService.getBudgetTransactions(currAccount._id, this.days, this.subdays))
+        }
+        return forkJoin(transactionObservables)
       })
     )
-    .subscribe(transactions => {
-      this.transactions = transactions;
+    .subscribe(transactionsArray => {
+      for (let transactions of transactionsArray) {
+        if (transactions != null) {
+          for (let transaction of transactions) {
+            this.transactions.push(transaction);
+          }
+        }
+      }
       this.onGetTransactions();
       this.getTop3Budgets();
       this.getRandomCompletedGoals();

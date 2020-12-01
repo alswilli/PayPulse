@@ -1,7 +1,7 @@
 <div *ngIf="userAccountsDetails.accounts.length === 0">
   <p>No accounts added! Please add an account to see transactions</p>
 </div>
-<div *ngIf="userAccountsDetails.accounts.length > 0" fxFlex fxLayout="row">
+<div *ngIf="userAccountsDetails.accounts.length > 0 && userAccountsDetails.currentAccounts.length > 0" fxFlex fxLayout="row">
   <div fxFlex='1'></div> 
   <div fxFlex='18'>
     <h4 matSubheader class="toggleHeader">Sub Accounts</h4>
@@ -96,6 +96,9 @@
     </div>
   </div>
   <div fxFlex='1'></div> 
+</div>
+<div *ngIf="userAccountsDetails.accounts.length > 0 && userAccountsDetails.currentAccounts.length == 0">
+  <p>Please select a current account(s) on the home page to view transactions!</p>
 </div>
 
 

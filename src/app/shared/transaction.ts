@@ -3,6 +3,7 @@ export class Transaction {
     date: string;
     transactionName: string;
     accountName: string;
+    mainAccountName: string;
     amount: string;
     category: string[];
     account_id: string;

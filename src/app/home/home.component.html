@@ -80,8 +80,9 @@
       </div>
     </div>
   </div>
-  <div *ngIf="listValue.length > 0" style="border: 1px solid rgb(209, 209, 209); margin: 10px;">
-    <h2 *ngIf="listValue.length > 0" style="margin: 10px;"><span style="color: rgb(3, 192, 3)">{{currentAccountName}}</span> - Summary:</h2>
+  <div *ngIf="listValue.length > 0 && currentAccounts.length > 0" style="border: 1px solid rgb(209, 209, 209); margin: 10px;">
+    <!-- <h2 *ngIf="listValue.length > 0" style="margin: 10px;"><span style="color: rgb(3, 192, 3)">{{currentAccountName}}</span> - Summary:</h2> -->
+    <h2 *ngIf="listValue.length > 0 && currentAccounts.length > 0" style="margin: 10px;"> Budgeting Summary: </h2>
     <div fxLayout="row" fxLayout.lt-md="column" class="outerCardDiv"
     [ngStyle.lt-md]=
       "{'width': '100%',
@@ -171,6 +172,9 @@
         </mat-card-actions>
       </mat-card>
     </div>
+  </div>
+  <div *ngIf="listValue.length > 0 && currentAccounts.length == 0">
+    <p>Please select a current account(s) to view home page data!</p>
   </div>
 </div>
 
