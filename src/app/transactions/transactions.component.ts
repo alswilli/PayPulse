@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit, ViewChild, Injectable} from '@angular/core';
 import {MatPaginator, PageEvent} from '@angular/material/paginator';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource, MatTable} from '@angular/material/table';
@@ -12,6 +12,133 @@ import {merge, Observable, of as observableOf} from 'rxjs';
 import {catchError, map, startWith, switchMap} from 'rxjs/operators';
 import { MatSelectionList, MatSelectionListChange } from '@angular/material';
 
+
+
+
+
+
+
+
+
+
+import {SelectionModel} from '@angular/cdk/collections';
+import {FlatTreeControl} from '@angular/cdk/tree';
+import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
+import {BehaviorSubject} from 'rxjs';
+
+/**
+ * Node for to-do item
+ */
+export class TodoItemNode {
+  children: TodoItemNode[];
+  item: string;
+}
+
+/** Flat to-do item node with expandable and level information */
+export class TodoItemFlatNode {
+  item: string;
+  level: number;
+  expandable: boolean;
+}
+
+/**
+ * The Json object for to-do list data.
+ */
+
+// const TREE_DATA = {
+//   Groceries: {
+//     'Almond Meal flour': null,
+//     'Organic eggs': null,
+//     'Protein Powder': null,
+//     Fruits: {
+//       Apple: null,
+//       Berries: ['Blueberry', 'Raspberry'],
+//       Orange: null
+//     }
+//   },
+//   Reminders: [
+//     'Cook dinner',
+//     'Read the Material Design spec',
+//     'Upgrade Application to Angular'
+//   ]
+// };
+
+var TREE_DATA = {};
+
+/**
+ * Checklist database, it can build a tree structured Json object.
+ * Each node in Json object represents a to-do item or a category.
+ * If a node is a category, it has children items and new items can be added under the category.
+ */
+@Injectable()
+export class ChecklistDatabase {
+  dataChange = new BehaviorSubject<TodoItemNode[]>([]);
+
+  get data(): TodoItemNode[] { return this.dataChange.value; }
+
+  constructor() {
+    this.initialize();
+  }
+
+  initialize() {
+    // Build the tree nodes from Json object. The result is a list of `TodoItemNode` with nested
+    //     file node as children.
+    var data = this.buildFileTree(TREE_DATA, 0);
+
+    // Notify the change.
+    this.dataChange.next(data);
+  }
+
+  /**
+   * Build the file structure tree. The `value` is the Json object, or a sub-tree of a Json object.
+   * The return value is the list of `TodoItemNode`.
+   */
+  buildFileTree(obj: object, level: number): TodoItemNode[] {
+    return Object.keys(obj).reduce<TodoItemNode[]>((accumulator, key) => {
+      const value = obj[key];
+      const node = new TodoItemNode();
+      node.item = key;
+
+      if (value != null) {
+        if (typeof value === 'object') {
+          node.children = this.buildFileTree(value, level + 1);
+        } else {
+          node.item = value;
+        }
+      }
+
+      return accumulator.concat(node);
+    }, []);
+  }
+
+  /** Add an item to to-do list */
+  insertItem(parent: TodoItemNode, name: string) {
+    if (parent.children) {
+      parent.children.push({item: name} as TodoItemNode);
+      this.dataChange.next(this.data);
+    }
+  }
+
+  updateItem(node: TodoItemNode, name: string) {
+    node.item = name;
+    this.dataChange.next(this.data);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export interface TransactionData {
   amount: string;
   transactionName: string;
@@ -22,11 +149,12 @@ export interface TransactionData {
 @Component({
   selector: 'app-transactions',
   templateUrl: './transactions.component.html',
-  styleUrls: ['./transactions.component.scss']
+  styleUrls: ['./transactions.component.scss'],
+  providers: [ChecklistDatabase]
 })
 export class TransactionsComponent implements OnInit {
 
-  displayedColumns: string[] = ['accountName', 'amount', 'transactionName', 'category', 'date'];
+  displayedColumns: string[] = ['bankAccountName', 'subAccountName', 'amount', 'transactionName', 'category', 'date'];
   dataSource: MatTableDataSource<TransactionData>;
   transactions: Transaction[];
   accounts: Account[];
@@ -34,7 +162,7 @@ export class TransactionsComponent implements OnInit {
   totalPosts: number;
   userAccounts: Account[];
   userAccountsDetails;
-  currentAccountId: string;
+  currentAccountIds: string[] = [];
   postsPerPage = 10;
   currentPage = 1;
   adjustedPage: number;
@@ -45,10 +173,32 @@ export class TransactionsComponent implements OnInit {
   subAccountsDict: any;
   balancesAvailableDict: any;
   balancesCurrentDict: any;
+  currentAccounts: any[];
 
 
   listValue: any = [];
   preSelection = [];
+
+  /** Map from flat node to nested node. This helps us finding the nested node to be modified */
+  flatNodeMap = new Map<TodoItemFlatNode, TodoItemNode>();
+
+  /** Map from nested node to flattened node. This helps us to keep the same object for selection */
+  nestedNodeMap = new Map<TodoItemNode, TodoItemFlatNode>();
+
+  /** A selected parent node to be inserted */
+  selectedParent: TodoItemFlatNode | null = null;
+
+  /** The new item's name */
+  newItemName = '';
+
+  treeControl: FlatTreeControl<TodoItemFlatNode>;
+
+  treeFlattener: MatTreeFlattener<TodoItemNode, TodoItemFlatNode>;
+
+  treeDataSource: MatTreeFlatDataSource<TodoItemNode, TodoItemFlatNode>;
+
+  /** The selection for checklist */
+  checklistSelection = new SelectionModel<TodoItemFlatNode>(true /* multiple */);
 
   // actualPaginator: MatPaginator;
   // @ViewChild(MatPaginator)
@@ -61,7 +211,17 @@ export class TransactionsComponent implements OnInit {
   @ViewChild(MatTable) table: MatTable<any>;
   @ViewChild(MatSelectionList) selectionList: MatSelectionList;
 
-  constructor(private accountService: AccountService) {}
+  constructor(private accountService: AccountService,
+    private database: ChecklistDatabase) {
+    this.treeFlattener = new MatTreeFlattener(this.transformer, this.getLevel,
+      this.isExpandable, this.getChildren);
+    this.treeControl = new FlatTreeControl<TodoItemFlatNode>(this.getLevel, this.isExpandable);
+    this.treeDataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
+
+    database.dataChange.subscribe(data => {
+      this.treeDataSource.data = data;
+    });
+  }
 
   ngOnInit() {
     this.isLoading = true;
@@ -69,8 +229,12 @@ export class TransactionsComponent implements OnInit {
 
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
     console.log("Current Account Details: ", this.userAccountsDetails)
-    this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id; 
-    console.log("Current Account Id: ", this.currentAccountId);
+    this.accounts = this.userAccountsDetails.accounts;
+    this.currentAccounts = this.userAccountsDetails.currentAccounts;
+    for (let account of this.currentAccounts) {
+      this.currentAccountIds.push(account._id);
+    }
+    console.log("Current Account Ids: ", this.currentAccountIds);
 
     this.listValue.push('All');
     this.subAccount = 'All';
@@ -83,11 +247,13 @@ export class TransactionsComponent implements OnInit {
     this.balancesCurrentDict['All'] = 0;
     this.preSelection.push('All')
     console.log("Pre Selection: ", this.preSelection);
-    for (let account of this.userAccountsDetails.currentAccount) {
+    for (let account of this.currentAccounts) {
       console.log("A");
+      TREE_DATA[account.institutionName] = []
       for (let subAcc of account.subAccounts) {
         console.log("B");
         this.listValue.push(subAcc.name);
+        TREE_DATA[account.institutionName].push(subAcc.name)
         // console.log(subAcc.name);
         // console.log(subAcc.account_id);
         // console.log(this.subAccountsDict);
@@ -96,6 +262,7 @@ export class TransactionsComponent implements OnInit {
         this.balancesCurrentDict[subAcc.name] = subAcc.balances.current;
       }
     }
+    this.database.initialize();
     console.log("C");
 
     // var totalAvailable = 0;
@@ -125,7 +292,7 @@ export class TransactionsComponent implements OnInit {
     console.log('Current Page: ', this.currentPage);
     this.adjustedPage = this.currentPage-1;
     // Now get the currentAccount transactions
-    this.accountService.getTransactions(this.currentAccountId, this.postsPerPage, this.currentPage, this.subAccount, this.subAccountId)
+    this.accountService.getTransactions(this.currentAccountIds[0], this.postsPerPage, this.currentPage, this.subAccount, this.subAccountId)
     .subscribe(res => {
       console.log(res);
       this.isLoading = false;
@@ -138,7 +305,7 @@ export class TransactionsComponent implements OnInit {
       var currAccountName;
       for (let entry of this.transactions) {
         // Translate account_id to account name
-        for (let account of this.userAccountsDetails.currentAccount) {
+        for (let account of this.currentAccounts) {
           for (let subAcc of account.subAccounts) {
             if (subAcc.account_id === entry.account_id) {
               currAccountName = subAcc.name;
@@ -151,7 +318,8 @@ export class TransactionsComponent implements OnInit {
           transactionName: entry.transactionName,
           category: entry.category,
           date: entry.date,
-          accountName: currAccountName
+          subAccountName: currAccountName,
+          bankAccountName: 'test'
         };
         parsedTransactions.push(newTransaction);
       }
@@ -192,7 +360,7 @@ export class TransactionsComponent implements OnInit {
       this.currentPage = pageData.pageIndex+1;
       this.postsPerPage = pageData.pageSize;
     }
-    this.accountService.getTransactions(this.currentAccountId, this.postsPerPage, this.currentPage, this.subAccount, this.subAccountId)
+    this.accountService.getTransactions(this.currentAccountIds[0], this.postsPerPage, this.currentPage, this.subAccount, this.subAccountId)
       .subscribe(res => {
         console.log(res)
         this.isLoading = false;
@@ -206,7 +374,7 @@ export class TransactionsComponent implements OnInit {
         var currAccountName;
         for (let entry of this.transactions) {
           // Translate account_id to account name
-          for (let account of this.userAccountsDetails.currentAccount) {
+          for (let account of this.currentAccounts) {
             for (let subAcc of account.subAccounts) {
               if (subAcc.account_id === entry.account_id) {
                 currAccountName = subAcc.name;
@@ -219,7 +387,8 @@ export class TransactionsComponent implements OnInit {
             transactionName: entry.transactionName,
             category: entry.category,
             date: entry.date,
-            accountName: currAccountName
+            subAccountName: currAccountName,
+            bankAccountName: 'test'
           };
           parsedTransactions.push(newTransaction);
         }
@@ -254,6 +423,96 @@ export class TransactionsComponent implements OnInit {
 
   sortData(event) {
     console.log(event);
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  getLevel = (node: TodoItemFlatNode) => node.level;
+
+  isExpandable = (node: TodoItemFlatNode) => node.expandable;
+
+  getChildren = (node: TodoItemNode): TodoItemNode[] => node.children;
+
+  hasChild = (_: number, _nodeData: TodoItemFlatNode) => _nodeData.expandable;
+
+  hasNoContent = (_: number, _nodeData: TodoItemFlatNode) => _nodeData.item === '';
+
+  /**
+   * Transformer to convert nested node to flat node. Record the nodes in maps for later use.
+   */
+  transformer = (node: TodoItemNode, level: number) => {
+    const existingNode = this.nestedNodeMap.get(node);
+    const flatNode = existingNode && existingNode.item === node.item
+        ? existingNode
+        : new TodoItemFlatNode();
+    flatNode.item = node.item;
+    flatNode.level = level;
+    flatNode.expandable = !!node.children;
+    this.flatNodeMap.set(flatNode, node);
+    this.nestedNodeMap.set(node, flatNode);
+    return flatNode;
+  }
+
+  /** Whether all the descendants of the node are selected */
+  descendantsAllSelected(node: TodoItemFlatNode): boolean {
+    const descendants = this.treeControl.getDescendants(node);
+    return descendants.every(child => this.checklistSelection.isSelected(child));
+  }
+
+  /** Whether part of the descendants are selected */
+  descendantsPartiallySelected(node: TodoItemFlatNode): boolean {
+    const descendants = this.treeControl.getDescendants(node);
+    const result = descendants.some(child => this.checklistSelection.isSelected(child));
+    return result && !this.descendantsAllSelected(node);
+  }
+
+  /** Toggle the to-do item selection. Select/deselect all the descendants node */
+  todoItemSelectionToggle(node: TodoItemFlatNode): void {
+    this.checklistSelection.toggle(node);
+    const descendants = this.treeControl.getDescendants(node);
+    this.checklistSelection.isSelected(node)
+      ? this.checklistSelection.select(...descendants)
+      : this.checklistSelection.deselect(...descendants);
+  }
+
+  /** Select the category so we can insert the new item. */
+  addNewItem(node: TodoItemFlatNode) {
+    const parentNode = this.flatNodeMap.get(node);
+    this.database.insertItem(parentNode!, '');
+    this.treeControl.expand(node);
+  }
+
+  /** Save the node to database */
+  saveNode(node: TodoItemFlatNode, itemValue: string) {
+    const nestedNode = this.flatNodeMap.get(node);
+    this.database.updateItem(nestedNode!, itemValue);
   }
 
 }
