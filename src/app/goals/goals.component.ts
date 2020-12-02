@@ -25,7 +25,7 @@ export class GoalsComponent implements OnInit {
 
   @ViewChild('box') box: ElementRef;
   userAccountsDetails: any;
-  currentAccountId: any;
+  currentAccountIds: any[] = [];
   jwtDetails: any;
   admin: any;
   form: FormGroup;
@@ -34,6 +34,7 @@ export class GoalsComponent implements OnInit {
 
   @ViewChild('filePicker') filePicker: ElementRef;
   initialLoad: boolean;
+  currentAccounts: any[] = [];
   
 
   constructor(private goalService: GoalService,) { }
@@ -43,8 +44,9 @@ export class GoalsComponent implements OnInit {
     this.initialLoad = true;
     this.allGoals = [];
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
-    if (this.userAccountsDetails.currentAccount[0] != null) {
-      this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id;
+    this.currentAccounts = this.userAccountsDetails.currentAccounts;
+    for (let account of this.currentAccounts) {
+      this.currentAccountIds.push(account._id);
     }
 
     this.jwtDetails = JSON.parse(localStorage.getItem('JWT'));

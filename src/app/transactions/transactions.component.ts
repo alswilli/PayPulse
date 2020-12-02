@@ -236,47 +236,37 @@ export class TransactionsComponent implements OnInit {
     }
     console.log("Current Account Ids: ", this.currentAccountIds);
 
-    this.listValue.push('All');
     this.subAccount = 'All';
     this.subAccountId = null;
     this.subAccountsDict = {};
-    this.subAccountsDict['All'] = null;
     this.balancesAvailableDict = {};
-    this.balancesAvailableDict['All'] = null;
     this.balancesCurrentDict = {};
-    this.balancesCurrentDict['All'] = 0;
-    this.preSelection.push('All')
-    console.log("Pre Selection: ", this.preSelection);
+    TREE_DATA = {}
     for (let account of this.currentAccounts) {
       console.log("A");
       TREE_DATA[account.institutionName] = []
+      this.subAccountsDict[account.institutionName] = {}
+      this.balancesAvailableDict[account.institutionName] = {}
+      this.balancesCurrentDict[account.institutionName] = {}
       for (let subAcc of account.subAccounts) {
         console.log("B");
-        this.listValue.push(subAcc.name);
         TREE_DATA[account.institutionName].push(subAcc.name)
         // console.log(subAcc.name);
         // console.log(subAcc.account_id);
         // console.log(this.subAccountsDict);
-        this.subAccountsDict[subAcc.name] = subAcc.account_id;
-        this.balancesAvailableDict[subAcc.name] = subAcc.balances.available;
-        this.balancesCurrentDict[subAcc.name] = subAcc.balances.current;
+        this.subAccountsDict[account.institutionName][subAcc.name] = subAcc.account_id;
+        this.balancesAvailableDict[account.institutionName][subAcc.name] = subAcc.balances.available;
+        this.balancesCurrentDict[account.institutionName][subAcc.name] = subAcc.balances.current;
       }
     }
+    console.log(TREE_DATA)
     this.database.initialize();
-    // this.checklistSelection.select(this.treeControl.dataNodes[0])
-    console.log(this.checklistSelection.selected)
-    console.log(this.treeDataSource.data)
-    this.todoItemSelectionToggle(this.treeControl.dataNodes[0])
+
+    this.todoItemSelectionToggle(this.treeControl.dataNodes[0]) // MONEY
     console.log("C");
 
-    // var totalAvailable = 0;
     var totalCurrent = 0;
-    // console.log(this.balancesAvailableDict)
-    // for (let key of this.balancesAvailableDict) {
-    //   totalAvailable = totalAvailable + this.balancesAvailableDict[key];
-    // }
     for (let key in this.balancesCurrentDict) {
-      // console.log(this.balancesCurrentDict[key])
       totalCurrent = totalCurrent + this.balancesCurrentDict[key];
     }
     // console.log(totalAvailable);

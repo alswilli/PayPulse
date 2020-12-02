@@ -2,7 +2,8 @@
   <p>No accounts added! Please add an account to see transactions</p>
 </div>
 <div *ngIf="userAccountsDetails.accounts.length > 0 && userAccountsDetails.currentAccounts.length > 0" style="margin: 10px;">
-  <h2>Sub Account Selected: <p style="color: rgb(76, 0, 255); display: inline;">{{subAccount}}</p></h2>
+  <h2>Bank Account(s) Selected: <p style="color: rgb(255, 0, 64); display: inline;">{{numBankAccountsSelected}}</p></h2>
+  <h3>Sub Account(s) Selected: <p style="color: rgb(76, 0, 255); display: inline;">{{numSubAccountsSelected}}</p></h3>
     <h4>Current Balance: <p style="color: green; display: inline;">$ {{balancesCurrentDict[subAccount]}}</p></h4>
 
     <mat-form-field *ngIf="!errMess">
