@@ -263,6 +263,10 @@ export class TransactionsComponent implements OnInit {
       }
     }
     this.database.initialize();
+    // this.checklistSelection.select(this.treeControl.dataNodes[0])
+    console.log(this.checklistSelection.selected)
+    console.log(this.treeDataSource.data)
+    this.todoItemSelectionToggle(this.treeControl.dataNodes[0])
     console.log("C");
 
     // var totalAvailable = 0;
