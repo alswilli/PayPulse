@@ -11,6 +11,7 @@ import { BindingType } from '@angular/compiler';
 import { map, mergeMap } from 'rxjs/operators';
 import { Router } from "@angular/router";
 import { TransactionService } from './transaction.service';
+import { Budget } from '../shared/budget';
 // import { Observable } from 'rxjs/Observable';
 // import 'rxjs/add/observable/forkJoin';
 
@@ -43,7 +44,7 @@ export class GoalService {
     11:["November", 30],
     12:["December", 31]
   }
-  budgets: import("c:/Users/alexp/Documents/Classes/Coursera/Angular Cert/PayPulseAnotherTry/PayPulse/src/app/shared/budget").Budget[];
+  budgets: Budget[];
   totalBudgetAmount: number;
   pairs: any;
 
