@@ -16,8 +16,8 @@ export const routes: Routes = [
   { path: 'transactions',  component: TransactionsComponent, canActivate: [AuthGuard] },
   { path: 'budgets',  component: BudgetsComponent, canActivate: [AuthGuard] },
   { path: 'goals', component: GoalsComponent, canActivate: [AuthGuard] },
-  { path: 'sharing',  component: SharingComponent, canActivate: [AuthGuard] },
-  { path: 'advice',  component: AdviceComponent, canActivate: [AuthGuard] },
+  // { path: 'sharing',  component: SharingComponent, canActivate: [AuthGuard] },
+  // { path: 'advice',  component: AdviceComponent, canActivate: [AuthGuard] },
   { path: 'linkAccount',  component: LinkAccountComponent },
   { path: 'createAccount',  component: CreateAccountComponent },
   { path: '', redirectTo: '/home', pathMatch: 'full' }
