@@ -67,60 +67,64 @@
   </mat-card>
 </div>
 
-<p>NOTE: Goals functionality is currently still under construction!</p>
-<h2 style="margin: 10px;">Goals:</h2>
-<mat-spinner *ngIf="initialLoad" style="margin: auto;"></mat-spinner>
-<div #box>
-  <mat-grid-list [cols]="columns" rowHeight="300px" 
-  width="100%"
-  (window:resize)="onBoxResize($event)">
-    <mat-grid-tile
-      *ngFor="let matchedGoal of matchedGoals"
-      style="margin: auto;"
-    >
-      <mat-spinner *ngIf="isLoading" style="margin: auto;"></mat-spinner>
-      <div *ngIf="!isLoading" style="height: 100%; width: 100%">
-        <div class="goal-image" *ngIf="matchedGoal[0].goalProgress != 100">
-          <img [src]="matchedGoal[1].imagePath" [alt]="matchedGoal[1].goalName" 
-          matTooltip="{{matchedGoal[1].goalDescription}}" matTooltipPosition="above">
-        </div>
-        <div class="goal-image-unlocked" *ngIf="matchedGoal[0].goalProgress == 100">
-          <img [src]="matchedGoal[1].imagePath" [alt]="matchedGoal[1].goalName" 
-          matTooltip="{{matchedGoal[1].goalDescription}}" matTooltipPosition="above">
-        </div>
-        <h3 *ngIf="matchedGoal[0].goalProgress == 100">{{matchedGoal[1].goalName}}</h3>
-        <p *ngIf="matchedGoal[0].goalProgress != 100">{{matchedGoal[1].goalName}}</p>
-      </div>
-      <!-- <mat-card>
-        <mat-card-header>
-          <h3>{{goal.goalName}}</h3>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="goal-image">
-            <img [src]="goal.imagePath" [alt]="goal.goalName">
+<div style="max-width: 1400px; margin: auto">
+  <p>NOTE: Goals functionality is currently still under construction!</p>
+  <h2 style="margin: 10px;">Goals:</h2>
+  <mat-spinner *ngIf="initialLoad" style="margin: auto;"></mat-spinner>
+  <div #box>
+    <mat-grid-list [cols]="columns" rowHeight="300px" 
+    width="100%"
+    (window:resize)="onBoxResize($event)">
+      <mat-grid-tile
+        *ngFor="let matchedGoal of matchedGoals"
+        style="margin: auto;"
+      >
+        <mat-spinner *ngIf="isLoading" style="margin: auto;"></mat-spinner>
+        <div *ngIf="!isLoading" style="height: 100%; width: 100%">
+          <div class="goal-image" *ngIf="matchedGoal[0].goalProgress != 100">
+            <img [src]="matchedGoal[1].imagePath" [alt]="matchedGoal[1].goalName" 
+            matTooltip="{{matchedGoal[1].goalDescription}}" matTooltipPosition="above">
           </div>
-          <p>{{goal.goalDescription}}</p>
-        </mat-card-content>
-      </mat-card> -->
-    </mat-grid-tile>
-  </mat-grid-list>
-  <!-- <mat-grid-list *ngIf="lessThanMedium" cols="2" rowHeight="200px">
-    <mat-grid-tile
-      *ngFor="let goal of allGoals"
-      [colspan]="1"
-      [rowspan]="1"
-    >
-      <mat-card>
-        <mat-card-header>
-          <h3>{{goal.goalName}}</h3>
-        </mat-card-header>
-        <mat-card-content>
-          <p>Description and image go here</p>
-        </mat-card-content>
-      </mat-card>
-    </mat-grid-tile>
-  </mat-grid-list> -->
+          <div class="goal-image-unlocked" *ngIf="matchedGoal[0].goalProgress == 100">
+            <img [src]="matchedGoal[1].imagePath" [alt]="matchedGoal[1].goalName" 
+            matTooltip="{{matchedGoal[1].goalDescription}}" matTooltipPosition="above">
+          </div>
+          <h3 *ngIf="matchedGoal[0].goalProgress == 100">{{matchedGoal[1].goalName}}</h3>
+          <p *ngIf="matchedGoal[0].goalProgress != 100">{{matchedGoal[1].goalName}}</p>
+        </div>
+        <!-- <mat-card>
+          <mat-card-header>
+            <h3>{{goal.goalName}}</h3>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="goal-image">
+              <img [src]="goal.imagePath" [alt]="goal.goalName">
+            </div>
+            <p>{{goal.goalDescription}}</p>
+          </mat-card-content>
+        </mat-card> -->
+      </mat-grid-tile>
+    </mat-grid-list>
+    <!-- <mat-grid-list *ngIf="lessThanMedium" cols="2" rowHeight="200px">
+      <mat-grid-tile
+        *ngFor="let goal of allGoals"
+        [colspan]="1"
+        [rowspan]="1"
+      >
+        <mat-card>
+          <mat-card-header>
+            <h3>{{goal.goalName}}</h3>
+          </mat-card-header>
+          <mat-card-content>
+            <p>Description and image go here</p>
+          </mat-card-content>
+        </mat-card>
+      </mat-grid-tile>
+    </mat-grid-list> -->
+  </div>
 </div>
+
+
 
 
 
