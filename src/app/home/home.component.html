@@ -138,13 +138,13 @@
                     <span fxFlex></span>
                     <p fxLayoutAlign="end center" style="margin-right: 10px;">
                       <span *ngIf="(budget.total / (budget.amount)) >= 1" style="color: red;">
-                        <b>{{ budget.total }} / {{ (budget.amount) }}</b>
+                        <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
                       </span>
                       <span *ngIf="!((budget.total / (budget.amount)) >= 1) && (budget.total / (budget.amount)) >= 0.75" style="color: orange;">
-                        <b>{{ budget.total }} / {{ (budget.amount) }}</b>
+                        <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
                       </span>
                       <span *ngIf="!((budget.total / (budget.amount)) >= 0.75) && (budget.total / (budget.amount)) >= 0" style="color: green;">
-                        <b>{{ budget.total }} / {{ (budget.amount) }}</b>
+                        <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
                       </span>
                     </p>
                   </div>

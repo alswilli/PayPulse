@@ -5,6 +5,8 @@ import { mergeMap } from 'rxjs/operators';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { mimeType } from "./mime-type.validator";
 import { UserGoal } from '../shared/usergoal';
+import { MatDialog } from '@angular/material';
+import { GoalsUnlockedComponent } from './goals-unlocked/goals-unlocked.component';
 
 @Component({
   selector: 'app-goals',
@@ -35,9 +37,12 @@ export class GoalsComponent implements OnInit {
   @ViewChild('filePicker') filePicker: ElementRef;
   initialLoad: boolean;
   currentAccounts: any[] = [];
-  
+  goalsUnlocked: boolean;
+  goalsUnlockedRef: any;
+  newlyUnlockedGoals = [];
 
-  constructor(private goalService: GoalService,) { }
+  constructor(private goalService: GoalService,
+    public dialog: MatDialog) { }
 
   ngOnInit() {
     this.isLoading = true;
@@ -92,6 +97,16 @@ export class GoalsComponent implements OnInit {
         // if (!found) {
         //   this.matchedGoals.push([null, goal])
         // }
+      }
+
+      this.newlyUnlockedGoals.push(this.matchedGoals[9])
+      this.newlyUnlockedGoals.push(this.matchedGoals[10])
+      this.goalsUnlocked = true;
+      if (this.goalsUnlocked) {
+        this.goalsUnlockedRef = this.dialog.open(GoalsUnlockedComponent, {data: {newlyUnlockedGoals: this.newlyUnlockedGoals}});
+        // this.goalsUnlockedRef.componentInstance.onAdd
+        // // this.addBudgetRef.close()
+        //   .subscribe(result => {})
       }
     })
   }

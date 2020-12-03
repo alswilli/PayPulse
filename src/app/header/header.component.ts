@@ -18,6 +18,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   opened: boolean;
   loggingIn: boolean;
   bgColor: string;
+  hidden: boolean;
 
   constructor(private router: Router,
     private activatedRoute: ActivatedRoute, 
@@ -52,6 +53,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .subscribe(username => { console.log(username); this.username = username; });
     this.tokenSubscription = this.authService.getTokenTimer()
       .subscribe(tokenTimer => { console.log(tokenTimer); this.tokenTimer = tokenTimer; });
+    this.hidden = false;
   }
 
   ngOnDestroy() {
@@ -86,6 +88,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
     //   // this.router.navigate(['/login']);
     // });
     // this.router.navigate(['/login']);
+  }
+
+  toggleBadgeVisibility() {
+    this.hidden = true
   }
 
 }

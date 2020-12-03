@@ -27,7 +27,8 @@
       <!-- <div fxFlex='1'></div> -->
       <div fxFlex='50' class="mainPanels">
         <h2>Trends:</h2>
-        <mat-form-field>
+        <span>Showing data from: </span>
+        <mat-form-field style="margin-right: 5px;">
           <mat-label>From:</mat-label>
           <mat-select id="from" #from> 
             <mat-option *ngFor="let month of fromMonths" [value]="month">
@@ -35,6 +36,7 @@
             </mat-option>
           </mat-select>
         </mat-form-field>
+        <span><b>-</b></span>
         <mat-form-field style="margin-left: 10px;">
           <mat-label>To:</mat-label>
           <mat-select id="to" #to> 
@@ -46,13 +48,13 @@
         <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
         <div *ngIf="!isLoading">
           <h3 *ngIf="(totalBudgetedExpenses / (totalBudget * totalMonthsActive)) >= 1" style="color: red;">
-            <span style="color: black;">Budgeted Expenses: </span>{{totalBudgetedExpenses}} / {{(totalBudget * totalMonthsActive)}}
+            <span style="color: black;">Budgeted Expenses: </span>$ {{totalBudgetedExpenses}} / {{(totalBudget * totalMonthsActive)}}
           </h3>
           <h3 *ngIf="!((totalBudgetedExpenses / (totalBudget * totalMonthsActive)) >= 1) && (totalBudgetedExpenses / (totalBudget * totalMonthsActive)) >= 0.75" style="color: orange;">
-            <span style="color: black;">Budgeted Expenses: </span>{{totalBudgetedExpenses}} / {{(totalBudget * totalMonthsActive)}}
+            <span style="color: black;">Budgeted Expenses: </span>$ {{totalBudgetedExpenses}} / {{(totalBudget * totalMonthsActive)}}
           </h3>
           <h3 *ngIf="!((totalBudgetedExpenses / (totalBudget * totalMonthsActive)) >= 0.75) && (totalBudgetedExpenses / (totalBudget * totalMonthsActive)) >= 0" style="color: green;">
-            <span style="color: black;">Budgeted Expenses: </span>{{totalBudgetedExpenses}} / {{(totalBudget * totalMonthsActive)}}
+            <span style="color: black;">Budgeted Expenses: </span>$ {{totalBudgetedExpenses}} / {{(totalBudget * totalMonthsActive)}}
           </h3>
           <!-- <h3>Budgeted Expenses: {{totalBudgetedExpenses}} / {{totalBudget}}</h3> -->
           <div>
@@ -91,13 +93,13 @@
                     </p>
                     <p fxLayoutAlign="end center" style="margin-right: 10px;">
                       <span *ngIf="(budget.total / (budget.amount * totalMonthsActive)) >= 1" style="color: red;">
-                        <b>{{ budget.total }} / {{ (budget.amount * totalMonthsActive) }}</b>
+                        <b>$ {{ budget.total }} / {{ (budget.amount * totalMonthsActive) }}</b>
                       </span>
                       <span *ngIf="!((budget.total / (budget.amount * totalMonthsActive)) >= 1) && (budget.total / (budget.amount * totalMonthsActive)) >= 0.75" style="color: orange;">
-                        <b>{{ budget.total }} / {{ (budget.amount * totalMonthsActive) }}</b>
+                        <b>$ {{ budget.total }} / {{ (budget.amount * totalMonthsActive) }}</b>
                       </span>
                       <span *ngIf="!((budget.total / (budget.amount * totalMonthsActive)) >= 0.75) && (budget.total / (budget.amount * totalMonthsActive)) >= 0" style="color: green;">
-                        <b>{{ budget.total }} / {{ (budget.amount * totalMonthsActive) }}</b>
+                        <b>$ {{ budget.total }} / {{ (budget.amount * totalMonthsActive) }}</b>
                       </span>
                     </p>
                   </mat-expansion-panel-header>

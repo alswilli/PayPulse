@@ -29,6 +29,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTreeModule } from '@angular/material/tree';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 import { AppComponent } from './app.component';
 import { LoginComponent } from './login/login.component';
@@ -62,6 +64,7 @@ import { PieChartComponent } from './budgets/pie-chart/pie-chart.component';
 import { AddBudgetComponent } from './budgets/add-budget/add-budget.component';
 import { DeleteBudgetComponent } from './budgets/delete-budget/delete-budget.component';
 import { TokenExpiredComponent } from './token-expired/token-expired.component';
+import { GoalsUnlockedComponent } from './goals/goals-unlocked/goals-unlocked.component';
 
 @NgModule({
   declarations: [
@@ -82,7 +85,8 @@ import { TokenExpiredComponent } from './token-expired/token-expired.component';
     PieChartComponent,
     AddBudgetComponent,
     DeleteBudgetComponent,
-    TokenExpiredComponent
+    TokenExpiredComponent,
+    GoalsUnlockedComponent
   ],
   imports: [
     BrowserModule,
@@ -111,7 +115,9 @@ import { TokenExpiredComponent } from './token-expired/token-expired.component';
     MatGridListModule,
     MatTooltipModule,
     MatTreeModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatBadgeModule,
+    MatProgressBarModule
   ],
   // exports: [
   //   MatFormFieldModule,
@@ -145,7 +151,8 @@ import { TokenExpiredComponent } from './token-expired/token-expired.component';
     ErrorComponent,
     AddBudgetComponent,
     DeleteBudgetComponent,
-    TokenExpiredComponent
+    TokenExpiredComponent,
+    GoalsUnlockedComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

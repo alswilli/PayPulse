@@ -5,7 +5,7 @@
   <div *ngIf="userAccountsDetails.accounts.length > 0 && userAccountsDetails.currentAccounts.length > 0" style="margin: 10px;">
     <h2>Bank Account(s) Selected: <p style="color: rgb(255, 0, 64); display: inline;">{{activeCurrentsLength}} / {{currentAccounts.length}}</p></h2>
     <h3>Sub Account(s) Selected: <p style="color: rgb(76, 0, 255); display: inline;">{{activeSubsLength}} / {{subAccountsLength}}</p></h3>
-      <h4>Current Balance: <p style="color: green; display: inline;">$ {{totalCurrent}}</p></h4>
+      <h3>Current Balance: <p style="color: green; display: inline;">$ {{totalCurrent}}</p></h3>
   
       <mat-form-field *ngIf="!errMess">
         <mat-label>Filter</mat-label>
