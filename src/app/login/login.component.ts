@@ -36,6 +36,7 @@ export class LoginComponent implements OnInit {
   accountIds: any;
   accountsData: Account[];
   currentAccounts: Account[];
+  newlyCompletedGoals: any[];
 
   constructor(private fb: FormBuilder,
     private router: Router,
@@ -194,11 +195,12 @@ export class LoginComponent implements OnInit {
                   // if (checkRes == null) { // won't happen?
                   //   return of(null)
                   // }
+                  this.newlyCompletedGoals = checkRes[1]
                   var index = 0;
                   let itemValidObservables: Observable<any>[] = [];
                   var foundInvalid = false;
                   console.log(checkRes)
-                  for (let res of checkRes) {
+                  for (let res of checkRes[0]) {
                     console.log(res)
                     if (res == "item invalid") { //item invalid
                       foundInvalid = true;
@@ -236,7 +238,7 @@ export class LoginComponent implements OnInit {
                 //     this.currentAccount = account
                 //   }
                 // }
-                this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals});
+                this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals});
                 this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                 this.router.navigate(['/home']);
               })
@@ -340,11 +342,12 @@ export class LoginComponent implements OnInit {
                           // if (checkRes == null) { // won't happen?
                           //   return of(null)
                           // }
+                          this.newlyCompletedGoals = checkRes[1]
                           var index = 0;
                           let itemValidObservables: Observable<any>[] = [];
                           var foundInvalid = false;
                           console.log(checkRes)
-                          for (let res of checkRes) {
+                          for (let res of checkRes[0]) {
                             console.log(res)
                             if (res == "item invalid") { //item invalid
                               foundInvalid = true;
@@ -382,7 +385,7 @@ export class LoginComponent implements OnInit {
                         //     this.currentAccount = account
                         //   }
                         // }
-                        this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals});
+                        this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals});
                         this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                         this._ngZone.run(() => this.router.navigate(['/home']));
                       })

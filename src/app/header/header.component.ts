@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, Event} from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../services/auth.service';
+import { UserGoal } from '../shared/usergoal';
 
 @Component({
   selector: 'app-header',
@@ -15,10 +16,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   tokenTimer: number = undefined;
   usernameSubscription: Subscription;
   tokenSubscription: Subscription;
+  newGoalsSubscription: Subscription;
   opened: boolean;
   loggingIn: boolean;
   bgColor: string;
   hidden: boolean;
+  numNotifications: number;
+  newlyCompletedGoals: UserGoal[];
 
   constructor(private router: Router,
     private activatedRoute: ActivatedRoute, 
@@ -53,12 +57,30 @@ export class HeaderComponent implements OnInit, OnDestroy {
       .subscribe(username => { console.log(username); this.username = username; });
     this.tokenSubscription = this.authService.getTokenTimer()
       .subscribe(tokenTimer => { console.log(tokenTimer); this.tokenTimer = tokenTimer; });
-    this.hidden = false;
+
+    this.numNotifications = 0;
+    this.hidden = true;
+    console.log("aaaaa")
+    this.newGoalsSubscription = this.authService.getNewlyCompletedGoals()
+      .subscribe(goals => { 
+        console.log("bbbbb")
+        console.log(goals);
+        this.newlyCompletedGoals = goals
+        if (this.newlyCompletedGoals.length == 0) {
+          this.numNotifications = 0;
+          this.hidden = true;
+        }
+        else {
+          this.numNotifications = this.newlyCompletedGoals.length;
+          this.hidden = false;
+        }
+      });
   }
 
   ngOnDestroy() {
     this.usernameSubscription.unsubscribe();
     this.tokenSubscription.unsubscribe();
+    this.newGoalsSubscription.unsubscribe();
   }
 
   onMenuClick() {

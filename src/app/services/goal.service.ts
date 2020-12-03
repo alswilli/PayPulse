@@ -117,7 +117,8 @@ export class GoalService {
         this.budgets = budgets;
         var oldDate = new Date(JSON.parse(localStorage.getItem('JWT'))["lastUpdated"])
         var currDate = new Date();
-        // var currDate = new Date("2020-12-21T01:14:54.483Z"); 
+        // var oldDate = new Date("2020-08-21T01:14:54.483Z");
+        // var currDate = new Date("2020-10-21T01:14:54.483Z"); 
         if (oldDate != null && oldDate.getMonth() != currDate.getMonth() && budgets.length > 0) {
           // Time to update
           console.log("passed")
@@ -128,13 +129,16 @@ export class GoalService {
           var currYear = currDate.getFullYear();
           var currMonth = currDate.getMonth()+1;
           var remainderMonths = 0
+          var numMonthsAhead = 0
           if (currMonth > oldMonth) {
             remainderMonths = (currMonth - oldMonth);
+            numMonthsAhead = (currYear - oldYear)*12 + remainderMonths;
           }
           else {
             remainderMonths = currMonth + (12 - oldMonth);
+            numMonthsAhead = (currYear - oldYear - 1)*12 + remainderMonths;
           }
-          var numMonthsAhead = (currYear - oldYear)*12 + remainderMonths;
+          
           // var totalBudgetAmount = 0;
           // for (let budget of budgets) {
           //   totalBudgetAmount = totalBudgetAmount + Number(budget.amount);
@@ -257,6 +261,7 @@ export class GoalService {
         var index = 0;
         var accountsIndex = 0;
         var monthlyTotal = 0
+        var potentialGoals = []
         for (let transactions of transactionsDataArray) {
           console.log("inside transactions loop")
           if (accountsIndex < accountIds.length) {
@@ -292,12 +297,24 @@ export class GoalService {
                     var retObj = {}
                     if (usergoal.goalProgress == 0) {
                       retObj['done'] = "Done"
+                      retObj["numTimesAchieved"] = usergoal.numTimesAchieved+1
                     }
                     else {
                       retObj['done'] = "Already Done"
                       retObj["numTimesAchieved"] = usergoal.numTimesAchieved+1 //needs to be years since last achieved
                     }
-                    usergoalObservables.push(this.updateUserGoal(usergoal._id, retObj))
+                    var found = false
+                    for (let obj of potentialGoals) {
+                      if (obj[0] == usergoal._id) {
+                        obj[1]["numTimesAchieved"] += 1
+                        found = true
+                        console.log("found dup month")
+                        break
+                      }
+                    }
+                    if (!found) {
+                      potentialGoals.push([usergoal._id, retObj])
+                    }
                     break
                   }
                 }
@@ -309,6 +326,9 @@ export class GoalService {
           accountsIndex = 0;
           monthlyTotal = 0
           index += 1
+        }
+        for (let obj of potentialGoals) {
+          usergoalObservables.push(this.updateUserGoal(obj[0], obj[1]))
         }
         // Step 4: Update local user goals
         if (usergoalObservables.length == 0) {
@@ -323,8 +343,9 @@ export class GoalService {
       mergeMap(dataArray => {
         console.log("55555555")
         if (dataArray == "item invalid") {
-          return of(accountsItemStatus)
+          return of([accountsItemStatus, []])
         }
+        var unlockedGoals = []
         if (dataArray != null) {
           console.log("In usergoals fork join")
           console.log(dataArray)
@@ -338,12 +359,13 @@ export class GoalService {
               }
               j += 1
             }
+            unlockedGoals.push(updatedUG)
           }
         }
         // this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
         // return this.authService.update()
         // return of(null)
-        return of(accountsItemStatus)
+        return of([accountsItemStatus, unlockedGoals])
       }))  
   }
 

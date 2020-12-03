@@ -85,9 +85,13 @@
             <img [src]="matchedGoal[1].imagePath" [alt]="matchedGoal[1].goalName" 
             matTooltip="{{matchedGoal[1].goalDescription}}" matTooltipPosition="above">
           </div>
-          <div class="goal-image-unlocked" *ngIf="matchedGoal[0].goalProgress == 100">
+          <div class="goal-image-unlocked" *ngIf="matchedGoal[0].goalProgress == 100 && !matchedGoal.new">
             <img [src]="matchedGoal[1].imagePath" [alt]="matchedGoal[1].goalName" 
             matTooltip="{{matchedGoal[1].goalDescription}}" matTooltipPosition="above">
+          </div>
+          <div class="goal-image-unlocked-new" *ngIf="matchedGoal[0].goalProgress == 100 && matchedGoal.new">
+            <img [src]="matchedGoal[1].imagePath" [alt]="matchedGoal[1].goalName" 
+            matTooltip="(NEW UNLOCK) {{matchedGoal[1].goalDescription}}" matTooltipPosition="above">
           </div>
           <h3 *ngIf="matchedGoal[0].goalProgress == 100">{{matchedGoal[1].goalName}}</h3>
           <p *ngIf="matchedGoal[0].goalProgress != 100">{{matchedGoal[1].goalName}}</p>

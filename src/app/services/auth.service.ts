@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { TokenExpiredComponent } from '../token-expired/token-expired.component';
 import { User } from '../shared/user';
+import { UserGoal } from '../shared/usergoal';
 
 interface AuthResponse {
   status: string;
@@ -56,6 +57,7 @@ export class AuthService {
   authToken: string = undefined;
   tokenExpiredRef: MatDialogRef<TokenExpiredComponent>;
   abc: any;
+  newlyCompletedGoals: Subject<UserGoal[]> = new Subject<UserGoal[]>();
 
    constructor(private http: HttpClient,
      private processHTTPMsgService: ProcessHTTPMsgService,
@@ -73,14 +75,6 @@ export class AuthService {
        console.log('JWT Token invalid: ', err);
        this.destroyUserCredentials();
      });
-   }
-
-   sendUsername(name: string) {
-     this.username.next(name);
-   }
-
-   clearUsername() {
-     this.username.next(undefined);
    }
 
    loadUserCredentials() {
@@ -135,10 +129,12 @@ export class AuthService {
 
    storeGoalsDetails(details: any) {
     console.log('storeUserGoalsDetails ', details); 
+    this.sendNewlyCompletedGoals(details.newlyCompletedGoals);
     localStorage.setItem("User Goals Details", JSON.stringify(details));
   }
 
   destroyGoalsDetails() {
+    this.clearNewlyCompletedGoals();
     localStorage.removeItem("User Goals Details")
   }
  
@@ -241,10 +237,6 @@ export class AuthService {
     return this.isUpdating;
   }
 
-   getUsername(): Observable<string> {
-     return this.username.asObservable();
-   }
-
    getToken(): string {
      return this.authToken;
    }
@@ -308,6 +300,18 @@ export class AuthService {
     }, expTime*1000)
    }
 
+   getUsername(): Observable<string> {
+    return this.username.asObservable();
+  }
+
+   sendUsername(name: string) {
+    this.username.next(name);
+  }
+
+  clearUsername() {
+    this.username.next(undefined);
+  }
+
    getTokenTimer(): Observable<number>  {
      return this.tokenTimer.asObservable();
    }
@@ -318,6 +322,20 @@ export class AuthService {
 
    clearTokenTimer() {
      this.tokenTimer.next(undefined);
+   }
+
+   getNewlyCompletedGoals(): Observable<UserGoal[]> {
+     console.log("get goals")
+     return this.newlyCompletedGoals.asObservable();
+   }
+
+   sendNewlyCompletedGoals(goals: UserGoal[]) {
+     console.log("sent goals")
+     this.newlyCompletedGoals.next(goals);
+   }
+
+   clearNewlyCompletedGoals() {
+     this.newlyCompletedGoals.next(undefined);
    }
 }
 

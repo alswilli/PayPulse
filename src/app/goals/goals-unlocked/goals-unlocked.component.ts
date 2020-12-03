@@ -39,6 +39,7 @@ export class GoalsUnlockedComponent implements OnInit {
         else {
           goal['show'] = false
         }
+        goal[0].dateFirstAchieved = new Date(goal[0].dateFirstAchieved).toLocaleString("en-US")
         this.matchedGoals.push(goal)
         currIndex += 1
       }

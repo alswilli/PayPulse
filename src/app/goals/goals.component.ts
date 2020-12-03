@@ -85,13 +85,24 @@ export class GoalsComponent implements OnInit {
       this.initialLoad = false;
 
       this.allUserGoals = JSON.parse(localStorage.getItem('User Goals Details'))["usergoals"];
+      var completedGoals = JSON.parse(localStorage.getItem('User Goals Details'))["newlyCompletedGoals"];
+      var matchIndex = 0
       for (let goal of this.allGoals) {
         // var found = false;
         for (let usergoal of this.allUserGoals) {
           if (usergoal.goalId == goal._id) {
             // found = true;
+
             this.matchedGoals.push([usergoal, goal])
+            this.matchedGoals[matchIndex]["new"] = false
+            matchIndex += 1
             break;
+          }
+        }
+        for (let usergoal of completedGoals) {
+          if (usergoal.goalId == goal._id) {
+            // found = true;
+            this.newlyUnlockedGoals.push([usergoal, goal])
           }
         }
         // if (!found) {
@@ -99,16 +110,25 @@ export class GoalsComponent implements OnInit {
         // }
       }
 
-      this.newlyUnlockedGoals.push(this.matchedGoals[8])
-      this.newlyUnlockedGoals.push(this.matchedGoals[9])
-      this.newlyUnlockedGoals.push(this.matchedGoals[10])
-      this.goalsUnlocked = true;
-      if (this.goalsUnlocked) {
+      for (let match of this.matchedGoals) {
+        for (let newGoal of this.newlyUnlockedGoals) {
+          if (match[0]._id == newGoal[0]._id) {
+            match["new"] = true
+          }
+        }
+      }
+
+      // this.newlyUnlockedGoals.push(this.matchedGoals[8])
+      // this.newlyUnlockedGoals.push(this.matchedGoals[9])
+      // this.newlyUnlockedGoals.push(this.matchedGoals[10])
+
+      if (this.newlyUnlockedGoals.length > 0) {
         this.goalsUnlockedRef = this.dialog.open(GoalsUnlockedComponent, {data: {newlyUnlockedGoals: this.newlyUnlockedGoals}});
         // this.goalsUnlockedRef.componentInstance.onAdd
         // // this.addBudgetRef.close()
         //   .subscribe(result => {})
       }
+      localStorage.setItem(('User Goals Details'), JSON.stringify({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: []}));
     })
   }
 

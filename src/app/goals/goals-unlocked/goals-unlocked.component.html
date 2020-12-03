@@ -1,14 +1,14 @@
 <div>
-  <h1 *ngIf="newGoals" style="text-align: center;">Newly Completed Goals!</h1>
-  <h1 *ngIf="!newGoals" style="text-align: center;">All Goals</h1>
   <div *ngIf="!isLoading" fxLayout="row" style="height: 100%; width: 100%">
     <mat-dialog-actions style="padding: 0px; margin-bottom: 0px; margin-right: 20px;">
       <button mat-button class="leftIconDiv" (click)="onLeftIconClicked();" [disabled]="farthestLeft">
         <mat-icon class="icon">keyboard_arrow_left</mat-icon>
       </button>
     </mat-dialog-actions>
-    <div *ngFor="let goal of goals">
+    <div *ngFor="let goal of goals; let i = index">
       <div *ngIf="goal.show">
+        <h1 *ngIf="newGoals" style="text-align: center;">Newly Completed Goals!</h1>
+        <h1 *ngIf="!newGoals" style="text-align: center;">All Goals</h1>
         <div class="goal-image" *ngIf="goal[0].goalProgress != 100">
           <img [src]="goal[1].imagePath" [alt]="goal[1].goalName">
         </div>
@@ -23,6 +23,7 @@
         <p style="text-align: center;">{{goal[1].goalDescription}}</p>
         <p *ngIf="goal[0].goalProgress == 100" style="text-align: center;"> Number of Times Achieved: <b>{{goal[0].numTimesAchieved}}</b></p>
         <p *ngIf="goal[0].goalProgress == 100" style="text-align: center;"> Date First Achieved: <b>{{goal[0].dateFirstAchieved}}</b></p>
+        <h4 style="text-align: center;">{{i+1}} / {{goals.length}}</h4>
       </div>
     </div>
     <mat-dialog-actions style="padding: 0px; margin-bottom: 0px; margin-left: 20px;">
