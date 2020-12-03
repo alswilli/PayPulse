@@ -20,8 +20,8 @@ const mongoUsername = process.env.MONGODB_USERNAME;
 const mongoUserPassword = process.env.MONGODB_USER_PASSWORD;
 const mongoDatabaseName = process.env.MONGODB_DATABASE_NAME;
 
-const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName + "?retryWrites=true&w=majority";
-// const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName;
+// const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName + "?retryWrites=true&w=majority";
+const url = "mongodb+srv://" + mongoUsername + ":" + mongoUserPassword + "@cluster0.r11ua.mongodb.net/" + mongoDatabaseName;
 const connect = mongoose.connect( process.env.MONGODB_URI || url);
 
 connect.then((db) => {
