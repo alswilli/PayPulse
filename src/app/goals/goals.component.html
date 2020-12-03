@@ -76,11 +76,11 @@
     width="100%"
     (window:resize)="onBoxResize($event)">
       <mat-grid-tile
-        *ngFor="let matchedGoal of matchedGoals"
+        *ngFor="let matchedGoal of matchedGoals; let i = index"
         style="margin: auto;"
       >
         <mat-spinner *ngIf="isLoading" style="margin: auto;"></mat-spinner>
-        <div *ngIf="!isLoading" style="height: 100%; width: 100%">
+        <div *ngIf="!isLoading" style="height: 100%; width: 100%" (click)="openGoals(i)">
           <div class="goal-image" *ngIf="matchedGoal[0].goalProgress != 100">
             <img [src]="matchedGoal[1].imagePath" [alt]="matchedGoal[1].goalName" 
             matTooltip="{{matchedGoal[1].goalDescription}}" matTooltipPosition="above">

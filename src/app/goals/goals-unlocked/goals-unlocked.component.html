@@ -1,14 +1,18 @@
 <div>
-  <h1 style="text-align: center;">Newly Completed Goals!</h1>
+  <h1 *ngIf="newGoals" style="text-align: center;">Newly Completed Goals!</h1>
+  <h1 *ngIf="!newGoals" style="text-align: center;">All Goals</h1>
   <div *ngIf="!isLoading" fxLayout="row" style="height: 100%; width: 100%">
     <mat-dialog-actions style="padding: 0px; margin-bottom: 0px; margin-right: 20px;">
       <button mat-button class="leftIconDiv" (click)="onLeftIconClicked();" [disabled]="farthestLeft">
         <mat-icon class="icon">keyboard_arrow_left</mat-icon>
       </button>
     </mat-dialog-actions>
-    <div *ngFor="let goal of newlyUnlockedGoals">
+    <div *ngFor="let goal of goals">
       <div *ngIf="goal.show">
-        <div class="goal-image-unlocked">
+        <div class="goal-image" *ngIf="goal[0].goalProgress != 100">
+          <img [src]="goal[1].imagePath" [alt]="goal[1].goalName">
+        </div>
+        <div class="goal-image-unlocked" *ngIf="goal[0].goalProgress == 100">
           <img [src]="goal[1].imagePath" [alt]="goal[1].goalName">
         </div>
         <mat-progress-bar mode="determinate" [value]="goal[0].goalProgress"></mat-progress-bar>
@@ -17,8 +21,8 @@
         </div>
         <h3 style="text-align: center;">{{goal[1].goalName}}</h3>
         <p style="text-align: center;">{{goal[1].goalDescription}}</p>
-        <p style="text-align: center;"> Number of Times Achieved: <b>{{goal[0].numTimesAchieved}}</b></p>
-        <p style="text-align: center;"> Date First Achieved: <b>{{goal[0].dateFirstAchieved}}</b></p>
+        <p *ngIf="goal[0].goalProgress == 100" style="text-align: center;"> Number of Times Achieved: <b>{{goal[0].numTimesAchieved}}</b></p>
+        <p *ngIf="goal[0].goalProgress == 100" style="text-align: center;"> Date First Achieved: <b>{{goal[0].dateFirstAchieved}}</b></p>
       </div>
     </div>
     <mat-dialog-actions style="padding: 0px; margin-bottom: 0px; margin-left: 20px;">
@@ -28,12 +32,3 @@
     </mat-dialog-actions>
   </div>
 </div>
-
-
-<!-- <mat-dialog-content class="mat-typography">
-  <p>Are you sure you want to delete your <b>{{data.budget.mainCategory}}</b> budget?</p>
-</mat-dialog-content>
-<mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>Cancel</button>
-  <button mat-button class="mat-warn" (click)="onDeleteConfirmed(data.budget._id, data.budget.accountId);" cdkFocusInitial>Delete Budget</button>
-</mat-dialog-actions> -->

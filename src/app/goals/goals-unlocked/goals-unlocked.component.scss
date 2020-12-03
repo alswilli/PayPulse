@@ -14,3 +14,34 @@
     width: 80px;
     // background-color: grey;
 }
+
+.goal-image {
+    // width: 200px;
+    // height: 200px;
+    // cursor: pointer;
+    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(100%);
+    opacity: 0.1;
+}
+
+// .goal-image img {
+//     width: 100%;
+//     height: 100%;
+//     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+// }
+
+.goal-image-unlocked {
+    // width: 100%;
+    // height: 50%;
+    // width: 200px;
+    // height: 200px;
+    // cursor: pointer;
+}
+
+// .goal-image-unlocked img {
+//     // width: 100%;
+//     // height: 100%;
+//     width: 100%;
+//     height: 100%;
+//     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.5);
+// }

@@ -99,6 +99,7 @@ export class GoalsComponent implements OnInit {
         // }
       }
 
+      this.newlyUnlockedGoals.push(this.matchedGoals[8])
       this.newlyUnlockedGoals.push(this.matchedGoals[9])
       this.newlyUnlockedGoals.push(this.matchedGoals[10])
       this.goalsUnlocked = true;
@@ -109,6 +110,10 @@ export class GoalsComponent implements OnInit {
         //   .subscribe(result => {})
       }
     })
+  }
+
+  openGoals(i) {
+    this.goalsUnlockedRef = this.dialog.open(GoalsUnlockedComponent, {data: {matchedGoals: this.matchedGoals, index: i}});
   }
 
   onImageSelected(event: Event) {

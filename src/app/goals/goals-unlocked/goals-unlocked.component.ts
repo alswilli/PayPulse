@@ -14,8 +14,11 @@ export class GoalsUnlockedComponent implements OnInit {
   isLoading = false;
   index: number;
   newlyUnlockedGoals = []
+  matchedGoals = []
   farthestRight: boolean;
   farthestLeft: boolean;
+  newGoals: boolean;
+  goals = []
 
   constructor(public dialogRef: MatDialogRef<GoalsUnlockedComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
@@ -26,25 +29,50 @@ export class GoalsUnlockedComponent implements OnInit {
     this.isLoading = false;
     this.index = 0;
     var currIndex = 0;
-    for (let goal of this.data.newlyUnlockedGoals) {
-      if (currIndex == this.index) {
-        goal['show'] = true
+    if ('matchedGoals' in this.data) {
+      this.newGoals = false
+      this.index = this.data.index;
+      for (let goal of this.data.matchedGoals) {
+        if (currIndex == this.index) {
+          goal['show'] = true
+        }
+        else {
+          goal['show'] = false
+        }
+        this.matchedGoals.push(goal)
+        currIndex += 1
       }
-      else {
-        goal['show'] = false
-      }
-      goal[0].dateFirstAchieved = new Date(goal[0].dateFirstAchieved).toLocaleString("en-US")
-      this.newlyUnlockedGoals.push(goal)
-      currIndex += 1
+      console.log(this.matchedGoals)
+      this.goals = this.matchedGoals
     }
-    console.log(this.newlyUnlockedGoals)
+    else {
+      this.newGoals = true
+      for (let goal of this.data.newlyUnlockedGoals) {
+        if (currIndex == this.index) {
+          goal['show'] = true
+        }
+        else {
+          goal['show'] = false
+        }
+        goal[0].dateFirstAchieved = new Date(goal[0].dateFirstAchieved).toLocaleString("en-US")
+        this.newlyUnlockedGoals.push(goal)
+        currIndex += 1
+      }
+      console.log(this.newlyUnlockedGoals)
+      this.goals = this.newlyUnlockedGoals
+    }
+
     if (this.index == 0) {
       this.farthestLeft = true;
     }
     else {
       this.farthestLeft = false;
     }
-    if (this.index == this.newlyUnlockedGoals.length-1) {
+
+    if (this.newGoals && this.index == this.newlyUnlockedGoals.length-1) {
+      this.farthestRight = true;
+    }
+    else if (!this.newGoals && this.index == this.matchedGoals.length-1) {
       this.farthestRight = true;
     }
     else {
@@ -54,12 +82,12 @@ export class GoalsUnlockedComponent implements OnInit {
 
   onLeftIconClicked() {
     var currIndex = 0;
-    while (currIndex < this.newlyUnlockedGoals.length) {
+    while (currIndex < this.goals.length) {
       if (currIndex - 1 >= 0 && currIndex == this.index) {
         console.log("left")
-        this.newlyUnlockedGoals[this.index].show = false
+        this.goals[this.index].show = false
         this.index = currIndex - 1
-        this.newlyUnlockedGoals[this.index].show = true
+        this.goals[this.index].show = true
         this.farthestRight = false
         break
       }
@@ -75,18 +103,18 @@ export class GoalsUnlockedComponent implements OnInit {
 
   onRightIconClicked() {
     var currIndex = 0;
-    while (currIndex < this.newlyUnlockedGoals.length) {
-      if (currIndex + 1 < this.newlyUnlockedGoals.length && currIndex == this.index) {
+    while (currIndex < this.goals.length) {
+      if (currIndex + 1 < this.goals.length && currIndex == this.index) {
         console.log("right")
-        this.newlyUnlockedGoals[this.index].show = false
+        this.goals[this.index].show = false
         this.index = currIndex + 1
-        this.newlyUnlockedGoals[this.index].show = true
+        this.goals[this.index].show = true
         this.farthestLeft = false
         break
       }
       currIndex += 1
     }
-    if (this.index == this.newlyUnlockedGoals.length-1) {
+    if (this.index == this.goals.length-1) {
       this.farthestRight = true;
     }
     else {
