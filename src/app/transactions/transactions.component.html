@@ -37,7 +37,7 @@
                           [checked]="checklistSelection.isSelected(node)"
                   
                           (change)="todoItemSelectionToggle(node)" 
-                          color="primary" style="overflow-x: auto; overflow-y: hidden">{{node.item}}</mat-checkbox>
+                          color="primary" style="overflow-x: auto; overflow-y: hidden" [disabled]="isLoading">{{node.item}}</mat-checkbox>
           </mat-tree-node>
         
           <!-- <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding>
@@ -57,7 +57,7 @@
             </button>
             <mat-checkbox [checked]="descendantsAllSelected(node)"
                           
-                          (change)="todoItemSelectionToggle(node)" color="primary">{{node.item}}</mat-checkbox>
+                          (change)="todoItemSelectionToggle(node)" color="primary" [disabled]="isLoading">{{node.item}}</mat-checkbox>
             <!-- <button mat-icon-button (click)="addNewItem(node)"><mat-icon>add</mat-icon></button> -->
           </mat-tree-node>
         </mat-tree>

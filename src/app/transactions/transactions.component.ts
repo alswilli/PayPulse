@@ -12,15 +12,6 @@ import {forkJoin, merge, Observable, of as observableOf} from 'rxjs';
 import {catchError, map, startWith, switchMap} from 'rxjs/operators';
 import { MatSelectionList, MatSelectionListChange } from '@angular/material';
 
-
-
-
-
-
-
-
-
-
 import {SelectionModel} from '@angular/cdk/collections';
 import {FlatTreeControl} from '@angular/cdk/tree';
 import {MatTreeFlatDataSource, MatTreeFlattener} from '@angular/material/tree';
@@ -124,20 +115,6 @@ export class ChecklistDatabase {
     this.dataChange.next(this.data);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export interface TransactionData {
   amount: string;
@@ -593,34 +570,6 @@ export class TransactionsComponent implements OnInit {
   sortData(event) {
     console.log(event);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   
 
   getLevel = (node: TodoItemFlatNode) => node.level;

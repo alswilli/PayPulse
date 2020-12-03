@@ -10,6 +10,7 @@ import { Transaction } from '../shared/transaction';
 import { PieChartService } from '../services/pie-chart.service';
 import { CodegenComponentFactoryResolver } from '@angular/core/src/linker/component_factory_resolver';
 import { basename } from 'path';
+import { forkJoin, Observable } from 'rxjs';
 
 @Component({
   selector: 'app-budgets',
@@ -25,7 +26,7 @@ export class BudgetsComponent implements OnInit {
   categories: any;
   isLoading: boolean;
   userAccountsDetails: any;
-  currentAccountId: string;
+  currentAccountIds: string[] = [];
   days: number;
   subdays: number;
   transactions: any[];
@@ -71,6 +72,7 @@ export class BudgetsComponent implements OnInit {
     "November":["11", 30],
     "December":["12", 31]
   }
+  currentAccounts: any[] = [];
 
   constructor(public dialog: MatDialog,
     private accountService: AccountService,
@@ -82,7 +84,10 @@ export class BudgetsComponent implements OnInit {
     this.budgets = [];
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
     this.initialLoad = false;
-    this.currentAccountId = this.userAccountsDetails.currentAccount[0]._id;
+    this.currentAccounts = this.userAccountsDetails.currentAccounts
+    for (let currAccount of this.currentAccounts) {
+      this.currentAccountIds.push(currAccount._id)
+    }
 
     var today = new Date();
     var currMonth = today.getMonth() + 1;
@@ -160,11 +165,24 @@ export class BudgetsComponent implements OnInit {
         // var yyyy = String(currYear);
         // this.days = yyyy + '-' + mm + '-' + dd;
         console.log("Days: ", this.days);
-        return this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays);
+        let btObservables: Observable<any>[] = [];
+        for (let currAccount of this.currentAccounts) {
+          btObservables.push(this.accountService.getBudgetTransactions(currAccount._id, this.days, this.subdays))
+        }
+        return forkJoin(btObservables);
       })
     )
-    .subscribe(transactions => {
-      this.transactions = transactions;
+    .subscribe(transactionsArray => {
+      console.log(transactionsArray)
+      this.transactions = []
+      for (let transactions of transactionsArray) {
+        if (transactions != null) {
+          for (let transaction of transactions) {
+            this.transactions.push(transaction);
+          }
+        }
+      }
+      console.log(this.transactions)
       this.onGetTransactions();
 
       // FROM SIDE
@@ -234,9 +252,20 @@ export class BudgetsComponent implements OnInit {
 
         console.log("NUM DAYS: ", this.days)
 
-        this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays)
-          .subscribe(transactions => {
-            this.transactions = transactions;
+        let btFromObservables: Observable<any>[] = [];
+        for (let currAccount of this.currentAccounts) {
+          btFromObservables.push(this.accountService.getBudgetTransactions(currAccount._id, this.days, this.subdays))
+        }
+        forkJoin(btFromObservables)
+          .subscribe(transactionsArray => {
+            this.transactions = []
+            for (let transactions of transactionsArray) {
+              if (transactions != null) {
+                for (let transaction of transactions) {
+                  this.transactions.push(transaction);
+                }
+              }
+            }
             this.onGetTransactions();
         });
       });
@@ -295,9 +324,20 @@ export class BudgetsComponent implements OnInit {
           j -= 1;
         }
 
-        this.accountService.getBudgetTransactions(this.currentAccountId, this.days, this.subdays)
-          .subscribe(transactions => {
-            this.transactions = transactions;
+        let btToObservables: Observable<any>[] = [];
+        for (let currAccount of this.currentAccounts) {
+          btToObservables.push(this.accountService.getBudgetTransactions(currAccount._id, this.days, this.subdays))
+        }
+        forkJoin(btToObservables)
+          .subscribe(transactionsArray => {
+            this.transactions = []
+            for (let transactions of transactionsArray) {
+              if (transactions != null) {
+                for (let transaction of transactions) {
+                  this.transactions.push(transaction);
+                }
+              }
+            }
             this.onGetTransactions();
         });
       });
@@ -514,7 +554,7 @@ export class BudgetsComponent implements OnInit {
 
   onAddBudgetClicked() {
     console.log("add clicked")
-    this.addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: false, accountId: this.currentAccountId}});
+    this.addBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: false, accountIds: this.currentAccountIds}});
     this.addBudgetRef.componentInstance.onAdd
     // this.addBudgetRef.close()
       .subscribe(result => {
