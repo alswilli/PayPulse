@@ -378,8 +378,8 @@ plaidRouter.route("/accounts/transactions/:accountId")
   // Variables from customized requests
   const pageSize = +req.query.pageSize;
   const currentPage = +req.query.page;
-  const subAccount = req.query.subAccount;
-  const subAccountId = req.query.subAccountId;
+  var subAccountIds = []
+  var index = 0
   const N = 3;
   // Variables for Plaid API query
   const now = moment();
@@ -425,24 +425,40 @@ plaidRouter.route("/accounts/transactions/:accountId")
           console.log("First Transaction: ", response.transactions[0])
           // Checks for pagination query params
           if (pageSize && currentPage) {
+            console.log("Pagination")
+            while(index < req.query.subAccountIds.length) {
+              var subAccountId = ""
+              while (index < req.query.subAccountIds.length && req.query.subAccountIds[index] !== ",") {
+                subAccountId = subAccountId + req.query.subAccountIds[index]
+                index += 1
+              }
+              subAccountIds.push(subAccountId)
+              index += 1
+            }
             // Filter for subAccount
             filteredTransactions = []
             // console.log(response.transactions)
-            console.log(subAccount)
-            console.log(subAccountId)
-            if (subAccount === 'All') {
-              console.log('all');
-              for (let transaction of response.transactions) {
-                  filteredTransactions.push(transaction);
-              }
-            }
-            else {
+            console.log(subAccountIds)
+            console.log(response.transactions.length)
+            for (let subAccountId of subAccountIds) {
               for (let transaction of response.transactions) {
                 if (transaction.account_id === subAccountId) {
                   filteredTransactions.push(transaction);
                 }
+                // else if (transaction.account_id == subAccountId) {
+                //   console.log("found2")
+                //   filteredTransactions.push(transaction);
+                // }
               }
-            } 
+            }
+
+            function compareTransactions(a,b) {
+              if (new Date(a.date) >= new Date(b.date)) //push more recent dates to front
+                 return -1;
+              if (new Date(a.date) < new Date(b.date)) //if equal then use one that is further down user goals list
+                return 1;
+            }
+            this.filteredTransactions.sort(compareTransactions)
             responseLength = filteredTransactions.length;
             startIndex = pageSize * (currentPage - 1)
             endIndex = Math.min(startIndex + pageSize, responseLength);  

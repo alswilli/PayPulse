@@ -129,8 +129,8 @@ export class AccountService {
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }
 
-  getTransactions(accountId: string, postsPerPage: number, currentPage: number, subAccount: string, subAccountId: string) {
-    const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}&subAccount=${subAccount}&subAccountId=${subAccountId}`;
+  getTransactions(accountId: string, postsPerPage: number, currentPage: number, subAccountIds: string[]) {
+    const queryParams = `?pageSize=${postsPerPage}&page=${currentPage}&subAccountIds=${subAccountIds}`;
     return this.http.get<{success: boolean, transactions: any[], maxTransactions: number}>(baseURL + 'plaid/accounts/transactions/' + accountId + queryParams);
       // .pipe(catchError(this.processHTTPMsgService.handleError));
   }

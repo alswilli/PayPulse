@@ -2,9 +2,9 @@
   <p>No accounts added! Please add an account to see transactions</p>
 </div>
 <div *ngIf="userAccountsDetails.accounts.length > 0 && userAccountsDetails.currentAccounts.length > 0" style="margin: 10px;">
-  <h2>Bank Account(s) Selected: <p style="color: rgb(255, 0, 64); display: inline;">{{numBankAccountsSelected}}</p></h2>
-  <h3>Sub Account(s) Selected: <p style="color: rgb(76, 0, 255); display: inline;">{{numSubAccountsSelected}}</p></h3>
-    <h4>Current Balance: <p style="color: green; display: inline;">$ {{balancesCurrentDict[subAccount]}}</p></h4>
+  <h2>Bank Account(s) Selected: <p style="color: rgb(255, 0, 64); display: inline;">{{activeCurrentsLength}} / {{currentAccounts.length}}</p></h2>
+  <h3>Sub Account(s) Selected: <p style="color: rgb(76, 0, 255); display: inline;">{{activeSubsLength}} / {{subAccountsLength}}</p></h3>
+    <h4>Current Balance: <p style="color: green; display: inline;">$ {{totalCurrent}}</p></h4>
 
     <mat-form-field *ngIf="!errMess">
       <mat-label>Filter</mat-label>
@@ -27,12 +27,17 @@
           </mat-list-option> -->
         </mat-selection-list>
   
+        <!-- (change)="checklistSelection.toggle(node);" -->
+        <!-- [indeterminate]="descendantsPartiallySelected(node)" -->
+
         <mat-tree [dataSource]="treeDataSource" [treeControl]="treeControl">
           <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle style="padding-left: 20px"> 
             <button mat-icon-button disabled></button>
             <mat-checkbox class="checklist-leaf-node"
                           [checked]="checklistSelection.isSelected(node)"
-                          (change)="checklistSelection.toggle(node);" color="primary" style="overflow-x: auto; overflow-y: hidden">{{node.item}}</mat-checkbox>
+                  
+                          (change)="todoItemSelectionToggle(node)" 
+                          color="primary" style="overflow-x: auto; overflow-y: hidden">{{node.item}}</mat-checkbox>
           </mat-tree-node>
         
           <!-- <mat-tree-node *matTreeNodeDef="let node; when: hasNoContent" matTreeNodePadding>
@@ -51,7 +56,7 @@
               </mat-icon>
             </button>
             <mat-checkbox [checked]="descendantsAllSelected(node)"
-                          [indeterminate]="descendantsPartiallySelected(node)"
+                          
                           (change)="todoItemSelectionToggle(node)" color="primary">{{node.item}}</mat-checkbox>
             <!-- <button mat-icon-button (click)="addNewItem(node)"><mat-icon>add</mat-icon></button> -->
           </mat-tree-node>
