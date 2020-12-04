@@ -12,6 +12,7 @@ import { map, mergeMap } from 'rxjs/operators';
 import { Router } from "@angular/router";
 import { TransactionService } from './transaction.service';
 import { Budget } from '../shared/budget';
+import { GoalData } from '../shared/goaldata';
 // import { Observable } from 'rxjs/Observable';
 // import 'rxjs/add/observable/forkJoin';
 
@@ -23,6 +24,11 @@ interface GoalResponse {
 interface UserGoalResponse {
   message: string;
   usergoals: UserGoal[];
+}
+
+interface GoalDataResponse {
+  message: string;
+  goaldata: GoalData;
 }
 
 @Injectable({
@@ -90,7 +96,7 @@ export class GoalService {
     return forkJoin(addObservables)
   }
 
-  checkAndUpdateUserGoals(accountIds, allGoals, allUserGoals) {
+  checkAndUpdateUserGoals(accountIds, allGoals, allUserGoals, userGoalData) {
     /*
     If (prev date is same month and year as current date) {
       do nothing
@@ -118,8 +124,8 @@ export class GoalService {
         var oldDate = new Date(JSON.parse(localStorage.getItem('JWT'))["lastUpdated"])
         var currDate = new Date();
         this.totalBudgetAmount = 0
-        // var oldDate = new Date("2020-08-21T01:14:54.483Z");
-        // var currDate = new Date("2020-09-21T01:14:54.483Z"); 
+        var oldDate = new Date("2020-08-21T01:14:54.483Z");
+        var currDate = new Date("2021-08-21T01:14:54.483Z"); 
         console.log(oldDate)
         console.log(currDate)
         console.log(budgets.length)
@@ -264,7 +270,31 @@ export class GoalService {
         var index = 0;
         var accountsIndex = 0;
         var monthlyTotal = 0
-        var potentialGoals = []
+        var potentialMonthlyGoals = []
+        var allMonthsId = null
+        for (let goal of allGoals) {
+          console.log(goal.goalName)
+          if (goal.goalName == "Budget Manager - All Months") {
+            console.log("found all months")
+            for (let ug of allUserGoals) {
+              if (ug.goalId == goal._id) {
+                allMonthsId = ug._id
+                break
+              }
+            }
+            break
+          }
+        }
+        console.log("all months id: ", allMonthsId)
+
+        var allMonthsDone = true
+        for (let month in userGoalData.allMonthsAchieved) {
+          if (!userGoalData.allMonthsAchieved[month]) {
+            allMonthsDone = false
+            break
+          }
+        }
+        
         for (let transactions of transactionsDataArray) {
           console.log("inside transactions loop")
           if (accountsIndex < accountIds.length) {
@@ -308,7 +338,7 @@ export class GoalService {
                       retObj["numTimesAchieved"] = usergoal.numTimesAchieved+1 //needs to be years since last achieved
                     }
                     var found = false
-                    for (let obj of potentialGoals) {
+                    for (let obj of potentialMonthlyGoals) {
                       if (obj[0] == usergoal._id) {
                         obj[1]["numTimesAchieved"] += 1
                         found = true
@@ -317,7 +347,8 @@ export class GoalService {
                       }
                     }
                     if (!found) {
-                      potentialGoals.push([usergoal._id, retObj])
+                      userGoalData.allMonthsAchieved[this.pairs[index][0]] = true
+                      potentialMonthlyGoals.push([usergoal._id, retObj])
                     }
                     break
                   }
@@ -331,7 +362,33 @@ export class GoalService {
           monthlyTotal = 0
           index += 1
         }
-        for (let obj of potentialGoals) {
+
+        if (!allMonthsDone) {
+          var monthsCount = 0
+          allMonthsDone = true
+          for (let month in userGoalData.allMonthsAchieved) {
+            if (!userGoalData.allMonthsAchieved[month]) {
+              allMonthsDone = false
+            }
+            else {
+              monthsCount += 1
+            }
+          }
+          if (allMonthsDone) {
+            var retObj = {}
+            retObj['done'] = "Done"
+            retObj["numTimesAchieved"] = 1
+            usergoalObservables.push(this.updateUserGoal(allMonthsId, retObj))
+          }
+          else {
+            var retObj = {}
+            retObj['done'] = "Not Done"
+            retObj["goalProgression"] = this.roundNumber((monthsCount / 12)*100, 2)
+            usergoalObservables.push(this.updateUserGoal(allMonthsId, retObj))
+          }
+        }
+
+        for (let obj of potentialMonthlyGoals) {
           usergoalObservables.push(this.updateUserGoal(obj[0], obj[1]))
         }
         // Step 4: Update local user goals
@@ -364,7 +421,9 @@ export class GoalService {
               }
               j += 1
             }
-            unlockedGoals.push(updatedUG)
+            if (updatedUG.goalProgress == 100) {
+              unlockedGoals.push(updatedUG) 
+            }
           }
         }
         // this.authService.storeUserGoalsDetails({usergoals: allUserGoals});
@@ -374,8 +433,21 @@ export class GoalService {
       }))  
   }
 
+  roundNumber(number, decimals) {
+    var newnumber = new Number(number+'').toFixed(parseInt(decimals));
+    return parseFloat(newnumber); 
+  }
+
   updateUserGoal(usergoalId: string, usergoalinfo: object) {
     return this.http.put<UserGoal>(baseURL + 'usergoals/' + usergoalId, usergoalinfo);
   }
+
+  getGoalData(userId: string) {
+    return this.http.post<GoalDataResponse>(baseURL + 'goals/goaldata/' + userId, null);
+  }
+
+  // addGoalData(userId: string) {
+  //   return this.http.post<GoalDataResponse>(baseURL + 'goals/goaldata' + userId, null);
+  // }
 
 }

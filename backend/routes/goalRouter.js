@@ -3,6 +3,7 @@ var goalRouter = express.Router();
 const bodyParser = require('body-parser');
 var passport = require('passport');
 var Goal = require('../models/goals');
+var GoalData = require('../models/goalData');
 var authenticate = require('../authenticate');
 const cors = require('./corsRoutes');
 const extractFile = require("../imageFile");
@@ -59,6 +60,65 @@ goalRouter.route("/:goalId")
 .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
 .delete(cors.corsWithOptions, authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {
   
+});
+
+goalRouter.route("/goalData/:userId")
+.options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
+.get(cors.corsWithOptions, authenticate.verifyUser, function(req, res, next) {
+  GoalData.find({userId: req.params.userId})
+  .then(goaldata => {
+    res.status(200).json({
+      message: "Goal data fetched successfully!",
+      goaldata: goaldata
+    });
+  })
+  .catch(error => {
+    res.status(500).json({
+      message: "Fetching goal data failed!"
+    });
+  });
+})
+.post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+  GoalData.find({userId: req.params.userId})
+  .then(result => {
+    console.log(result)
+    if (result.length > 0) {
+      res.status(200).json({
+        message: "Goal data fetched successfully!",
+        goaldata: result
+      });
+    }
+    else {
+      const goaldata = new GoalData({
+        userId: req.params.userId,
+        allMonthsAchieved: {"January" : false,
+                            "February" : false,
+                            "March" : false,
+                            "April" : false,
+                            "May" : false,
+                            "June" : false,
+                            "July" : false,
+                            "August" : false,
+                            "September" : false,
+                            "October" : false,
+                            "November" : false,
+                            "December" : false 
+                          }
+      });
+      goaldata.save()
+        .then(createdGoalData => {
+          res.status(201).json({
+            message: "Goal data added successfully",
+            goaldata: [createdGoalData]
+          });
+        })
+        .catch(error => {
+          res.status(500).json({
+            message: "Creating a goal data failed!"
+          });
+        });
+    }
+  })
 });
 
 module.exports = goalRouter;

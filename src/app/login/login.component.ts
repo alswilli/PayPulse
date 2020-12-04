@@ -9,6 +9,7 @@ import { mergeMap } from 'rxjs/operators';
 import { Goal } from '../shared/goal';
 import { UserGoal } from '../shared/usergoal';
 import { Observable, forkJoin, of } from 'rxjs';
+import { GoalData } from '../shared/goaldata';
 
 declare var FB: any;
 
@@ -37,6 +38,7 @@ export class LoginComponent implements OnInit {
   accountsData: Account[];
   currentAccounts: Account[];
   newlyCompletedGoals: any[];
+  userGoalData: GoalData;
 
   constructor(private fb: FormBuilder,
     private router: Router,
@@ -139,14 +141,21 @@ export class LoginComponent implements OnInit {
                       this.currentAccounts = currAccounts
                     }
                     console.log("BBBBBBBB")
+                    this.userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
+                    console.log(this.userId)
+                    return this.goalService.getGoalData(this.userId)
+                }),
+                mergeMap(goalDataResponse => {
+                    console.log("CCCCCCCCGOALDATA")
+                    this.userGoalData = goalDataResponse.goaldata[0];
+                    console.log(this.userGoalData)
+                    console.log("DDDDDDDDGOALDATA")
                     return this.goalService.getGoals()
                 }),
                 mergeMap(goalResponse => {
                     console.log("CCCCCCCC")
                     this.allGoals = goalResponse.goals;
                     console.log(this.allGoals)
-                    this.userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
-                    console.log(this.userId)
                     console.log("DDDDDDDD")
                     return this.goalService.getUserGoals(this.userId)
                 }),
@@ -188,7 +197,7 @@ export class LoginComponent implements OnInit {
                       }
                     }
                     console.log("HHHHHHHH")
-                    return this.goalService.checkAndUpdateUserGoals(this.accountIds, this.allGoals, this.allUserGoals)
+                    return this.goalService.checkAndUpdateUserGoals(this.accountIds, this.allGoals, this.allUserGoals, this.userGoalData)
                 }),
                 mergeMap(checkRes => {
                   console.log("IIIIIIII")
@@ -231,13 +240,13 @@ export class LoginComponent implements OnInit {
                     }
                     index += 1
                   }
-                  this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals});
+                  this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
                   this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                   this.router.navigate(['/home']);
                 }
                 else {
                   this.authService.update().subscribe(res => {
-                    this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals});
+                    this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
                     this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                     this.router.navigate(['/home']);
                   })
@@ -280,24 +289,31 @@ export class LoginComponent implements OnInit {
                       this.accountService.getCurrentAccounts()
                       .pipe(
                         mergeMap(currAccounts => {
-                            console.log("AAAAAAAA")
-                            console.log(currAccounts)
-                            this.currentAccounts = []
-                            if (currAccounts.length > 0) {
-                              this.currentAccounts = currAccounts
-                            }
-                            console.log("BBBBBBBB")
-                            return this.goalService.getGoals()
-                        }),
-                        mergeMap(goalResponse => {
-                            console.log("CCCCCCCC")
-                            this.allGoals = goalResponse.goals;
-                            console.log(this.allGoals)
-                            this.userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
-                            console.log(this.userId)
-                            console.log("DDDDDDDD")
-                            return this.goalService.getUserGoals(this.userId)
-                        }),
+                          console.log("AAAAAAAA")
+                          console.log(currAccounts)
+                          this.currentAccounts = []
+                          if (currAccounts.length > 0) {
+                            this.currentAccounts = currAccounts
+                          }
+                          console.log("BBBBBBBB")
+                          this.userId = JSON.parse(localStorage.getItem('JWT'))["userId"];
+                          console.log(this.userId)
+                          return this.goalService.getGoalData(this.userId)
+                      }),
+                      mergeMap(goalDataResponse => {
+                          console.log("CCCCCCCCGOALDATA")
+                          this.userGoalData = goalDataResponse.goaldata[0];
+                          console.log(this.userGoalData)
+                          console.log("DDDDDDDDGOALDATA")
+                          return this.goalService.getGoals()
+                      }),
+                      mergeMap(goalResponse => {
+                          console.log("CCCCCCCC")
+                          this.allGoals = goalResponse.goals;
+                          console.log(this.allGoals)
+                          console.log("DDDDDDDD")
+                          return this.goalService.getUserGoals(this.userId)
+                      }),
                         mergeMap(usergoalResponse => {
                             console.log("EEEEEEEE")
                             console.log(usergoalResponse)
@@ -336,7 +352,7 @@ export class LoginComponent implements OnInit {
                               }
                             }
                             console.log("HHHHHHHH")
-                            return this.goalService.checkAndUpdateUserGoals(this.accountIds, this.allGoals, this.allUserGoals)
+                            return this.goalService.checkAndUpdateUserGoals(this.accountIds, this.allGoals, this.allUserGoals, this.userGoalData)
                         }),
                         mergeMap(checkRes => {
                           console.log("IIIIIIII")
@@ -379,13 +395,13 @@ export class LoginComponent implements OnInit {
                             }
                             index += 1
                           }
-                          this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals});
+                          this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
                           this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                           this._ngZone.run(() => this.router.navigate(['/home']))
                         }
                         else {
                           this.authService.update().subscribe(res => {
-                            this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals});
+                            this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
                             this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                             this._ngZone.run(() => this.router.navigate(['/home']))
                           })

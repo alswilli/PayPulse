@@ -62,9 +62,9 @@ $outer-Card-Width: 100%;
     overflow-y: auto;
 }
 
-// mat-list-option[aria-selected="true"] {
-//     background: rgb(202, 202, 202);
-// }
+mat-list-option[aria-selected="true"] {
+    background: rgb(202, 202, 202);
+}
 
 // mat-list-option[aria-selected="false"] {
 //     border: solid black;
