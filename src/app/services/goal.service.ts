@@ -45,7 +45,7 @@ export class GoalService {
     12:["December", 31]
   }
   budgets: Budget[];
-  totalBudgetAmount: number;
+  totalBudgetAmount: number = 0;
   pairs: any;
 
   constructor(private http: HttpClient,
@@ -117,34 +117,37 @@ export class GoalService {
         this.budgets = budgets;
         var oldDate = new Date(JSON.parse(localStorage.getItem('JWT'))["lastUpdated"])
         var currDate = new Date();
+        this.totalBudgetAmount = 0
         // var oldDate = new Date("2020-08-21T01:14:54.483Z");
-        // var currDate = new Date("2020-10-21T01:14:54.483Z"); 
-        if (oldDate != null && oldDate.getMonth() != currDate.getMonth() && budgets.length > 0) {
+        // var currDate = new Date("2020-09-21T01:14:54.483Z"); 
+        console.log(oldDate)
+        console.log(currDate)
+        console.log(budgets.length)
+        // Step 1: Gather total number of months to check + total Budget amount
+        var oldYear = oldDate.getFullYear();
+        var oldMonth = oldDate.getMonth()+1;
+        var currYear = currDate.getFullYear();
+        var currMonth = currDate.getMonth()+1;
+        var remainderMonths = 0
+        var numMonthsAhead = 0
+        if (currMonth > oldMonth) {
+          remainderMonths = (currMonth - oldMonth);
+          numMonthsAhead = (currYear - oldYear)*12 + remainderMonths;
+        }
+        else {
+          remainderMonths = currMonth + (12 - oldMonth);
+          numMonthsAhead = (currYear - oldYear - 1)*12 + remainderMonths;
+        }
+        
+        // var totalBudgetAmount = 0;
+        // for (let budget of budgets) {
+        //   totalBudgetAmount = totalBudgetAmount + Number(budget.amount);
+        // }
+
+        console.log("Number of Months ahead: ", numMonthsAhead)
+        if (oldDate != null && numMonthsAhead > 0 && budgets.length > 0) {
           // Time to update
           console.log("passed")
-
-          // Step 1: Gather total number of months to check + total Budget amount
-          var oldYear = oldDate.getFullYear();
-          var oldMonth = oldDate.getMonth()+1;
-          var currYear = currDate.getFullYear();
-          var currMonth = currDate.getMonth()+1;
-          var remainderMonths = 0
-          var numMonthsAhead = 0
-          if (currMonth > oldMonth) {
-            remainderMonths = (currMonth - oldMonth);
-            numMonthsAhead = (currYear - oldYear)*12 + remainderMonths;
-          }
-          else {
-            remainderMonths = currMonth + (12 - oldMonth);
-            numMonthsAhead = (currYear - oldYear - 1)*12 + remainderMonths;
-          }
-          
-          // var totalBudgetAmount = 0;
-          // for (let budget of budgets) {
-          //   totalBudgetAmount = totalBudgetAmount + Number(budget.amount);
-          // }
-
-          console.log("Number of Months ahead: ", numMonthsAhead)
           
           // Step 2: Convert them to pairs (total number of days, days behind current date) + get highest budget categories
           this.pairs = [];
@@ -285,6 +288,7 @@ export class GoalService {
             }
           }
           console.log("Monthly Total: ", monthlyTotal)
+          console.log("Total Budget Amount: ", this.totalBudgetAmount)
 
           // BUDGET MANAGER MONTHLY GOALS
           if (monthlyTotal < this.totalBudgetAmount) {
@@ -342,6 +346,7 @@ export class GoalService {
       }),
       mergeMap(dataArray => {
         console.log("55555555")
+        console.log(dataArray)
         if (dataArray == "item invalid") {
           return of([accountsItemStatus, []])
         }

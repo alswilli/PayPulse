@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { timer } from 'rxjs';
 
@@ -57,7 +57,9 @@ export class AuthService {
   authToken: string = undefined;
   tokenExpiredRef: MatDialogRef<TokenExpiredComponent>;
   abc: any;
-  newlyCompletedGoals: Subject<UserGoal[]> = new Subject<UserGoal[]>();
+  onNewGoals = new EventEmitter();
+  // newlyCompletedGoals: Subject<UserGoal[]> = new Subject<UserGoal[]>();
+  newlyCompletedGoals: Subject<UserGoal[]> = new BehaviorSubject<UserGoal[]>([]);
 
    constructor(private http: HttpClient,
      private processHTTPMsgService: ProcessHTTPMsgService,
@@ -129,7 +131,8 @@ export class AuthService {
 
    storeGoalsDetails(details: any) {
     console.log('storeUserGoalsDetails ', details); 
-    this.sendNewlyCompletedGoals(details.newlyCompletedGoals);
+    this.onNewGoals.emit(details.newlyCompletedGoals)
+    // this.sendNewlyCompletedGoals(details.newlyCompletedGoals);
     localStorage.setItem("User Goals Details", JSON.stringify(details));
   }
 
@@ -214,9 +217,11 @@ export class AuthService {
     return this.http.put<User>(baseURL + 'users/update', {userId: userId})
     .pipe( map(res => {
         var oldValues = JSON.parse(localStorage.getItem(this.tokenKey));
+        console.log(oldValues)
+        console.log(res)
         oldValues.lastUpdated = res.lastUpdated;
         localStorage.setItem(this.tokenKey, JSON.stringify(oldValues));
-        console.log("updated")
+        console.log("updated user lastUpdated")
         return res;
     }));
    }
@@ -325,7 +330,6 @@ export class AuthService {
    }
 
    getNewlyCompletedGoals(): Observable<UserGoal[]> {
-     console.log("get goals")
      return this.newlyCompletedGoals.asObservable();
    }
 

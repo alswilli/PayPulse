@@ -11,6 +11,8 @@ import { PieChartService } from '../services/pie-chart.service';
 import { CodegenComponentFactoryResolver } from '@angular/core/src/linker/component_factory_resolver';
 import { basename } from 'path';
 import { forkJoin, Observable } from 'rxjs';
+import { GoalService } from '../services/goal.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-budgets',
@@ -43,6 +45,8 @@ export class BudgetsComponent implements OnInit {
   editBudgetRef: any;
   deleteBudgetRef: any;
   initialLoad: boolean = true;
+  allGoals = [];
+  allUserGoals = [];
   // dataEmpty = true;
   dates = {
     "01":["January", 31],
@@ -73,16 +77,22 @@ export class BudgetsComponent implements OnInit {
     "December":["12", 31]
   }
   currentAccounts: any[] = [];
+  newlyCompletedGoals = [];
 
   constructor(public dialog: MatDialog,
     private accountService: AccountService,
     private budgetService: BudgetService,
-    private pieChartService: PieChartService) {
+    private pieChartService: PieChartService,
+    private goalService: GoalService,
+    private authService: AuthService) {
   }
 
   ngOnInit() {
     this.budgets = [];
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
+    this.allGoals = JSON.parse(localStorage.getItem('User Goals Details'))['goals'];
+    this.allUserGoals = JSON.parse(localStorage.getItem('User Goals Details'))['usergoals'];
+    this.newlyCompletedGoals = JSON.parse(localStorage.getItem('User Goals Details'))['newlyCompletedGoals'];
     this.initialLoad = false;
     this.currentAccounts = this.userAccountsDetails.currentAccounts
     for (let currAccount of this.currentAccounts) {
@@ -658,55 +668,135 @@ export class BudgetsComponent implements OnInit {
           }
         }
         // Add to list
-        this.budgets.push(result);
+        var goalIndex = 0
+        var usergoal = null
+        var finishAdd = false
+        if (this.budgets.length == 0) {
+          for (let goal of this.allGoals) {
+            if (goal.goalName == "Time To Save Money") {
+              usergoal = this.allUserGoals[goalIndex]
+              break
+            }
+            goalIndex += 1
+          }
+          if (usergoal.goalProgress == 0) {
+            var retObj = {}
+            retObj['done'] = "Done"
+            retObj["numTimesAchieved"] = usergoal.numTimesAchieved+1
+            this.goalService.updateUserGoal(usergoal._id, retObj).subscribe(res => {
+              this.allUserGoals[goalIndex] = res;
+              this.newlyCompletedGoals.push(res)
+              this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals});
+              this.budgets.push(result);
 
-        var currIndex = 4;
-        if (result.category3 !== "") {
-          if (currIndex == 4) {
-            currIndex = 3;
+              var currIndex = 4;
+              if (result.category3 !== "") {
+                if (currIndex == 4) {
+                  currIndex = 3;
+                }
+              }
+              else if (result.category2 !== "" && result.category3 === "") {
+                if (currIndex >= 3) {
+                  currIndex = 2;
+                }
+              }
+              else if (result.category !== "" && result.category2 === "") {
+                if (currIndex >= 2) {
+                  currIndex = 1;
+                }
+              }
+              // Now figure out what to do with it
+              if (result.category in this.budgetSets) {
+                if (currIndex === this.budgetSets[result.category][1]) {
+                  this.budgetSets[result.category][0] += Number(result.amount);
+                }
+                else if (currIndex < this.budgetSets[result.category][1]) {
+                  this.budgetSets[result.category] = [Number(result.amount), currIndex];
+                }
+              }
+              else {
+                this.budgetSets[result.category] = [Number(result.amount), currIndex];
+              }
+
+              this.totalBudget = 0;
+              for (let key in this.budgetSets) {
+                this.totalBudget += this.budgetSets[key][0];
+              }
+              console.log(this.budgetSets)
+
+              this.totalBudgetedExpenses = 0;
+              for (let dataVal of this.pieData) {
+                this.totalBudgetedExpenses += dataVal.total;
+                // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
+              }
+
+              // if (this.budgets.length == 1) {
+
+              // }
+
+              // Close dialogue ref
+              this.addBudgetRef.close();
+            })
           }
-        }
-        else if (result.category2 !== "" && result.category3 === "") {
-          if (currIndex >= 3) {
-            currIndex = 2;
-          }
-        }
-        else if (result.category !== "" && result.category2 === "") {
-          if (currIndex >= 2) {
-            currIndex = 1;
-          }
-        }
-        // Now figure out what to do with it
-        if (result.category in this.budgetSets) {
-          if (currIndex === this.budgetSets[result.category][1]) {
-            this.budgetSets[result.category][0] += Number(result.amount);
-          }
-          else if (currIndex < this.budgetSets[result.category][1]) {
-            this.budgetSets[result.category] = [Number(result.amount), currIndex];
-          }
+          else {
+            finishAdd = true
+          }        
         }
         else {
-          this.budgetSets[result.category] = [Number(result.amount), currIndex];
+          finishAdd = true
         }
 
-        this.totalBudget = 0;
-        for (let key in this.budgetSets) {
-          this.totalBudget += this.budgetSets[key][0];
+        if (finishAdd) {
+          this.budgets.push(result);
+
+          var currIndex = 4;
+          if (result.category3 !== "") {
+            if (currIndex == 4) {
+              currIndex = 3;
+            }
+          }
+          else if (result.category2 !== "" && result.category3 === "") {
+            if (currIndex >= 3) {
+              currIndex = 2;
+            }
+          }
+          else if (result.category !== "" && result.category2 === "") {
+            if (currIndex >= 2) {
+              currIndex = 1;
+            }
+          }
+          // Now figure out what to do with it
+          if (result.category in this.budgetSets) {
+            if (currIndex === this.budgetSets[result.category][1]) {
+              this.budgetSets[result.category][0] += Number(result.amount);
+            }
+            else if (currIndex < this.budgetSets[result.category][1]) {
+              this.budgetSets[result.category] = [Number(result.amount), currIndex];
+            }
+          }
+          else {
+            this.budgetSets[result.category] = [Number(result.amount), currIndex];
+          }
+
+          this.totalBudget = 0;
+          for (let key in this.budgetSets) {
+            this.totalBudget += this.budgetSets[key][0];
+          }
+          console.log(this.budgetSets)
+
+          this.totalBudgetedExpenses = 0;
+          for (let dataVal of this.pieData) {
+            this.totalBudgetedExpenses += dataVal.total;
+            // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
+          }
+
+          // if (this.budgets.length == 1) {
+
+          // }
+
+          // Close dialogue ref
+          this.addBudgetRef.close();
         }
-        console.log(this.budgetSets)
-
-        this.totalBudgetedExpenses = 0;
-        for (let dataVal of this.pieData) {
-          this.totalBudgetedExpenses += dataVal.total;
-          // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
-        }
-
-        // if (this.budgets.length == 1) {
-
-        // }
-
-        // Close dialogue ref
-        this.addBudgetRef.close();
       });
   }
 

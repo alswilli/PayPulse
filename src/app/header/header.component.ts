@@ -16,7 +16,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   tokenTimer: number = undefined;
   usernameSubscription: Subscription;
   tokenSubscription: Subscription;
-  newGoalsSubscription: Subscription;
+  // newGoalsSubscription: Subscription;
   opened: boolean;
   loggingIn: boolean;
   bgColor: string;
@@ -61,7 +61,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.numNotifications = 0;
     this.hidden = true;
     console.log("aaaaa")
-    this.newGoalsSubscription = this.authService.getNewlyCompletedGoals()
+    this.authService.onNewGoals
       .subscribe(goals => { 
         console.log("bbbbb")
         console.log(goals);
@@ -74,13 +74,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.numNotifications = this.newlyCompletedGoals.length;
           this.hidden = false;
         }
+        console.log("hidden: ", this.hidden)
       });
   }
 
   ngOnDestroy() {
     this.usernameSubscription.unsubscribe();
     this.tokenSubscription.unsubscribe();
-    this.newGoalsSubscription.unsubscribe();
+    // this.newGoalsSubscription.unsubscribe();
   }
 
   onMenuClick() {
@@ -106,6 +107,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // this.tokenSubscription.unsubscribe();
     this.ngOnDestroy();
     this.authService.logOut()
+    this.hidden = true;
     // this.authService.logOut().subscribe(res => {
     //   // this.router.navigate(['/login']);
     // });

@@ -87,7 +87,7 @@ router.post('/login', cors.corsWithOptions, (req, res, next) => {
 router.put('/update', cors.corsWithOptions, (req, res) => {
   User.findByIdAndUpdate(req.body.userId, {
     $set: { lastUpdated: Date.now() }
-    })
+    }, { new: true })
     .then((user) => {
       console.log(user)
       res.statusCode = 200;
