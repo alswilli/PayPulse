@@ -15,7 +15,7 @@
         <div class="goal-image-unlocked" *ngIf="goal[0].goalProgress == 100">
           <img [src]="goal[1].imagePath" [alt]="goal[1].goalName">
         </div>
-        <mat-progress-bar mode="determinate" [value]="goal[0].goalProgress"></mat-progress-bar>
+        <mat-progress-bar mode="determinate" [value]="goal[0].goalProgress" style="padding: 5px; max-width: 100%; margin: auto"></mat-progress-bar>
         <div style="text-align: center;">
           <span style="text-align: center;">{{ goal[0].goalProgress }} %</span>
         </div>
@@ -23,7 +23,7 @@
         <p style="text-align: center;">{{goal[1].goalDescription}}</p>
         <p *ngIf="goal[0].goalProgress == 100" style="text-align: center;"> Number of Times Achieved: <b>{{goal[0].numTimesAchieved}}</b></p>
         <p *ngIf="goal[0].goalProgress == 100" style="text-align: center;"> Date First Achieved: <b>{{goal[0].dateFirstAchieved}}</b></p>
-        <h4 style="text-align: center;">{{i+1}} / {{goals.length}}</h4>
+        <h4 style="text-align: center;">({{i+1}} / {{goals.length}})</h4>
       </div>
     </div>
     <mat-dialog-actions style="padding: 0px; margin-bottom: 0px; margin-left: 20px;">

@@ -272,8 +272,11 @@ export class GoalService {
         var monthlyTotal = 0
         var potentialMonthlyGoals = []
         var allMonthsId = null
+        var threeRowId = null
+        var sixrowId = null
+        var nineRowId = null
+        var oneYearRow = null
         for (let goal of allGoals) {
-          console.log(goal.goalName)
           if (goal.goalName == "Budget Manager - All Months") {
             console.log("found all months")
             for (let ug of allUserGoals) {
@@ -282,7 +285,42 @@ export class GoalService {
                 break
               }
             }
-            break
+          }
+          if (goal.goalName == "Budget Manager - All Months") {
+            console.log("found 3 in a row")
+            for (let ug of allUserGoals) {
+              if (ug.goalId == goal._id) {
+                allMonthsId = ug._id
+                break
+              }
+            }
+          }
+          if (goal.goalName == "Budget Manager - All Months") {
+            console.log("found 6 in a row")
+            for (let ug of allUserGoals) {
+              if (ug.goalId == goal._id) {
+                allMonthsId = ug._id
+                break
+              }
+            }
+          }
+          if (goal.goalName == "Budget Manager - All Months") {
+            console.log("found 9 in a row")
+            for (let ug of allUserGoals) {
+              if (ug.goalId == goal._id) {
+                allMonthsId = ug._id
+                break
+              }
+            }
+          }
+          if (goal.goalName == "Budget Manager - All Months") {
+            console.log("found one year in a row")
+            for (let ug of allUserGoals) {
+              if (ug.goalId == goal._id) {
+                allMonthsId = ug._id
+                break
+              }
+            }
           }
         }
         console.log("all months id: ", allMonthsId)

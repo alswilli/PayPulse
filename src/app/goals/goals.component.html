@@ -93,8 +93,12 @@
             <img [src]="matchedGoal[1].imagePath" [alt]="matchedGoal[1].goalName" 
             matTooltip="(NEW UNLOCK) {{matchedGoal[1].goalDescription}}" matTooltipPosition="above">
           </div>
-          <h3 *ngIf="matchedGoal[0].goalProgress == 100">{{matchedGoal[1].goalName}}</h3>
-          <p *ngIf="matchedGoal[0].goalProgress != 100">{{matchedGoal[1].goalName}}</p>
+          <mat-progress-bar mode="determinate" [value]="matchedGoal[0].goalProgress" style="padding: 3px; max-width: 70%; margin: auto"></mat-progress-bar>
+          <div style="text-align: center;">
+            <span style="text-align: center;">{{ matchedGoal[0].goalProgress }} %</span>
+          </div>
+          <h3 style="text-align: center;">{{matchedGoal[1].goalName}}</h3>
+          <!-- <p *ngIf="matchedGoal[0].goalProgress != 100">{{matchedGoal[1].goalName}}</p> -->
         </div>
         <!-- <mat-card>
           <mat-card-header>
