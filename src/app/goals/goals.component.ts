@@ -86,7 +86,7 @@ export class GoalsComponent implements OnInit {
 
       this.allUserGoals = JSON.parse(localStorage.getItem('User Goals Details'))["usergoals"];
       var completedGoals = JSON.parse(localStorage.getItem('User Goals Details'))["newlyCompletedGoals"];
-      var userGoalData = JSON.parse(localStorage.getItem('User Goals Details'))["userGoalData"];
+      var userGoalData = JSON.parse(localStorage.getItem('User Goals Details'))["goaldata"];
       var matchIndex = 0
       for (let goal of this.allGoals) {
         // var found = false;
@@ -129,6 +129,7 @@ export class GoalsComponent implements OnInit {
         // // this.addBudgetRef.close()
         //   .subscribe(result => {})
       }
+      console.log("resetting local storage")
       localStorage.setItem(('User Goals Details'), JSON.stringify({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: [], goaldata: userGoalData}));
     })
   }

@@ -78,6 +78,7 @@ export class BudgetsComponent implements OnInit {
   }
   currentAccounts: any[] = [];
   newlyCompletedGoals = [];
+  userGoalData: any;
 
   constructor(public dialog: MatDialog,
     private accountService: AccountService,
@@ -93,6 +94,7 @@ export class BudgetsComponent implements OnInit {
     this.allGoals = JSON.parse(localStorage.getItem('User Goals Details'))['goals'];
     this.allUserGoals = JSON.parse(localStorage.getItem('User Goals Details'))['usergoals'];
     this.newlyCompletedGoals = JSON.parse(localStorage.getItem('User Goals Details'))['newlyCompletedGoals'];
+    this.userGoalData = JSON.parse(localStorage.getItem('User Goals Details'))['goaldata'];
     this.initialLoad = false;
     this.currentAccounts = this.userAccountsDetails.currentAccounts
     for (let currAccount of this.currentAccounts) {
@@ -688,14 +690,17 @@ export class BudgetsComponent implements OnInit {
             retObj['done'] = "Done"
             retObj["numTimesAchieved"] = usergoal.numTimesAchieved+1
             this.goalService.updateUserGoal(usergoal._id, retObj).subscribe(res => {
+              console.log(res)
+              var index = 0
               for (let ug of this.allUserGoals) {
                 if (ug._id == res._id) {
-                  ug = res
+                  this.allUserGoals[index] = res
                   break
                 }
+                index += 1
               }
               this.newlyCompletedGoals.push(res)
-              this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals});
+              this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
               this.budgets.push(result);
 
               var currIndex = 4;
