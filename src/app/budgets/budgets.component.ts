@@ -668,23 +668,32 @@ export class BudgetsComponent implements OnInit {
           }
         }
         // Add to list
-        var goalIndex = 0
         var usergoal = null
         var finishAdd = false
         if (this.budgets.length == 0) {
           for (let goal of this.allGoals) {
             if (goal.goalName == "Time To Save Money") {
-              usergoal = this.allUserGoals[goalIndex]
+              var goalId = goal._id
+              for (let ug of this.allUserGoals) {
+                if (ug.goalId == goalId) {
+                  usergoal = ug
+                  break
+                }
+              }
               break
             }
-            goalIndex += 1
           }
           if (usergoal.goalProgress == 0) {
             var retObj = {}
             retObj['done'] = "Done"
             retObj["numTimesAchieved"] = usergoal.numTimesAchieved+1
             this.goalService.updateUserGoal(usergoal._id, retObj).subscribe(res => {
-              this.allUserGoals[goalIndex] = res;
+              for (let ug of this.allUserGoals) {
+                if (ug._id == res._id) {
+                  ug = res
+                  break
+                }
+              }
               this.newlyCompletedGoals.push(res)
               this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals});
               this.budgets.push(result);

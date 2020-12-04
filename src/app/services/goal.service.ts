@@ -375,7 +375,7 @@ export class GoalService {
   }
 
   updateUserGoal(usergoalId: string, usergoalinfo: object) {
-    return this.http.put(baseURL + 'usergoals/' + usergoalId, usergoalinfo);
+    return this.http.put<UserGoal>(baseURL + 'usergoals/' + usergoalId, usergoalinfo);
   }
 
 }
