@@ -62,7 +62,7 @@ export class HomeComponent implements OnInit {
   recentlyCompletedGoals: Goal[];
 
   clientForm: FormGroup;
-  listValue: any = [];
+  listValue: Account[] = [];
   preSelection = [];
   environment: string;
   linkToken: string = null;
