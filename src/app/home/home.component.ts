@@ -62,7 +62,7 @@ export class HomeComponent implements OnInit {
   recentlyCompletedGoals: Goal[];
 
   clientForm: FormGroup;
-  listValue = [];
+  listValue: Account[] = [];
   preSelection = [];
   environment: string;
   linkToken: string = null;
@@ -73,6 +73,7 @@ export class HomeComponent implements OnInit {
 
   private config: PlaidConfig = {
     apiVersion: "v2",
+    clientName: 'PayPulse',
     env: "sandbox",
     token: null,
     webhook: "https://507ec71083932519eb6c52a27bbe8afd.m.pipedream.net",
@@ -137,7 +138,7 @@ export class HomeComponent implements OnInit {
     console.log(this.preSelection);
 
     for (let account of this.accounts) {
-      this.listValue.push(account.institutionName);
+      this.listValue.push(account);
       this.updatePlaidLinkHandlers.push(null)
     }
 
@@ -467,9 +468,9 @@ export class HomeComponent implements OnInit {
   }
 
   onAccountSelected(listItem) {
-    var accountName = listItem
-    // var valid = listItem.itemValid
-    if (!this.removeAccounts && !this.isLoading) {
+    var accountName = listItem.institutionName
+    var valid = listItem.itemValid
+    if (!this.removeAccounts && valid && !this.isLoading) {
       console.log(accountName);
       var found = false
       var index = 0
@@ -833,7 +834,7 @@ export class HomeComponent implements OnInit {
       this.marginVal = '10';
       this.borderVal = '1px solid rgb(209, 209, 209)';
 
-      this.listValue.push(res.institutionName);
+      this.listValue.push(res);
       this.updatePlaidLinkHandlers.push(null)
       this.firstLoad = false;
       this.onAddedAccount();

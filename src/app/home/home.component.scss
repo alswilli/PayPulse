@@ -43,10 +43,6 @@ $outer-Card-Width: 100%;
     width: 33%;
 }
 
-.cardHeader {
-
-}
-
 .cardsubtitle {
     color:rgb(49, 48, 48);
     height: 30px;
@@ -61,21 +57,14 @@ $outer-Card-Width: 100%;
     margin: 10px;
 }
 
-.innerCard {
-    
-}
-
-.innerCardHeader {
-}
-
 .innerCardContent {
     height: 85%;
     overflow-y: auto;
 }
 
-mat-list-option[aria-selected="true"] {
-    background: rgb(202, 202, 202);
-}
+// mat-list-option[aria-selected="true"] {
+//     background: rgb(202, 202, 202);
+// }
 
 // mat-list-option[aria-selected="false"] {
 //     border: solid black;
