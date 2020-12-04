@@ -137,7 +137,7 @@ export class HomeComponent implements OnInit {
     console.log(this.preSelection);
 
     for (let account of this.accounts) {
-      this.listValue.push([account.institutionName, account.itemValid]);
+      this.listValue.push(account);
       this.updatePlaidLinkHandlers.push(null)
     }
 
@@ -466,9 +466,9 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  onAccountSelected(event, listItem) {
-    var accountName = listItem[0]
-    var valid = listItem[1]
+  onAccountSelected(listItem) {
+    var accountName = listItem.institutionName
+    var valid = listItem.itemValid
     if (!this.removeAccounts && valid && !this.isLoading) {
       console.log(accountName);
       var found = false
@@ -656,7 +656,7 @@ export class HomeComponent implements OnInit {
 
   onDeleteIconClicked(accountName) {
     console.log(accountName);
-    const deleteAccountRef = this.dialog.open(DeleteAccountComponent, {data: {accountName: accountName[0], userAccountsDetails: this.userAccountsDetails}});
+    const deleteAccountRef = this.dialog.open(DeleteAccountComponent, {data: {accountName: accountName, userAccountsDetails: this.userAccountsDetails}});
     deleteAccountRef.componentInstance.onDelete
       .subscribe(result => {
         console.log(result);
@@ -833,7 +833,7 @@ export class HomeComponent implements OnInit {
       this.marginVal = '10';
       this.borderVal = '1px solid rgb(209, 209, 209)';
 
-      this.listValue.push([res.institutionName, res.itemValid]);
+      this.listValue.push(res);
       this.updatePlaidLinkHandlers.push(null)
       this.firstLoad = false;
       this.onAddedAccount();

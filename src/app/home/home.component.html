@@ -14,16 +14,16 @@
         <!-- <mat-selection-list formControlName="myOtherControl"> -->
         <mat-spinner *ngIf="firstLoad" style="margin: auto"></mat-spinner>
         <mat-selection-list *ngIf="!firstLoad" style="margin:10px;">
-          <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index" (click)="onAccountSelected($event, list);" 
-          [selected]="preSelection.indexOf(list[0]) > -1" [value]="list[0]" [disabled]="removeAccounts || !list[1] || isLoading">
+          <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index" (click)="onAccountSelected(list);" 
+          [selected]="preSelection.indexOf(list.institutionName) > -1" [value]="list.institutionName" [disabled]="removeAccounts || !list.itemValid || isLoading">
             <div fxFlex fxLayout="row">
               <div *ngIf="removeAccounts">
-                <mat-icon class="trashIcon" (click)="onDeleteIconClicked(list);">delete</mat-icon> 
+                <mat-icon class="trashIcon" (click)="onDeleteIconClicked(list.institutionName);">delete</mat-icon> 
               </div>
               <div style="vertical-align: bottom; padding: 3px;">
-                {{list[0]}}
+                {{list.institutionName}}
               </div>
-              <div *ngIf="!list[1]">
+              <div *ngIf="!list.itemValid">
                 <button mat-flat-button (click)="updateOpen(i)"> Update Account</button>
               </div>
             </div>
