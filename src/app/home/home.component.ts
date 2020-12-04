@@ -62,7 +62,7 @@ export class HomeComponent implements OnInit {
   recentlyCompletedGoals: Goal[];
 
   clientForm: FormGroup;
-  listValue: Account[] = [];
+  listValue = [];
   preSelection = [];
   environment: string;
   linkToken: string = null;
@@ -137,7 +137,7 @@ export class HomeComponent implements OnInit {
     console.log(this.preSelection);
 
     for (let account of this.accounts) {
-      this.listValue.push(account);
+      this.listValue.push(account.institutionName);
       this.updatePlaidLinkHandlers.push(null)
     }
 
@@ -467,9 +467,9 @@ export class HomeComponent implements OnInit {
   }
 
   onAccountSelected(listItem) {
-    var accountName = listItem.institutionName
-    var valid = listItem.itemValid
-    if (!this.removeAccounts && valid && !this.isLoading) {
+    var accountName = listItem
+    // var valid = listItem.itemValid
+    if (!this.removeAccounts && !this.isLoading) {
       console.log(accountName);
       var found = false
       var index = 0
@@ -833,7 +833,7 @@ export class HomeComponent implements OnInit {
       this.marginVal = '10';
       this.borderVal = '1px solid rgb(209, 209, 209)';
 
-      this.listValue.push(res);
+      this.listValue.push(res.institutionName);
       this.updatePlaidLinkHandlers.push(null)
       this.firstLoad = false;
       this.onAddedAccount();

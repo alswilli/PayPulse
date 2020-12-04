@@ -15,17 +15,17 @@
         <mat-spinner *ngIf="firstLoad" style="margin: auto"></mat-spinner>
         <mat-selection-list *ngIf="!firstLoad" style="margin:10px;">
           <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index" (click)="onAccountSelected(list);" 
-          [selected]="preSelection.indexOf(list.institutionName) > -1" [value]="list.institutionName" [disabled]="removeAccounts || !list.itemValid || isLoading">
+          [selected]="preSelection.indexOf(list) > -1" [value]="list" [disabled]="removeAccounts || isLoading">
             <div fxFlex fxLayout="row">
               <div *ngIf="removeAccounts">
-                <mat-icon class="trashIcon" (click)="onDeleteIconClicked(list.institutionName);">delete</mat-icon> 
+                <mat-icon class="trashIcon" (click)="onDeleteIconClicked(list);">delete</mat-icon> 
               </div>
               <div style="vertical-align: bottom; padding: 3px;">
-                {{list.institutionName}}
+                {{list}}
               </div>
-              <div *ngIf="!list.itemValid">
+              <!-- <div *ngIf="!list.itemValid">
                 <button mat-flat-button (click)="updateOpen(i)"> Update Account</button>
-              </div>
+              </div> -->
             </div>
           </mat-list-option>
         </mat-selection-list>
