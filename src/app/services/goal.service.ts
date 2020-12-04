@@ -124,8 +124,8 @@ export class GoalService {
         var oldDate = new Date(JSON.parse(localStorage.getItem('JWT'))["lastUpdated"])
         var currDate = new Date();
         this.totalBudgetAmount = 0
-        // var oldDate = new Date("2020-08-21T01:14:54.483Z");
-        // var currDate = new Date("2021-08-21T01:14:54.483Z"); 
+        // var oldDate = new Date("2020-10-21T01:14:54.483Z");
+        // var currDate = new Date("2021-10-21T01:14:54.483Z"); 
         console.log(oldDate)
         console.log(currDate)
         console.log(budgets.length)
@@ -449,5 +449,9 @@ export class GoalService {
   // addGoalData(userId: string) {
   //   return this.http.post<GoalDataResponse>(baseURL + 'goals/goaldata' + userId, null);
   // }
+
+  updateGoalData(goaldata: GoalData) {
+    return this.http.put<GoalData>(baseURL + 'goals/goaldata/' + goaldata._id, goaldata);
+  }
 
 }

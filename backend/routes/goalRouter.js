@@ -119,6 +119,26 @@ goalRouter.route("/goalData/:userId")
         });
     }
   })
-});
+})
+
+goalRouter.route("/goalData/:goaldataId")
+.options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
+.put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    GoalData.findByIdAndUpdate(req.params.goaldataId, {
+        $set: {
+          userId: req.body.userId,
+          allMonthsAchieved: req.body.allMonthsAchieved,
+          monthsInARow: req.body.monthsInARow,
+          previousMonth: req.body.previousMonth
+              }
+        }, { new: true })
+        .then((goaldata) => {
+          console.log("GOAL DATA UPDATED DONE: ", goaldata)
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json');
+          res.json(goaldata);
+        })
+        .catch((err) => next(err));
+})
 
 module.exports = goalRouter;

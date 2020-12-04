@@ -39,6 +39,7 @@ export class LoginComponent implements OnInit {
   currentAccounts: Account[];
   newlyCompletedGoals: any[];
   userGoalData: GoalData;
+  validRes: any;
 
   constructor(private fb: FormBuilder,
     private router: Router,
@@ -228,13 +229,18 @@ export class LoginComponent implements OnInit {
                   else {
                     return of(null)
                   } 
+                }),
+                mergeMap(validRes => {
+                  console.log("LLLLLLLL")
+                  this.validRes = validRes;
+                  return this.goalService.updateGoalData(this.userGoalData)
                 })
               )
-              .subscribe(validRes => {
+              .subscribe(goalDataRes => {
                 console.log("made it to the end")
-                if (validRes != null) {
+                if (this.validRes != null) {
                   var index = 0
-                  for (let updatedAccount of validRes) {
+                  for (let updatedAccount of this.validRes) {
                     if (updatedAccount != null) {
                       this.accountsData[index].itemValid = false;
                     }
@@ -383,13 +389,18 @@ export class LoginComponent implements OnInit {
                           else {
                             return of(null)
                           } 
+                        }),
+                        mergeMap(validRes => {
+                          console.log("LLLLLLLL")
+                          this.validRes = validRes;
+                          return this.goalService.updateGoalData(this.userGoalData)
                         })
                       )
-                      .subscribe(validRes => {
+                      .subscribe(goalDataRes => {
                         console.log("made it to the end")
-                        if (validRes != null) {
+                        if (this.validRes != null) {
                           var index = 0
-                          for (let updatedAccount of validRes) {
+                          for (let updatedAccount of this.validRes) {
                             if (updatedAccount != null) {
                               this.accountsData[index].itemValid = false;
                             }
