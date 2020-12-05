@@ -210,6 +210,7 @@ export class TransactionsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.gotoTop();
     this.isLoading = true;
     console.log("ngInit");
 
@@ -653,6 +654,11 @@ export class TransactionsComponent implements OnInit {
     const nestedNode = this.flatNodeMap.get(node);
     this.database.updateItem(nestedNode!, itemValue);
   }
+
+  gotoTop() {
+    var scrollElem= document.querySelector('#moveTop');
+    scrollElem.scrollIntoView();  
+   }
 
 }
 

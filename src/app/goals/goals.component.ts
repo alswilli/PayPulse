@@ -45,6 +45,7 @@ export class GoalsComponent implements OnInit {
     public dialog: MatDialog) { }
 
   ngOnInit() {
+    this.gotoTop()
     this.isLoading = true;
     this.initialLoad = true;
     this.allGoals = [];
@@ -209,5 +210,10 @@ export class GoalsComponent implements OnInit {
     //   this.columns = 1;
     // }
   }
+
+  gotoTop() {
+    var scrollElem= document.querySelector('#moveTop');
+    scrollElem.scrollIntoView();  
+   }
 
 }

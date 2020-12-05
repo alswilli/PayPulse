@@ -49,6 +49,7 @@ export class CreateAccountComponent implements OnInit {
   };
 
   ngOnInit() {
+    this.gotoTop()
   }
 
   createForm() {
@@ -106,5 +107,10 @@ export class CreateAccountComponent implements OnInit {
       username: ''
     });
   }
+
+  gotoTop() {
+    var scrollElem= document.querySelector('#moveTop');
+    scrollElem.scrollIntoView();  
+   }
 
 }

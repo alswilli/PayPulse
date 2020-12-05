@@ -103,6 +103,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.gotoTop();
     this.isLoading = true;
     this.plaidLinkService
       .createPlaid(
@@ -865,4 +866,9 @@ export class HomeComponent implements OnInit {
     console.log("We exited:", error);
     console.log("We got metadata:", metadata);
   }
+
+  gotoTop() {
+    var scrollElem= document.querySelector('#moveTop');
+    scrollElem.scrollIntoView();  
+   }
 }

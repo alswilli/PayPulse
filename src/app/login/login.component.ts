@@ -65,6 +65,7 @@ export class LoginComponent implements OnInit {
   };
 
   ngOnInit() {
+    this.gotoTop();
     (window as any).fbAsyncInit = function() {
       FB.init({
         appId      : '366144767681380',
@@ -425,5 +426,10 @@ export class LoginComponent implements OnInit {
           }
       });
   }
+
+  gotoTop() {
+    var scrollElem= document.querySelector('#moveTop');
+    scrollElem.scrollIntoView();  
+   }
 
 }

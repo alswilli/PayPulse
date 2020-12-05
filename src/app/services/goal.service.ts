@@ -273,9 +273,9 @@ export class GoalService {
         var potentialMonthlyGoals = []
         var allMonthsId = null
         var threeRowId = null
-        var sixrowId = null
+        var sixRowId = null
         var nineRowId = null
-        var oneYearRow = null
+        var oneYearRowId = null
         for (let goal of allGoals) {
           if (goal.goalName == "Budget Manager - All Months") {
             console.log("found all months")
@@ -286,44 +286,48 @@ export class GoalService {
               }
             }
           }
-          if (goal.goalName == "Budget Manager - All Months") {
+          if (goal.goalName == "3 in a Row!") {
             console.log("found 3 in a row")
             for (let ug of allUserGoals) {
               if (ug.goalId == goal._id) {
-                allMonthsId = ug._id
+                threeRowId = ug._id
                 break
               }
             }
           }
-          if (goal.goalName == "Budget Manager - All Months") {
+          if (goal.goalName == "6 in a Row!") {
             console.log("found 6 in a row")
             for (let ug of allUserGoals) {
               if (ug.goalId == goal._id) {
-                allMonthsId = ug._id
+                sixRowId = ug._id
                 break
               }
             }
           }
-          if (goal.goalName == "Budget Manager - All Months") {
+          if (goal.goalName == "9 in a Row!") {
             console.log("found 9 in a row")
             for (let ug of allUserGoals) {
               if (ug.goalId == goal._id) {
-                allMonthsId = ug._id
+                nineRowId = ug._id
                 break
               }
             }
           }
-          if (goal.goalName == "Budget Manager - All Months") {
+          if (goal.goalName == "One Year Streak!") {
             console.log("found one year in a row")
             for (let ug of allUserGoals) {
               if (ug.goalId == goal._id) {
-                allMonthsId = ug._id
+                oneYearRowId = ug._id
                 break
               }
             }
           }
         }
         console.log("all months id: ", allMonthsId)
+        console.log("3 in a row id: ", threeRowId)
+        console.log("6 in a row id: ", sixRowId)
+        console.log("9 in a row id: ", nineRowId)
+        console.log("one year in a row id: ", oneYearRowId)
 
         var allMonthsDone = true
         for (let month in userGoalData.allMonthsAchieved) {

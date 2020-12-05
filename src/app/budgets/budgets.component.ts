@@ -89,6 +89,7 @@ export class BudgetsComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.gotoTop();
     this.budgets = [];
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
     this.allGoals = JSON.parse(localStorage.getItem('User Goals Details'))['goals'];
@@ -1453,4 +1454,9 @@ export class BudgetsComponent implements OnInit {
         this.editBudgetRef.close();
       });
   }
+
+  gotoTop() {
+    var scrollElem= document.querySelector('#moveTop');
+    scrollElem.scrollIntoView();  
+   }
 }

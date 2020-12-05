@@ -1,6 +1,7 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { SidebarService } from './services/sidebar.service';
 import { AuthService } from './services/auth.service';
+import { NavigationEnd, Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +16,18 @@ export class AppComponent {
   //   this.authService.logOut();
   // }
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService,
+    private router: Router) {}
+
+  // ngOnInit() {
+  //   this.router.events.subscribe((evt) => {
+  //     if (!(evt instanceof NavigationEnd)) {
+  //         return;
+  //     }
+  //     console.log("SDVASVSVSDVASDADASDJASDJASDAD")
+  //     window.scrollTo(0, 0)
+  // });
+  // }
 
   // @HostListener('window:beforeunload', ['$event'])
   // async doSomething($event) {
