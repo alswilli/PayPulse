@@ -7,7 +7,7 @@ import { Observable, forkJoin, of } from 'rxjs';
 import { AuthService } from './auth.service';
 import { AccountService } from './account.service';
 import { BudgetService } from './budget.service';
-import { BindingType } from '@angular/compiler';
+import { BindingType, IfStmt } from '@angular/compiler';
 import { map, mergeMap } from 'rxjs/operators';
 import { Router } from "@angular/router";
 import { TransactionService } from './transaction.service';
@@ -50,9 +50,24 @@ export class GoalService {
     11:["November", 30],
     12:["December", 31]
   }
+  reverseDates = {
+    "January":1,
+    "February":2,
+    "March":3,
+    "April":4,
+    "May":5,
+    "June":6,
+    "July":7,
+    "August":8,
+    "September":9,
+    "October":10,
+    "November":11,
+    "December":12
+  }
   budgets: Budget[];
   totalBudgetAmount: number = 0;
   pairs: any;
+  numMonthsAhead: number;
 
   constructor(private http: HttpClient,
     private authService: AuthService,
@@ -124,8 +139,8 @@ export class GoalService {
         var oldDate = new Date(JSON.parse(localStorage.getItem('JWT'))["lastUpdated"])
         var currDate = new Date();
         this.totalBudgetAmount = 0
-        // var oldDate = new Date("2020-10-21T01:14:54.483Z");
-        // var currDate = new Date("2021-10-21T01:14:54.483Z"); 
+        var oldDate = new Date("2020-09-21T01:14:54.483Z");
+        var currDate = new Date("2020-10-22T01:14:54.483Z"); 
         console.log(oldDate)
         console.log(currDate)
         console.log(budgets.length)
@@ -135,14 +150,14 @@ export class GoalService {
         var currYear = currDate.getFullYear();
         var currMonth = currDate.getMonth()+1;
         var remainderMonths = 0
-        var numMonthsAhead = 0
+        this.numMonthsAhead = 0
         if (currMonth > oldMonth) {
           remainderMonths = (currMonth - oldMonth);
-          numMonthsAhead = (currYear - oldYear)*12 + remainderMonths;
+          this.numMonthsAhead = (currYear - oldYear)*12 + remainderMonths;
         }
         else {
           remainderMonths = currMonth + (12 - oldMonth);
-          numMonthsAhead = (currYear - oldYear - 1)*12 + remainderMonths;
+          this.numMonthsAhead = (currYear - oldYear - 1)*12 + remainderMonths;
         }
         
         // var totalBudgetAmount = 0;
@@ -150,8 +165,8 @@ export class GoalService {
         //   totalBudgetAmount = totalBudgetAmount + Number(budget.amount);
         // }
 
-        console.log("Number of Months ahead: ", numMonthsAhead)
-        if (oldDate != null && numMonthsAhead > 0 && budgets.length > 0) {
+        console.log("Number of Months ahead: ", this.numMonthsAhead)
+        if (this.numMonthsAhead > 0 && budgets.length > 0) {
           // Time to update
           console.log("passed")
           
@@ -161,7 +176,7 @@ export class GoalService {
           var days = this.dates[oldMonth][1]
           var subdays = 0; 
           var currentMonth = currMonth;
-          while (i != numMonthsAhead) {
+          while (i != this.numMonthsAhead) {
             if (subdays == 0) {
               subdays = currDate.getDate() // num days elapsed in current month
             }
@@ -267,7 +282,7 @@ export class GoalService {
         if (foundInvalid) {
             return of("item invalid") // if no budget and no invalid accounts, will have monthlyBudget = 0
         }
-        var index = 0;
+        var pairsIndex = 0;
         var accountsIndex = 0;
         var monthlyTotal = 0
         var potentialMonthlyGoals = []
@@ -276,6 +291,10 @@ export class GoalService {
         var sixRowId = null
         var nineRowId = null
         var oneYearRowId = null
+        var threeRowIndex = null
+        var sixRowIndex = null
+        var nineRowIndex = null
+        var oneYearRowIndex = null
         for (let goal of allGoals) {
           if (goal.goalName == "Budget Manager - All Months") {
             console.log("found all months")
@@ -288,38 +307,50 @@ export class GoalService {
           }
           if (goal.goalName == "3 in a Row!") {
             console.log("found 3 in a row")
+            var index = 0
             for (let ug of allUserGoals) {
               if (ug.goalId == goal._id) {
                 threeRowId = ug._id
+                threeRowIndex = index
                 break
               }
+              index += 1
             }
           }
           if (goal.goalName == "6 in a Row!") {
             console.log("found 6 in a row")
+            var index = 0
             for (let ug of allUserGoals) {
               if (ug.goalId == goal._id) {
                 sixRowId = ug._id
+                sixRowIndex = index
                 break
               }
+              index += 1
             }
           }
           if (goal.goalName == "9 in a Row!") {
             console.log("found 9 in a row")
+            var index = 0
             for (let ug of allUserGoals) {
               if (ug.goalId == goal._id) {
                 nineRowId = ug._id
+                nineRowIndex = index
                 break
               }
+              index += 1
             }
           }
           if (goal.goalName == "One Year Streak!") {
             console.log("found one year in a row")
+            var index = 0
             for (let ug of allUserGoals) {
               if (ug.goalId == goal._id) {
                 oneYearRowId = ug._id
+                oneYearRowIndex = index
                 break
               }
+              index += 1
             }
           }
         }
@@ -362,10 +393,164 @@ export class GoalService {
           console.log("Monthly Total: ", monthlyTotal)
           console.log("Total Budget Amount: ", this.totalBudgetAmount)
 
+
+
+          var nextMonthVal = 0
+          if (userGoalData.previousMonth != "") {
+            // Get correct next val
+            if (this.reverseDates[userGoalData.previousMonth] + 1 == 13) {
+              nextMonthVal = 1
+            }
+            else {
+              nextMonthVal = this.reverseDates[userGoalData.previousMonth] + 1
+            }
+            // Update monthsInARow
+            if (monthlyTotal < this.totalBudgetAmount) {
+              if (nextMonthVal == this.reverseDates[this.pairs[pairsIndex][0]]) {
+                userGoalData.previousMonth = this.pairs[pairsIndex][0]
+                userGoalData.monthsInARow += 1
+              }
+              else {
+                userGoalData.previousMonth = this.pairs[pairsIndex][0]
+                userGoalData.monthsInARow = 1
+              }
+            }
+            else {
+              if (this.numMonthsAhead > 0) {
+                userGoalData.monthsInARow = 0
+              }
+            }
+          }
+          else {
+            if (monthlyTotal < this.totalBudgetAmount) {
+              userGoalData.previousMonth = this.pairs[pairsIndex][0]
+              userGoalData.monthsInARow = 1
+            }
+            else {
+              if (this.numMonthsAhead > 0) {
+                userGoalData.monthsInARow = 0
+              }
+            }
+          }
+
+          if (userGoalData.monthsInARow == 0) {
+            var retObj = {}
+            retObj['done'] = "Not Done"
+            retObj["goalProgression"] = 0
+            if (allUserGoals[threeRowIndex].goalProgress != 100) {
+              usergoalObservables.push(this.updateUserGoal(threeRowId, retObj))
+            }
+            if (allUserGoals[sixRowIndex].goalProgress != 100) {
+              usergoalObservables.push(this.updateUserGoal(sixRowId, retObj))
+            }
+            if (allUserGoals[nineRowIndex].goalProgress != 100) {
+              usergoalObservables.push(this.updateUserGoal(nineRowId, retObj))
+            }
+            if (allUserGoals[oneYearRowIndex].goalProgress != 100) {
+              usergoalObservables.push(this.updateUserGoal(oneYearRowId, retObj))
+            }
+          }
+
+          console.log("Updated Months in a Row: ", userGoalData.monthsInARow)
+
           // BUDGET MANAGER MONTHLY GOALS
           if (monthlyTotal < this.totalBudgetAmount) {
-            var fullGoalName = "Budget Manager - " + this.pairs[index][0]
-            // userGoalData.
+            var fullGoalName = "Budget Manager - " + this.pairs[pairsIndex][0]
+          
+            // Check for "In a Row" goals
+            var retObj = {}
+            if (userGoalData.monthsInARow == 3) {  // NOT EFFICIENT< SHOULD NOT ADD AS OBSERVABKE TILL ALL GOALS DONE
+              retObj['done'] = "Done"
+              retObj["numTimesAchieved"] = allUserGoals[threeRowIndex].numTimesAchieved + 1
+              usergoalObservables.push(this.updateUserGoal(threeRowId, retObj))
+            }
+            else if (userGoalData.monthsInARow == 6) {
+              retObj['done'] = "Done"
+              retObj["numTimesAchieved"] = allUserGoals[sixRowIndex].numTimesAchieved + 1
+              usergoalObservables.push(this.updateUserGoal(sixRowId, retObj))
+            }
+            else if (userGoalData.monthsInARow == 9) {
+              retObj['done'] = "Done"
+              retObj["numTimesAchieved"] = allUserGoals[nineRowIndex].numTimesAchieved + 1
+              usergoalObservables.push(this.updateUserGoal(nineRowId, retObj))
+            }
+            else if (userGoalData.monthsInARow == 12) {
+              retObj['done'] = "Done"
+              retObj["numTimesAchieved"] = allUserGoals[oneYearRowIndex].numTimesAchieved + 1
+              usergoalObservables.push(this.updateUserGoal(oneYearRowId, retObj))
+            }
+
+            if (userGoalData.monthsInARow > 0 && userGoalData.monthsInARow < 3) {
+              if (allUserGoals[threeRowIndex].goalProgress != 100) {
+                var retObj = {}
+                retObj['done'] = "Not Done"
+                retObj["goalProgression"] = this.roundNumber((userGoalData.monthsInARow / 3)*100, 2)
+                usergoalObservables.push(this.updateUserGoal(threeRowId, retObj))
+              }
+              if (allUserGoals[sixRowIndex].goalProgress != 100) {
+                var retObj = {}
+                retObj['done'] = "Not Done"
+                retObj["goalProgression"] = this.roundNumber((userGoalData.monthsInARow / 6)*100, 2)
+                usergoalObservables.push(this.updateUserGoal(sixRowId, retObj))
+              }
+              if (allUserGoals[nineRowIndex].goalProgress != 100) {
+                var retObj = {}
+                retObj['done'] = "Not Done"
+                retObj["goalProgression"] = this.roundNumber((userGoalData.monthsInARow / 9)*100, 2)
+                usergoalObservables.push(this.updateUserGoal(nineRowId, retObj))
+              }
+              if (allUserGoals[oneYearRowIndex].goalProgress != 100) {
+                var retObj = {}
+                retObj['done'] = "Not Done"
+                retObj["goalProgression"] = this.roundNumber((userGoalData.monthsInARow / 12)*100, 2)
+                usergoalObservables.push(this.updateUserGoal(oneYearRowId, retObj))
+              }
+            }
+            else if (userGoalData.monthsInARow > 0 && userGoalData.monthsInARow < 6) {
+              if (allUserGoals[sixRowIndex].goalProgress != 100) {
+                var retObj = {}
+                retObj['done'] = "Not Done"
+                retObj["goalProgression"] = this.roundNumber((userGoalData.monthsInARow / 6)*100, 2)
+                usergoalObservables.push(this.updateUserGoal(sixRowId, retObj))
+              }
+              if (allUserGoals[nineRowIndex].goalProgress != 100) {
+                var retObj = {}
+                retObj['done'] = "Not Done"
+                retObj["goalProgression"] = this.roundNumber((userGoalData.monthsInARow / 9)*100, 2)
+                usergoalObservables.push(this.updateUserGoal(nineRowId, retObj))
+              }
+              if (allUserGoals[oneYearRowIndex].goalProgress != 100) {
+                var retObj = {}
+                retObj['done'] = "Not Done"
+                retObj["goalProgression"] = this.roundNumber((userGoalData.monthsInARow / 12)*100, 2)
+                usergoalObservables.push(this.updateUserGoal(oneYearRowId, retObj))
+              }
+            }
+            else if (userGoalData.monthsInARow > 0 && userGoalData.monthsInARow < 9) {
+              if (allUserGoals[nineRowIndex].goalProgress != 100) {
+                var retObj = {}
+                retObj['done'] = "Not Done"
+                retObj["goalProgression"] = this.roundNumber((userGoalData.monthsInARow / 9)*100, 2)
+                usergoalObservables.push(this.updateUserGoal(nineRowId, retObj))
+              }
+              if (allUserGoals[oneYearRowIndex].goalProgress != 100) {
+                var retObj = {}
+                retObj['done'] = "Not Done"
+                retObj["goalProgression"] = this.roundNumber((userGoalData.monthsInARow / 12)*100, 2)
+                usergoalObservables.push(this.updateUserGoal(oneYearRowId, retObj))
+              }
+            }
+            else if (userGoalData.monthsInARow > 0 && userGoalData.monthsInARow < 12) {
+              var retObj = {}
+              retObj['done'] = "Not Done"
+              retObj["goalProgression"] = this.roundNumber((userGoalData.monthsInARow / 12)*100, 2)
+              if (allUserGoals[oneYearRowIndex].goalProgress != 100) {
+                usergoalObservables.push(this.updateUserGoal(oneYearRowId, retObj))
+              }
+            }
+          
+
+
             for (let goal of allGoals) {
               console.log(goal.goalName, fullGoalName)
               if (goal.goalName == fullGoalName) {
@@ -390,7 +575,7 @@ export class GoalService {
                       }
                     }
                     if (!found) {
-                      userGoalData.allMonthsAchieved[this.pairs[index][0]] = true
+                      userGoalData.allMonthsAchieved[this.pairs[pairsIndex][0]] = true
                       potentialMonthlyGoals.push([usergoal._id, retObj])
                     }
                     break
@@ -403,7 +588,7 @@ export class GoalService {
           // need to check for more goals here
           accountsIndex = 0;
           monthlyTotal = 0
-          index += 1
+          pairsIndex += 1
         }
 
         if (!allMonthsDone) {
