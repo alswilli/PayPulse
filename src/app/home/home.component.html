@@ -17,7 +17,7 @@
         <mat-selection-list *ngIf="!firstLoad" style="margin:10px;">
           <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index" (click)="onAccountSelected(list);" 
           [selected]="preSelection.indexOf(list.institutionName) > -1" [value]="list.institutionName" [disabled]="removeAccounts || !list.itemValid || isLoading">
-            <div fxFlex fxLayout="row">
+            <div>
               <div *ngIf="removeAccounts">
                 <mat-icon class="trashIcon" (click)="onDeleteIconClicked(list.institutionName);">delete</mat-icon> 
               </div>
@@ -31,7 +31,7 @@
           </mat-list-option>
         </mat-selection-list>
         <mat-selection-list>
-          <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index">
+          <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index" [selected]="preSelection.indexOf(list.institutionName) > -1">
             {{list.institutionName}} test
           </mat-list-option>
         </mat-selection-list>
