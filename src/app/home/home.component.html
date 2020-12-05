@@ -31,8 +31,8 @@
           </mat-list-option>
         </mat-selection-list>
         <mat-selection-list>
-          <mat-list-option>
-            Test
+          <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index">
+            {{list.institutionName}} test
           </mat-list-option>
         </mat-selection-list>
       <!-- <p>Bank Account Selected: {{currentAccountName}}</p> -->

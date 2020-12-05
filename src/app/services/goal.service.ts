@@ -365,6 +365,7 @@ export class GoalService {
           // BUDGET MANAGER MONTHLY GOALS
           if (monthlyTotal < this.totalBudgetAmount) {
             var fullGoalName = "Budget Manager - " + this.pairs[index][0]
+            // userGoalData.
             for (let goal of allGoals) {
               console.log(goal.goalName, fullGoalName)
               if (goal.goalName == fullGoalName) {
