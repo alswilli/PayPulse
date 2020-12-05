@@ -17,7 +17,7 @@
         <mat-selection-list *ngIf="!firstLoad" style="margin:10px;">
           <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index" (click)="onAccountSelected(list);" 
           [selected]="preSelection.indexOf(list.institutionName) > -1" [value]="list.institutionName" [disabled]="removeAccounts || !list.itemValid || isLoading">
-            <div fxLayout="row">
+            <div fxFlex fxLayout="row">
               <div *ngIf="removeAccounts">
                 <mat-icon class="trashIcon" (click)="onDeleteIconClicked(list.institutionName);">delete</mat-icon> 
               </div>
@@ -30,9 +30,20 @@
             </div>
           </mat-list-option>
         </mat-selection-list>
-        <!-- <mat-selection-list>
-          <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index" [selected]="preSelection.indexOf(list.institutionName) > -1">
-            {{list.institutionName}} test
+        <!-- <mat-selection-list *ngIf="!firstLoad" style="margin:10px;">
+          <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index" (click)="onAccountSelected(list);" 
+          [selected]="preSelection.indexOf(list.institutionName) > -1" [value]="list.institutionName" [disabled]="removeAccounts || !list.itemValid || isLoading">
+            <div fxLayout="row">
+              <div *ngIf="removeAccounts">
+                <mat-icon class="trashIcon" (click)="onDeleteIconClicked(list.institutionName);">delete</mat-icon> 
+              </div>
+              <div style="vertical-align: bottom; padding: 3px;">
+                {{list.institutionName}}
+              </div>
+              <div *ngIf="!list.itemValid">
+                <button mat-flat-button (click)="updateOpen(i)"> Update Account</button>
+              </div>
+            </div>
           </mat-list-option>
         </mat-selection-list> -->
       <!-- <p>Bank Account Selected: {{currentAccountName}}</p> -->

@@ -528,10 +528,19 @@ export class HomeComponent implements OnInit {
           for (let currAccount of this.currentAccounts) {
             accountObservables.push(this.accountService.getRecentTransactions(currAccount._id, this.days, this.subdays))
           }
-          return forkJoin(accountObservables)
+          if (accountObservables.length == 0) {
+            return of(null)
+          }
+          else {
+            return forkJoin(accountObservables)
+          }
         }))
           // Now get the currentAccount transactions
             .subscribe(transactionsArray => {
+              if (transactionsArray == null) {
+                this.isLoading = false
+                return
+              }
               console.log(transactionsArray)
               // this.isLoading = false;
               // this.firstLoad = false;
