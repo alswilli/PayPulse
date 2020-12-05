@@ -263,12 +263,12 @@ export class HomeComponent implements OnInit {
           this.parsedTransactions.forEach(element => {
             console.log(element);
           });
-          // this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
-          //   console.log("yup")
-          //   this.selectionList.deselectAll();
-          //   console.log(s);
-          //   s.option.selected = true;
-          // });
+          this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
+            console.log("selection changed")
+            // this.selectionList.deselectAll();
+            // console.log(s);
+            // s.option.selected = true;
+          });
           this.getTopBudgets();
         });
     }
@@ -287,12 +287,12 @@ export class HomeComponent implements OnInit {
       this.isLoading = false;
 
       // this.firstLoad = false;
-      // this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
-      //   console.log("yup")
-      //   this.selectionList.deselectAll();
-      //   console.log(s);
-      //   s.option.selected = true;
-      // });
+      this.selectionList.selectionChange.subscribe((s: MatSelectionListChange) => {     
+        console.log("selection changed")
+        // this.selectionList.deselectAll();
+        // console.log(s);
+        // s.option.selected = true;
+      });
     }
   }
 

@@ -6,7 +6,6 @@
   <div fxLayout.lt-md="column" >
     <div class="addAccountDiv" fxFlex="50" [ngStyle]="{'margin': marginVal + 'px', 'border': borderVal}">
       <!-- <form [formGroup]="clientForm"> -->
-      <form *ngIf="listValue.length > 0">
         <h2 *ngIf="listValue.length > 0" style="margin:10px;">Linked Accounts:</h2>
       
         <!-- <pre>
@@ -31,7 +30,11 @@
             </div>
           </mat-list-option>
         </mat-selection-list>
-      </form>
+        <mat-selection-list>
+          <mat-list-option>
+            Test
+          </mat-list-option>
+        </mat-selection-list>
       <!-- <p>Bank Account Selected: {{currentAccountName}}</p> -->
       <div style="margin:10px;">
         <!-- <button mat-raised-button class="addDeleteButtons" routerLink='/linkAccount' color="primary">Add Account</button> -->
