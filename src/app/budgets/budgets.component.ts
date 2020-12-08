@@ -354,6 +354,12 @@ export class BudgetsComponent implements OnInit {
             this.onGetTransactions();
         });
       });
+      for (let budget of this.budgets) {
+        console.log(budget.total)
+        console.log(budget.amount)
+        console.log(this.totalMonthsActive)
+        console.log((budget.total / (Number(budget.amount) * this.totalMonthsActive)))
+      }
     });
   }
 
@@ -559,6 +565,12 @@ export class BudgetsComponent implements OnInit {
       }
       // this.totalBudget = this.totalBudget * this.totalMonthsActive;
       console.log(this.budgetSets)
+      for (let budget of this.budgets) {
+        console.log(budget.total)
+        console.log(budget.amount)
+        console.log(this.totalMonthsActive)
+        console.log((budget.total / (Number(budget.amount) * this.totalMonthsActive)))
+      }
   }
 
   // Notes:

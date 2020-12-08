@@ -135,13 +135,38 @@
                   </p>
                 </div>
               </div>
-              <div *ngIf="component.name === 'Budgets' && card.name === 'Top Budgets'">
+              <div *ngIf="component.name === 'Budgets' && card.name === 'Top Budgets'" style="width: 100%; height: 100%;">
                 <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
                 <div *ngIf="!isLoading"> 
                   <div *ngIf="top3Budgets.length === 0">
                     <p>No recent budgets in the last 30 days!</p>
                   </div>
-                  <div *ngFor="let budget of top3Budgets">
+                  <div *ngFor="let budget of top3Budgets" fxLayoutAlign="space-between center" style="width: 100%; height: 100%;">
+                    <p *ngIf="budget.mainCategory === budget.category3">
+                      {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
+                    </p>
+                    <p *ngIf="budget.mainCategory === budget.category2">
+                      {{ budget.category }}: <b>{{ budget.category2 }}</b> 
+                    </p>
+                    <p *ngIf="budget.mainCategory === budget.category">
+                      <b>{{ budget.category }}</b> 
+                    </p>
+                    <span *ngIf="(budget.total / (budget.amount)) >= 1" style="color: red;">
+                      <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
+                    </span>
+                    <span *ngIf="!((budget.total / (budget.amount)) >= 1) && (budget.total / (budget.amount)) >= 0.75" style="color: orange;">
+                      <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
+                    </span>
+                    <span *ngIf="!((budget.total / (budget.amount)) >= 0.75) && (budget.total / (budget.amount)) >= 0" style="color: green;">
+                      <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
+                    </span>
+                  </div>
+                  <!-- <mat-list *ngFor="let budget of top3Budgets" style="width: 100%; height: 100%;">
+                    <mat-list-item>
+                      
+                    </mat-list-item>
+                  </mat-list> -->
+                  <!-- <div *ngFor="let budget of top3Budgets">
                     <p fxFlex *ngIf="budget.mainCategory === budget.category3">
                       {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
                     </p>
@@ -163,7 +188,7 @@
                         <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
                       </span>
                     </p>
-                  </div>
+                  </div> -->
                 </div>
               </div>
               <div *ngIf="component.name === 'Goals' && card.name === 'Completed Goals'">
@@ -173,8 +198,12 @@
                     <p>No completed goals in the last 30 days!</p>
                   </div>
                   <div *ngIf="recentlyCompletedGoals.length > 0">
-                    <div *ngFor="let goal of recentlyCompletedGoals">
-                      <p>{{goal.goalName}}</p>
+                    <div *ngFor="let goal of recentlyCompletedGoals" style="margin-bottom: 30px;">
+                      <div class="goal-image">
+                        <img [src]="goal.imagePath" [alt]="goal.goalName" 
+                        matTooltip="{{goal.goalDescription}}" matTooltipPosition="above">
+                      </div>
+                      <p style="text-align: center"><b>{{goal.goalName}}</b></p>
                     </div>
                   </div>
                 </div>

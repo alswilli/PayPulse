@@ -210,7 +210,10 @@ export class AddBudgetComponent implements OnInit {
         else if (3 in this.budgetMins[key]) {
           this.minVal = 0;
           for (let cat of Object.keys(this.budgetMins[key][3])) {
-            this.minVal = this.minVal + this.budgetMins[key][3][cat];
+            for (let subcat of Object.keys(this.budgetMins[key][3][cat])) {
+              this.minVal = this.minVal + this.budgetMins[key][3][cat][subcat];
+            }
+            // this.minVal = this.minVal + this.budgetMins[key][3][cat];
           }
         }
         else {
@@ -224,7 +227,11 @@ export class AddBudgetComponent implements OnInit {
         if (1 in this.budgetMins[key] && 3 in this.budgetMins[key]) {
           // min
           if (this.budgetMins[key][3] && budget.category2 in this.budgetMins[key][3]) {
-            this.minVal = this.budgetMins[key][3][budget.category2]
+            this.minVal = 0;
+            for (let subcat of Object.keys(this.budgetMins[key][3][budget.category2])) {
+              this.minVal = this.minVal + this.budgetMins[key][3][budget.category2][subcat];
+            }
+            // this.minVal = this.budgetMins[key][3][budget.category2]
           }
           else {
             this.minVal = 0
@@ -255,7 +262,11 @@ export class AddBudgetComponent implements OnInit {
         }
         else if (3 in this.budgetMins[key]) {
           if (this.budgetMins[key][3] && budget.category2 in this.budgetMins[key][3]) {
-            this.minVal = this.budgetMins[key][3][budget.category2]
+            this.minVal = 0;
+            for (let subcat of Object.keys(this.budgetMins[key][3][budget.category2])) {
+              this.minVal = this.minVal + this.budgetMins[key][3][budget.category2][subcat];
+            }
+            // this.minVal = this.budgetMins[key][3][budget.category2]
           }
           else {
             this.minVal = 0
@@ -270,11 +281,17 @@ export class AddBudgetComponent implements OnInit {
 
       // Bottom case
       else {
+        console.log(this.budgetMins)
         if (2 in this.budgetMins[key] && 1 in this.budgetMins[key]) {
           if (budget.category2 in this.budgetMins[key][2]) {
+            // bounded above by 2
             var currVals = 0;
             if (this.budgetMins[key][3] && budget.category2 in this.budgetMins[key][3]) {
-              currVals = this.budgetMins[key][3][budget.category2];
+              for (let sameLevelBudget in this.budgetMins[key][3][budget.category2]) {
+                if (sameLevelBudget != budget.category3) {
+                  currVals += this.budgetMins[key][3][budget.category2][sameLevelBudget];
+                }
+              }
               this.maxVal = this.budgetMins[key][2][budget.category2] - currVals;
             }
             else {
@@ -282,6 +299,7 @@ export class AddBudgetComponent implements OnInit {
             }
           }
           else {
+            // bounded above by 1
             var otherVals = 0;
             for (let cat of Object.keys(this.budgetMins[key][2])) {
               if (cat !== budget.category2) {
@@ -290,7 +308,12 @@ export class AddBudgetComponent implements OnInit {
             }
             var currVals = 0;
             if (this.budgetMins[key][3] && budget.category2 in this.budgetMins[key][3]) {
-              currVals = this.budgetMins[key][3][budget.category2];
+              for (let sameLevelBudget in this.budgetMins[key][3][budget.category2]) {
+                if (sameLevelBudget != budget.category3) {
+                  currVals += this.budgetMins[key][3][budget.category2][sameLevelBudget];
+                } 
+              }
+              // currVals = this.budgetMins[key][3][budget.category2];
               this.maxVal = this.budgetMins[key][1] - otherVals - currVals;
             }
             else {
@@ -300,9 +323,14 @@ export class AddBudgetComponent implements OnInit {
         }
         else if (2 in this.budgetMins[key]) {
           if (budget.category2 in this.budgetMins[key][2]) {
+            // bounded above
             var currVals = 0;
             if (this.budgetMins[key][3] && budget.category2 in this.budgetMins[key][3]) {
-              currVals = this.budgetMins[key][3][budget.category2];
+              for (let sameLevelBudget in this.budgetMins[key][3][budget.category2]) {
+                if (sameLevelBudget != budget.category3) {
+                  currVals += this.budgetMins[key][3][budget.category2][sameLevelBudget];
+                } 
+              }
               this.maxVal = this.budgetMins[key][2][budget.category2] - currVals;
             }
             else {
@@ -316,10 +344,16 @@ export class AddBudgetComponent implements OnInit {
         else if (1 in this.budgetMins[key]) {
           var currVals = 0;
           if (this.budgetMins[key][3] && budget.category2 in this.budgetMins[key][3]) {
-            currVals = this.budgetMins[key][3][budget.category2];
+            // other restaurant budget 3's
+            for (let sameLevelBudget in this.budgetMins[key][3][budget.category2]) {
+              if (sameLevelBudget != budget.category3) {
+                currVals += this.budgetMins[key][3][budget.category2][sameLevelBudget];
+              } 
+            }
             this.maxVal = this.budgetMins[key][1] - currVals;
           }
           else {
+            // NO other restaurant budget 3's
             this.maxVal = this.budgetMins[key][1];
           }
         }
@@ -360,20 +394,28 @@ export class AddBudgetComponent implements OnInit {
       // var key = budget.category + String(budgetLevel);
       var key = budget.category
       if (key in this.budgetMins) {
+        // top category already exists
         if (budgetLevel in this.budgetMins[key]) {
           if (budgetLevel === 3) {
             if (budget.category2 in this.budgetMins[key][budgetLevel]) {
-              console.log("a")
-              this.budgetMins[key][budgetLevel][budget.category2] = this.budgetMins[key][budgetLevel][budget.category2] + Number(budget.amount);
+              if (budget.category3 in this.budgetMins[key][budgetLevel][budget.category2]) {
+                console.log("a") // won't get called?
+                this.budgetMins[key][budgetLevel][budget.category2][budget.category3] = this.budgetMins[key][budgetLevel][budget.category2][budget.category3] + Number(budget.amount);
+              }
+              else {
+                console.log("aa")
+                this.budgetMins[key][budgetLevel][budget.category2][budget.category3] = Number(budget.amount);
+              }
             }
             else {
               console.log("b")
-              this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
+              this.budgetMins[key][budgetLevel][budget.category2] = {}
+              this.budgetMins[key][budgetLevel][budget.category2][budget.category3] = Number(budget.amount);
             }
           }
           else if (budgetLevel === 2) {
             if (budget.category2 in this.budgetMins[key][budgetLevel]) {
-              console.log("c")
+              console.log("c") // will not get called?
               this.budgetMins[key][budgetLevel][budget.category2] = this.budgetMins[key][budgetLevel][budget.category2] + Number(budget.amount);
             }
             else {
@@ -382,7 +424,7 @@ export class AddBudgetComponent implements OnInit {
             }
           }
           else {
-            console.log("e")
+            console.log("e") // will not get called?
             this.budgetMins[key][budgetLevel] = this.budgetMins[key][budgetLevel] + Number(budget.amount);
           }
         }
@@ -390,7 +432,8 @@ export class AddBudgetComponent implements OnInit {
           if (budgetLevel === 3) {
             console.log("f")
             this.budgetMins[key][budgetLevel] = {}
-            this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
+            this.budgetMins[key][budgetLevel][budget.category2] = {}
+            this.budgetMins[key][budgetLevel][budget.category2][budget.category3] = Number(budget.amount);
           }
           else if (budgetLevel === 2) {
             console.log("g")
@@ -398,17 +441,19 @@ export class AddBudgetComponent implements OnInit {
             this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
           }
           else {
-            console.log("h")
+            console.log("h") 
             this.budgetMins[key][budgetLevel] = Number(budget.amount);
           }
         }
       }
       else {
+        // new top category
         this.budgetMins[key] = {};
         if (budgetLevel === 3) {
           console.log("i")
           this.budgetMins[key][budgetLevel] = {}
-          this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
+          this.budgetMins[key][budgetLevel][budget.category2] = {}
+          this.budgetMins[key][budgetLevel][budget.category2][budget.category3] = Number(budget.amount);
         }
         else if (budgetLevel === 2) {
           console.log("j")
