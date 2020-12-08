@@ -128,6 +128,7 @@ export class GoalService {
     */
 
     var accountsItemStatus = []
+    var didNotPass = false
     for (let accountId in accountIds) {
       accountsItemStatus.push(null)
     }
@@ -139,8 +140,8 @@ export class GoalService {
         var oldDate = new Date(JSON.parse(localStorage.getItem('JWT'))["lastUpdated"])
         var currDate = new Date();
         this.totalBudgetAmount = 0
-        // var oldDate = new Date("2020-09-21T01:14:54.483Z");
-        // var currDate = new Date("2020-10-22T01:14:54.483Z"); 
+        var oldDate = new Date("2020-10-21T01:14:54.483Z");
+        var currDate = new Date("2020-11-22T01:14:54.483Z"); 
         console.log(oldDate)
         console.log(currDate)
         console.log(budgets.length)
@@ -242,6 +243,7 @@ export class GoalService {
         }
         else {
           console.log("did not pass")
+          didNotPass = true
           let transactionObservables: Observable<any>[] = [];
           for (let accountId of accountIds) { // purely to check for invalid items
             transactionObservables.push(this.accountService.getBudgetTransactions(accountId, 30, 0))
@@ -291,10 +293,13 @@ export class GoalService {
         var sixRowId = null
         var nineRowId = null
         var oneYearRowId = null
+        var budgetBusterId = null
+        var expertBudgeteerId = null
         var threeRowIndex = null
         var sixRowIndex = null
         var nineRowIndex = null
         var oneYearRowIndex = null
+        var budgetBusterIndex = null
         for (let goal of allGoals) {
           if (goal.goalName == "Budget Manager - All Months") {
             console.log("found all months")
@@ -353,12 +358,37 @@ export class GoalService {
               index += 1
             }
           }
+          if (goal.goalName == "Budget Buster") {
+            console.log("found budget buster")
+            var index = 0
+            for (let ug of allUserGoals) {
+              if (ug.goalId == goal._id) {
+                budgetBusterId = ug._id
+                budgetBusterIndex = index
+                break
+              }
+              index += 1
+            }
+          }
+          if (goal.goalName == "Expert Budgeteer") {
+            console.log("found expert budgeteer")
+            var index = 0
+            for (let ug of allUserGoals) {
+              if (ug.goalId == goal._id) {
+                expertBudgeteerId = ug._id
+                break
+              }
+              index += 1
+            }
+          }
         }
         console.log("all months id: ", allMonthsId)
         console.log("3 in a row id: ", threeRowId)
         console.log("6 in a row id: ", sixRowId)
         console.log("9 in a row id: ", nineRowId)
         console.log("one year in a row id: ", oneYearRowId)
+        console.log("budget buster id: ", budgetBusterId)
+        console.log("expert budgeteer id: ", expertBudgeteerId)
 
         var allMonthsDone = true
         for (let month in userGoalData.allMonthsAchieved) {
@@ -393,7 +423,26 @@ export class GoalService {
           console.log("Monthly Total: ", monthlyTotal)
           console.log("Total Budget Amount: ", this.totalBudgetAmount)
 
+          var currBudgetMargin = monthlyTotal - this.totalBudgetAmount
 
+          if (this.numMonthsAhead > 0 && this.budgets.length > 0) {
+            console.log("in budget buster")
+            if (userGoalData.prevBudgetMargin != null && userGoalData.prevBudgetMargin > currBudgetMargin) {
+              console.log("updating budget buster")
+              var retObj = {}
+              if (allUserGoals[budgetBusterIndex].goalProgress != 100) {
+                retObj['done'] = "Done"
+                retObj["numTimesAchieved"] = allUserGoals[budgetBusterIndex].numTimesAchieved+1
+                usergoalObservables.push(this.updateUserGoal(budgetBusterId, retObj))
+              }
+              else if (allUserGoals[budgetBusterIndex].goalProgress == 100) {
+                retObj['done'] = "Already Done"
+                retObj["numTimesAchieved"] = allUserGoals[budgetBusterIndex].numTimesAchieved+1
+                usergoalObservables.push(this.updateUserGoal(budgetBusterId, retObj))
+              }
+            }
+            userGoalData.prevBudgetMargin = currBudgetMargin
+          }
 
           var nextMonthVal = 0
           if (userGoalData.previousMonth != "") {

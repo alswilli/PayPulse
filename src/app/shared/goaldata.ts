@@ -4,4 +4,5 @@ export class GoalData {
     allMonthsAchieved: Object;
     monthsInARow: number;
     previousMonth: string;
+    prevBudgetMargin: number;
 }

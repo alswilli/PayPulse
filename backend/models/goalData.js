@@ -17,6 +17,10 @@ const GoalDataSchema = new Schema({
     previousMonth: {
         type: String,
         default: ""
+    },
+    prevBudgetMargin: {
+        type: Number,
+        default: null
     }
 });
 module.exports = GoalData = mongoose.model("goaldata", GoalDataSchema);

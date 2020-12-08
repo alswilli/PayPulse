@@ -129,7 +129,8 @@ goalRouter.route("/goalData/:goaldataId")
           userId: req.body.userId,
           allMonthsAchieved: req.body.allMonthsAchieved,
           monthsInARow: req.body.monthsInARow,
-          previousMonth: req.body.previousMonth
+          previousMonth: req.body.previousMonth,
+          prevBudgetMargin: req.body.prevBudgetMargin
               }
         }, { new: true })
         .then((goaldata) => {
