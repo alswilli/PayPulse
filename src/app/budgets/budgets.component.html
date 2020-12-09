@@ -29,8 +29,10 @@
       <!-- <div fxFlex='1'></div> -->
       <div fxFlex='50' class="mainPanels">
         <h2>Trends:</h2>
-        <span>Showing data from: </span>
-        <mat-form-field style="margin-right: 5px;">
+        <span fxShow="true" fxHide.lt-md="true">Showing data from:</span>
+        <p fxHide="true" fxShow.lt-md="true"> Showing data from:</p>
+        <!-- <span> Showing data from:</span> -->
+        <mat-form-field style="margin-left: 10px; margin-right: 5px;">
           <mat-label>From:</mat-label>
           <mat-select id="from" #from> 
             <mat-option *ngFor="let month of fromMonths" [value]="month">

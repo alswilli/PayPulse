@@ -20,7 +20,7 @@ export class GoalsUnlockedComponent implements OnInit {
   farthestLeft: boolean;
   newGoals: boolean;
   goals = []
-  gtMd = true
+  // gtMd = true
 
   constructor(public dialogRef: MatDialogRef<GoalsUnlockedComponent>,
     @Inject(MAT_DIALOG_DATA) public data,
@@ -33,13 +33,13 @@ export class GoalsUnlockedComponent implements OnInit {
     var currIndex = 0;
     console.log(this.box.nativeElement.clientWidth)
     console.log(window.screen.availWidth)
-    if (window.screen.availWidth > 950) {
-      console.log(window.screen.availWidth)
-      this.gtMd = true
-    }
-    else {
-      this.gtMd = false
-    }
+    // if (window.screen.availWidth > 950) {
+    //   console.log(window.screen.availWidth)
+    //   this.gtMd = true
+    // }
+    // else {
+    //   this.gtMd = false
+    // }
     if ('matchedGoals' in this.data) {
       this.newGoals = false
       this.index = this.data.index;

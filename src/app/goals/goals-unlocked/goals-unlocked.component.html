@@ -1,6 +1,6 @@
 <!-- <div #box (window:resize)="onBoxResize()"> -->
 <div #box>
-  <div *ngIf="!isLoading && gtMd" fxLayout="row" style="height: 100%; width: 100%">
+  <div *ngIf="!isLoading" fxLayout="row" fxShow="true" fxHide.lt-md="true" style="height: 100%; width: 100%">
     <mat-dialog-actions style="padding: 0px; margin-bottom: 0px; margin-right: 20px;" [ngStyle.lt-sm]="{'max-width': '60px'}">
       <button mat-button class="leftIconDiv" (click)="onLeftIconClicked();" [disabled]="farthestLeft" [ngStyle.lt-sm]="{'max-width': '60px'}">
         <mat-icon class="icon" [ngStyle.lt-sm]="{'font-size': '30px'}">keyboard_arrow_left</mat-icon>
@@ -33,7 +33,7 @@
       </button>
     </mat-dialog-actions>
   </div>
-  <div *ngIf="!isLoading && !gtMd" fxLayout="column" style="height: 100%; width: 100%">
+  <div *ngIf="!isLoading" fxLayout="column" fxHide="true" fxShow.lt-md="true" style="height: 100%; width: 100%">
     <div *ngFor="let goal of goals; let i = index">
       <div *ngIf="goal.show">
         <h1 *ngIf="newGoals" style="text-align: center;">Newly Completed Goals!</h1>
