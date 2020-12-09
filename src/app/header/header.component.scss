@@ -23,10 +23,11 @@ a {
 
 .side {
     background: $background-lessdark;
-    height: 100%;
-    overflow-y: hidden; 
-    display: flex; 
-    flex-direction: column;
+    position: fixed;
+    // height: 100%;
+    // overflow-y: hidden; 
+    // display: flex; 
+    // flex-direction: column;
 }
 
 .sideContent {
