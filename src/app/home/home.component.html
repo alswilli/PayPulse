@@ -3,7 +3,7 @@
 <mat-spinner *ngIf="fullLoad" style="margin: auto"></mat-spinner>
 <!-- <div style="position: fixed; height: 100px; margin-top: 100px;"></div> -->
 <div *ngIf="!fullLoad" style="max-width: 1400px; margin: auto">
-  <div fxLayout.lt-md="column" >
+  <div fxLayout.lt-md="column" [ngStyle.lt-md]="{'margin': 'auto', 'max-width': '693px'}">
     <div class="addAccountDiv" fxFlex="50" [ngStyle]="{'margin': marginVal + 'px', 'border': borderVal}">
       <!-- <form [formGroup]="clientForm"> -->
         <h2 *ngIf="listValue.length > 0" style="margin:10px;">Linked Bank Accounts:</h2>
@@ -96,7 +96,7 @@
       </div>
     </div>
   </div>
-  <div *ngIf="listValue.length > 0 && currentAccounts.length > 0" style="border: 1px solid rgb(209, 209, 209); margin: 10px;">
+  <div [ngStyle.lt-md]="{'margin': 'auto', 'max-width': '673px'}" *ngIf="listValue.length > 0 && currentAccounts.length > 0" style="border: 1px solid rgb(209, 209, 209); margin: 10px;">
     <!-- <h2 *ngIf="listValue.length > 0" style="margin: 10px;"><span style="color: rgb(3, 192, 3)">{{currentAccountName}}</span> - Summary:</h2> -->
     <h2 *ngIf="listValue.length > 0 && currentAccounts.length > 0" style="margin: 10px;"> Budgeting Summary: </h2>
     <div fxLayout="row" fxLayout.lt-md="column" class="outerCardDiv"
@@ -125,14 +125,29 @@
                   <div *ngIf="parsedTransactions.length === 0">
                     <p>No recent transactions in the last 30 days!</p>
                   </div>
-                  <p *ngFor="let recentData of parsedTransactions">
-                    <span><b>Bank Account Name:</b> {{recentData.mainAccountName}} </span>
+                  <div>
+                  <!-- <div style="margin: 30px;" *ngFor="let recentData of parsedTransactions"> -->
+                    <!-- <span><b>Bank Account Name:</b> {{recentData.mainAccountName}} </span>
                     <span><b>Sub Account Name:</b> {{recentData.accountName}} </span>
                     <span><b>Amount:</b> {{recentData.amount}} </span>
                     <span><b>Transaction Name:</b> {{recentData.transactionName}} </span>
                     <span><b>Category:</b> {{recentData.category}} </span>
-                    <span><b>Date:</b> {{recentData.date}} </span>
-                  </p>
+                    <span><b>Date:</b> {{recentData.date}} </span> -->
+                    <mat-expansion-panel style="margin-bottom: 30px;" *ngFor="let recentData of parsedTransactions; let i = index">
+                      <mat-expansion-panel-header id="{{'budgetHeader' + i}}">
+                        <div>
+                          <p style="margin: 0px;"><b>{{recentData.transactionName}}</b> </p>
+                          <p style="margin: 0px; color: green;"><b>$ {{recentData.amount}}</b> </p>
+                        </div>
+                      </mat-expansion-panel-header>
+                      <p style="margin: 0px;"><b>Bank Account Name:</b> {{recentData.mainAccountName}} </p>
+                      <p style="margin: 0px;"><b>Sub Account Name:</b> {{recentData.accountName}} </p>
+                      <!-- <p style="margin: 0px;"><b>Amount:</b> {{recentData.amount}} </p> -->
+                      <!-- <p style="margin: 0px;"><b>Transaction Name:</b> {{recentData.transactionName}} </p> -->
+                      <p style="margin: 0px;"><b>Category:</b> {{recentData.category}} </p>
+                      <p style="margin: 0px;"><b>Date:</b> {{recentData.date}} </p>
+                    </mat-expansion-panel>
+                  </div>
                 </div>
               </div>
               <div *ngIf="component.name === 'Budgets' && card.name === 'Top Budgets'" style="width: 100%; height: 100%;">
@@ -141,23 +156,23 @@
                   <div *ngIf="top3Budgets.length === 0">
                     <p>No recent budgets in the last 30 days!</p>
                   </div>
-                  <div *ngFor="let budget of top3Budgets" fxLayoutAlign="space-between center" style="width: 100%; height: 100%;">
-                    <p *ngIf="budget.mainCategory === budget.category3">
+                  <div *ngFor="let budget of top3Budgets" fxLayoutAlign="space-between center" style="max-width: 374px; height: 100%; margin: auto; margin-bottom: 30px">
+                    <p style="margin: 0px;" *ngIf="budget.mainCategory === budget.category3">
                       {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
                     </p>
-                    <p *ngIf="budget.mainCategory === budget.category2">
+                    <p style="margin: 0px;" *ngIf="budget.mainCategory === budget.category2">
                       {{ budget.category }}: <b>{{ budget.category2 }}</b> 
                     </p>
-                    <p *ngIf="budget.mainCategory === budget.category">
+                    <p style="margin: 0px;" *ngIf="budget.mainCategory === budget.category">
                       <b>{{ budget.category }}</b> 
                     </p>
-                    <span *ngIf="(budget.total / (budget.amount)) >= 1" style="color: red;">
+                    <span style="margin: 0px;" *ngIf="(budget.total / (budget.amount)) >= 1 || (budget.amount) == 0" style="color: red;">
                       <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
                     </span>
-                    <span *ngIf="!((budget.total / (budget.amount)) >= 1) && (budget.total / (budget.amount)) >= 0.75" style="color: orange;">
+                    <span style="margin: 0px;" *ngIf="!((budget.total / (budget.amount)) >= 1) && (budget.total / (budget.amount)) >= 0.75" style="color: orange;">
                       <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
                     </span>
-                    <span *ngIf="!((budget.total / (budget.amount)) >= 0.75) && (budget.total / (budget.amount)) >= 0" style="color: green;">
+                    <span style="margin: 0px;" *ngIf="!((budget.total / (budget.amount)) >= 0.75) && (budget.total / (budget.amount)) >= 0" style="color: green;">
                       <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
                     </span>
                   </div>
@@ -223,5 +238,6 @@
     <p>Please select a current account(s) to view home page data!</p>
   </div>
 </div>
+<div [ngStyle.lt-md]="{'height': '30px'}"></div>
 
 

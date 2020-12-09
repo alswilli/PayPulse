@@ -121,8 +121,10 @@ a.fill-div {
     // width: 100%;
     // height: 50%;
     margin: auto;
-    width: 100px;
-    height: 100px;
+    max-width: 175px;
+    max-height: 175px;
+    // width: 100px;
+    // height: 100px;
     cursor: pointer;
 }
 
@@ -131,3 +133,14 @@ a.fill-div {
     height: 100%;
 }
 
+.green-progress .mat-progress-bar-fill::after {
+    background-color: green !important;
+}
+
+.orange-progress .mat-progress-bar-fill::after {
+    background-color: orange !important;
+}
+
+.red-progress .mat-progress-bar-fill::after {
+    background-color: red !important;
+}

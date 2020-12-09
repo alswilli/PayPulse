@@ -1,6 +1,6 @@
 <span id="moveTop"></span>
 <div style="height: 75px;"></div>
-<div style="max-width: 1400px; margin: auto">
+<div style="max-width: 1400px; margin: auto" [ngStyle.lt-md]="{'margin': 'auto', 'max-width': '693px'}">
   <!-- <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner> -->
   <div *ngIf="userAccountsDetails.accounts.length == 0">
     <p style="text-align: center;">No accounts added! Please add an account to see budgets</p>
@@ -81,7 +81,7 @@
             <p>No budgets added! Please add a budget using the 'Add New Budget' button above</p>
           </div>
             <mat-accordion class="example-headers-align" multi>
-              <div class="budgetList">
+              <div class="budgetList" [ngStyle.lt-md]="{'height': '200px', 'overflow': 'auto'}">
                 <mat-expansion-panel *ngFor="let budget of budgets; let i = index;">
                   <mat-expansion-panel-header id="{{'budgetHeader' + i}}">
                     <p fxFlex *ngIf="budget.mainCategory === budget.category3">
@@ -94,7 +94,7 @@
                       <b>{{ budget.category }}</b> 
                     </p>
                     <p fxLayoutAlign="end center" style="margin-right: 10px;">
-                      <span *ngIf="(budget.total / (budget.amount * totalMonthsActive)) >= 1" style="color: red;">
+                      <span *ngIf="(budget.total / (budget.amount * totalMonthsActive)) >= 1 || (budget.amount * totalMonthsActive) == 0" style="color: red;">
                         <b>$ {{ budget.total }} / {{ (budget.amount * totalMonthsActive) }}</b>
                       </span>
                       <span *ngIf="!((budget.total / (budget.amount * totalMonthsActive)) >= 1) && (budget.total / (budget.amount * totalMonthsActive)) >= 0.75" style="color: orange;">
@@ -105,7 +105,7 @@
                       </span>
                     </p>
                   </mat-expansion-panel-header>
-                  <button mat-raised-button style="background-color: grey; color: white;" id="{{'editButton' + i}}" (click)="onEditBudgetClicked(budget);">Edit Budget</button>
+                  <button mat-raised-button style="background-color: grey; color: white;" id="{{'editButton' + i}}" (click)="onEditBudgetClicked(budget, i);">Edit Budget</button>
                   <button mat-raised-button color="warn" style="margin: 10px;" id="{{'deleteButton' + i}}" (click)="onDeleteBudgetClicked(budget);">Delete Budget</button>
               
                 </mat-expansion-panel>
@@ -120,6 +120,7 @@
     <p style="text-align: center;">Please select a current account(s) on the home page to view budgets!</p>
   </div>
 </div>
+<div [ngStyle.lt-md]="{'height': '30px'}"></div>
 
 
 

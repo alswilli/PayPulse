@@ -28,6 +28,8 @@ export class AddBudgetComponent implements OnInit {
   edit: boolean;
   minVal: number;
   maxVal: number;
+  initialBudget: any;
+  initialBudgetIndex: number;
   // subscription: Subscription;
 
   constructor(public dialogRef: MatDialogRef<AddBudgetComponent>,
@@ -50,11 +52,14 @@ export class AddBudgetComponent implements OnInit {
     console.log("Active Budgets: ", this.budgets)
     console.log("Categories: ", this.categories)
     console.log("Edit: ", this.edit)
-    this.createBudgetMins(); //-> NEED TO FIX FOR TESTS TO WORK
     // console.log("Active Budgets: ", this.budgets)
     // console.log("Categories: ", this.categories)
+    this.initialBudget = null
     if (this.edit === true) {
       console.log(this.data.budget)
+      this.initialBudget = this.data.budget
+      this.initialBudgetIndex = this.data.budgetIndex
+      this.createBudgetMins(); //-> NEED TO FIX FOR TESTS TO WORK
       if (this.data.budget.category3 !== '') {
         this.firstOpSelected(this.data.budget.category);
         console.log(this.categories)
@@ -65,6 +70,11 @@ export class AddBudgetComponent implements OnInit {
       }
       this.addBudgetForm.setValue({category: this.data.budget.category, category2: this.data.budget.category2, 
         category3: this.data.budget.category3, amount: this.data.budget.amount});
+    }
+    else {
+      this.initialBudget = null
+      this.initialBudgetIndex = null
+      this.createBudgetMins(); //-> NEED TO FIX FOR TESTS TO WORK
     }
     this.getMinMaxVals();
     console.log("here")
@@ -238,15 +248,23 @@ export class AddBudgetComponent implements OnInit {
           }
 
           // max
-          var otherVals = 0;
-          if (this.budgetMins[key][2]) {
-            for (let cat of Object.keys(this.budgetMins[key][2])) {
-              if (cat !== budget.category2) {
-                otherVals = otherVals + this.budgetMins[key][2][cat];
+          // var otherVals = 0;
+          var otherSubVals = 0
+          // if (this.budgetMins[key][2]) {
+          //   for (let cat of Object.keys(this.budgetMins[key][2])) {
+          //     if (cat !== budget.category2) {
+          //       otherVals = otherVals + this.budgetMins[key][2][cat];
+          //     }
+          //   }
+          // }
+          for (let cat of Object.keys(this.budgetMins[key][3])) {
+            if (cat !== budget.category2) {
+              for (let subcat of Object.keys(this.budgetMins[key][3][cat])) {
+                otherSubVals = otherSubVals + this.budgetMins[key][3][cat][subcat];
               }
             }
           }
-          this.maxVal = this.budgetMins[key][1] - otherVals;
+          this.maxVal = this.budgetMins[key][1] - otherSubVals;
         }
         else if (1 in this.budgetMins[key]) {
           this.minVal = 0
@@ -287,6 +305,17 @@ export class AddBudgetComponent implements OnInit {
             // bounded above by 2
             var currVals = 0;
             if (this.budgetMins[key][3] && budget.category2 in this.budgetMins[key][3]) {
+              // for (let sameLevelBudget in this.budgetMins[key][3][budget.category2]) {
+              //   // if (sameLevelBudget != budget.category3) {
+              //   //   currVals += this.budgetMins[key][3][budget.category2][sameLevelBudget];
+              //   // } 
+              //   currVals += this.budgetMins[key][3][budget.category2][sameLevelBudget];
+              // }
+              // var yourVal = 0
+              // if (budget.category3 in this.budgetMins[key][3][budget.category2]) {
+              //   yourVal = this.budgetMins[key][3][budget.category2][budget.category3];
+              // }
+              // this.maxVal = this.budgetMins[key][1] - currVals - yourVal;
               for (let sameLevelBudget in this.budgetMins[key][3][budget.category2]) {
                 if (sameLevelBudget != budget.category3) {
                   currVals += this.budgetMins[key][3][budget.category2][sameLevelBudget];
@@ -380,93 +409,104 @@ export class AddBudgetComponent implements OnInit {
   createBudgetMins() {
     for (let budget of this.budgets) {
       console.log(budget)
-      var budgetLevel = null;
-      if (budget.category2 && budget.category3) {
-        budgetLevel = 3;
+      if (this.edit) {
+        if (budget != this.initialBudget) {
+          this.createBudgetMinsHelper(budget)
+        }
       }
-      else if (budget.category2) {
-        budgetLevel = 2
+      else{ 
+        this.createBudgetMinsHelper(budget)
       }
-      else {
-        budgetLevel = 1
-      } 
+    }
+    console.log(this.budgetMins)
+  }
 
-      // var key = budget.category + String(budgetLevel);
-      var key = budget.category
-      if (key in this.budgetMins) {
-        // top category already exists
-        if (budgetLevel in this.budgetMins[key]) {
-          if (budgetLevel === 3) {
-            if (budget.category2 in this.budgetMins[key][budgetLevel]) {
-              if (budget.category3 in this.budgetMins[key][budgetLevel][budget.category2]) {
-                console.log("a") // won't get called?
-                this.budgetMins[key][budgetLevel][budget.category2][budget.category3] = this.budgetMins[key][budgetLevel][budget.category2][budget.category3] + Number(budget.amount);
-              }
-              else {
-                console.log("aa")
-                this.budgetMins[key][budgetLevel][budget.category2][budget.category3] = Number(budget.amount);
-              }
+  createBudgetMinsHelper(budget) {
+    var budgetLevel = null;
+    if (budget.category2 && budget.category3) {
+      budgetLevel = 3;
+    }
+    else if (budget.category2) {
+      budgetLevel = 2
+    }
+    else {
+      budgetLevel = 1
+    } 
+
+    // var key = budget.category + String(budgetLevel);
+    var key = budget.category
+    if (key in this.budgetMins) {
+      // top category already exists
+      if (budgetLevel in this.budgetMins[key]) {
+        if (budgetLevel === 3) {
+          if (budget.category2 in this.budgetMins[key][budgetLevel]) {
+            if (budget.category3 in this.budgetMins[key][budgetLevel][budget.category2]) {
+              console.log("a") // won't get called?
+              this.budgetMins[key][budgetLevel][budget.category2][budget.category3] = this.budgetMins[key][budgetLevel][budget.category2][budget.category3] + Number(budget.amount);
             }
             else {
-              console.log("b")
-              this.budgetMins[key][budgetLevel][budget.category2] = {}
+              console.log("aa")
               this.budgetMins[key][budgetLevel][budget.category2][budget.category3] = Number(budget.amount);
             }
           }
-          else if (budgetLevel === 2) {
-            if (budget.category2 in this.budgetMins[key][budgetLevel]) {
-              console.log("c") // will not get called?
-              this.budgetMins[key][budgetLevel][budget.category2] = this.budgetMins[key][budgetLevel][budget.category2] + Number(budget.amount);
-            }
-            else {
-              console.log("d")
-              this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
-            }
-          }
           else {
-            console.log("e") // will not get called?
-            this.budgetMins[key][budgetLevel] = this.budgetMins[key][budgetLevel] + Number(budget.amount);
-          }
-        }
-        else {
-          if (budgetLevel === 3) {
-            console.log("f")
-            this.budgetMins[key][budgetLevel] = {}
+            console.log("b")
             this.budgetMins[key][budgetLevel][budget.category2] = {}
             this.budgetMins[key][budgetLevel][budget.category2][budget.category3] = Number(budget.amount);
           }
-          else if (budgetLevel === 2) {
-            console.log("g")
-            this.budgetMins[key][budgetLevel] = {}
-            this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
+        }
+        else if (budgetLevel === 2) {
+          if (budget.category2 in this.budgetMins[key][budgetLevel]) {
+            console.log("c") // will not get called?
+            this.budgetMins[key][budgetLevel][budget.category2] = this.budgetMins[key][budgetLevel][budget.category2] + Number(budget.amount);
           }
           else {
-            console.log("h") 
-            this.budgetMins[key][budgetLevel] = Number(budget.amount);
+            console.log("d")
+            this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
           }
+        }
+        else {
+          console.log("e") // will not get called?
+          this.budgetMins[key][budgetLevel] = this.budgetMins[key][budgetLevel] + Number(budget.amount);
         }
       }
       else {
-        // new top category
-        this.budgetMins[key] = {};
         if (budgetLevel === 3) {
-          console.log("i")
+          console.log("f")
           this.budgetMins[key][budgetLevel] = {}
           this.budgetMins[key][budgetLevel][budget.category2] = {}
           this.budgetMins[key][budgetLevel][budget.category2][budget.category3] = Number(budget.amount);
         }
         else if (budgetLevel === 2) {
-          console.log("j")
+          console.log("g")
           this.budgetMins[key][budgetLevel] = {}
           this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
         }
         else {
-          console.log("k")
+          console.log("h") 
           this.budgetMins[key][budgetLevel] = Number(budget.amount);
         }
       }
     }
-    console.log(this.budgetMins)
+    else {
+      // new top category
+      this.budgetMins[key] = {};
+      if (budgetLevel === 3) {
+        console.log("i")
+        this.budgetMins[key][budgetLevel] = {}
+        this.budgetMins[key][budgetLevel][budget.category2] = {}
+        this.budgetMins[key][budgetLevel][budget.category2][budget.category3] = Number(budget.amount);
+      }
+      else if (budgetLevel === 2) {
+        console.log("j")
+        this.budgetMins[key][budgetLevel] = {}
+        this.budgetMins[key][budgetLevel][budget.category2] = Number(budget.amount);
+      }
+      else {
+        console.log("k")
+        this.budgetMins[key][budgetLevel] = Number(budget.amount);
+      }
+    }
   }
 
   firstOpSelected(select) {
@@ -493,6 +533,22 @@ export class AddBudgetComponent implements OnInit {
         this.firstSelected = true;
       }
     }
+
+    // if (this.initialBudget != null) {
+    //   if (this.addBudgetForm.value != this.initialBudget) {
+    //     console.log("not equal to initial budget")
+    //     if (this.budgets.indexOf(this.initialBudget) > -1) { // only deleting when initially switching off it
+    //       this.budgets.splice(this.initialBudgetIndex, 1)
+    //       // need to recreate from budget mins
+    //       this.createBudgetMins()
+    //     }
+    //   }
+    //   else { 
+    //     console.log("equal to initial budget")
+    //     this.budgets.push(this.initialBudget)
+    //     this.createBudgetMins()
+    //   }
+    // }
 
     console.log("CATEGORIES 2: ", this.categories2)
     this.getMinMaxVals()
@@ -526,5 +582,12 @@ export class AddBudgetComponent implements OnInit {
     console.log(this.categories3);
     this.getMinMaxVals()
   }
+
+  // onformCanceled() {
+  //   // if (this.edit) {
+  //   //   this.createBudgetMinsHelper(this.initialBudget)
+  //   // }
+  //   this.dialogRef.close()
+  // }
 
 }

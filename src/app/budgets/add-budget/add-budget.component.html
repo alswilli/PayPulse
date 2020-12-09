@@ -54,6 +54,7 @@
         <button mat-button *ngIf="!edit" id="addbutton" [disabled]="addBudgetForm.invalid" type="button" class="mat-primary" (click)="onFormConfirmed()" cdkFocusInitial>Add Budget</button>
         <button mat-button *ngIf="edit" id="editbutton" [disabled]="addBudgetForm.invalid" type="button" class="mat-primary" (click)="onFormConfirmed()" cdkFocusInitial>Edit Budget</button>
         <button mat-button mat-dialog-close>Cancel</button>
+        <!-- <button mat-button (click)="onFormCanceled()">Cancel</button> -->
       </form>
       <!-- <mat-form-field style="margin-left: 10px;">
         <mat-label>Budget Category</mat-label>

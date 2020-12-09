@@ -1,10 +1,39 @@
-<div>
-  <div *ngIf="!isLoading" fxLayout="row" style="height: 100%; width: 100%">
-    <mat-dialog-actions style="padding: 0px; margin-bottom: 0px; margin-right: 20px;">
-      <button mat-button class="leftIconDiv" (click)="onLeftIconClicked();" [disabled]="farthestLeft">
-        <mat-icon class="icon">keyboard_arrow_left</mat-icon>
+<!-- <div #box (window:resize)="onBoxResize()"> -->
+<div #box>
+  <div *ngIf="!isLoading && gtMd" fxLayout="row" style="height: 100%; width: 100%">
+    <mat-dialog-actions style="padding: 0px; margin-bottom: 0px; margin-right: 20px;" [ngStyle.lt-sm]="{'max-width': '60px'}">
+      <button mat-button class="leftIconDiv" (click)="onLeftIconClicked();" [disabled]="farthestLeft" [ngStyle.lt-sm]="{'max-width': '60px'}">
+        <mat-icon class="icon" [ngStyle.lt-sm]="{'font-size': '30px'}">keyboard_arrow_left</mat-icon>
       </button>
     </mat-dialog-actions>
+    <div *ngFor="let goal of goals; let i = index">
+      <div *ngIf="goal.show">
+        <h1 *ngIf="newGoals" style="text-align: center;">Newly Completed Goals!</h1>
+        <h1 *ngIf="!newGoals" style="text-align: center;">All Goals</h1>
+        <div class="goal-image" *ngIf="goal[0].goalProgress != 100">
+          <img [src]="goal[1].imagePath" [alt]="goal[1].goalName">
+        </div>
+        <div class="goal-image-unlocked" *ngIf="goal[0].goalProgress == 100">
+          <img [src]="goal[1].imagePath" [alt]="goal[1].goalName">
+        </div>
+        <mat-progress-bar mode="determinate" [value]="goal[0].goalProgress" style="height: 10px; max-width: 100%; margin: auto"></mat-progress-bar>
+        <div style="text-align: center;">
+          <span style="text-align: center;">{{ goal[0].goalProgress }} %</span>
+        </div>
+        <h3 style="text-align: center;">{{goal[1].goalName}}</h3>
+        <p style="text-align: center;">{{goal[1].goalDescription}}</p>
+        <p *ngIf="goal[0].goalProgress == 100" style="text-align: center;"> Number of Times Achieved: <b>{{goal[0].numTimesAchieved}}</b></p>
+        <p *ngIf="goal[0].goalProgress == 100" style="text-align: center;"> Date First Achieved: <b>{{goal[0].dateFirstAchieved}}</b></p>
+        <h4 style="text-align: center;">({{i+1}} / {{goals.length}})</h4>
+      </div>
+    </div>
+    <mat-dialog-actions style="padding: 0px; margin-bottom: 0px; margin-left: 20px;" [ngStyle.lt-sm]="{'max-width': '60px'}">
+      <button mat-button class="rightIconDiv" (click)="onRightIconClicked();" [disabled]="farthestRight" [ngStyle.lt-sm]="{'max-width': '60px'}">
+        <mat-icon class="icon" [ngStyle.lt-sm]="{'font-size': '30px'}">keyboard_arrow_right</mat-icon>
+      </button>
+    </mat-dialog-actions>
+  </div>
+  <div *ngIf="!isLoading && !gtMd" fxLayout="column" style="height: 100%; width: 100%">
     <div *ngFor="let goal of goals; let i = index">
       <div *ngIf="goal.show">
         <h1 *ngIf="newGoals" style="text-align: center;">Newly Completed Goals!</h1>
@@ -26,10 +55,17 @@
         <h4 style="text-align: center;">({{i+1}} / {{goals.length}})</h4>
       </div>
     </div>
-    <mat-dialog-actions style="padding: 0px; margin-bottom: 0px; margin-left: 20px;">
-      <button mat-button class="rightIconDiv" (click)="onRightIconClicked();" [disabled]="farthestRight">
-        <mat-icon class="icon">keyboard_arrow_right</mat-icon>
-      </button>
-    </mat-dialog-actions>
+    <div fxLayout="row" style="margin: auto;">
+      <mat-dialog-actions style="padding: 0px; margin-bottom: 0px; margin-right: 20px; max-width: 80px;">
+        <button mat-button class="leftIconDiv" (click)="onLeftIconClicked();" [disabled]="farthestLeft">
+          <mat-icon class="icon" [ngStyle.lt-md]="{'font-size': '30px'}">keyboard_arrow_left</mat-icon>
+        </button>
+      </mat-dialog-actions>
+      <mat-dialog-actions style="padding: 0px; margin-bottom: 0px; margin-left: 20px; max-width: 80px;">
+        <button mat-button class="rightIconDiv" (click)="onRightIconClicked();" [disabled]="farthestRight">
+          <mat-icon class="icon" [ngStyle.lt-md]="{'font-size': '30px'}">keyboard_arrow_right</mat-icon>
+        </button>
+      </mat-dialog-actions>
+    </div>
   </div>
 </div>

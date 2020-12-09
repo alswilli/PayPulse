@@ -1,5 +1,5 @@
 <span id="moveTop"></span>
-<div style="height: 75px;"></div>
+<div style="height: 85px;"></div>
 <!-- <h2 style="margin: 10px;"></h2> -->
 
 <!-- <h2 style="margin: 10px;">Recently Completed Goals:</h2>
@@ -69,8 +69,8 @@
   </mat-card>
 </div>
 
-<div style="max-width: 1400px; margin: auto">
-  <p>NOTE: Goals functionality is currently still under construction!</p>
+<div style="max-width: 1400px; margin: auto" [ngStyle.lt-md]="{'margin': 'auto', 'max-width': '693px'}">
+  <!-- <p>NOTE: Goals functionality is currently still under construction!</p> -->
   <h2 style="margin: 10px;">Goals:</h2>
   <mat-spinner *ngIf="initialLoad" style="margin: auto;"></mat-spinner>
   <div #box>
@@ -133,6 +133,7 @@
     </mat-grid-list> -->
   </div>
 </div>
+<div [ngStyle.lt-md]="{'height': '30px'}"></div>
 
 
 

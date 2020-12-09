@@ -1032,9 +1032,10 @@ export class BudgetsComponent implements OnInit {
       });
   }
 
-  onEditBudgetClicked(currBudget) {
+  onEditBudgetClicked(currBudget, currBudgetIndex) {
     console.log(currBudget);
-    this.editBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: true, budget: currBudget}});
+    console.log(currBudgetIndex);
+    this.editBudgetRef = this.dialog.open(AddBudgetComponent, {data: {categories: this.categories, budgets: this.budgets, edit: true, budget: currBudget, budgetIndex: currBudgetIndex}});
     this.editBudgetRef.componentInstance.onEdit
       .subscribe(result => {
         console.log(result);

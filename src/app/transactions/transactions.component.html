@@ -3,7 +3,7 @@
 <div *ngIf="userAccountsDetails.accounts.length === 0">
   <p style="text-align: center;">No accounts added! Please add an account to see transactions</p>
 </div>
-<div style="max-width: 1400px; margin: auto">
+<div style="max-width: 1400px; margin: auto" [ngStyle.lt-md]="{'margin': 'auto', 'max-width': '693px'}">
   <div *ngIf="userAccountsDetails.accounts.length > 0 && userAccountsDetails.currentAccounts.length > 0" style="margin: 10px;">
     <h2>Bank Account(s) Selected: <p style="color: rgb(255, 0, 64); display: inline;">{{activeCurrentsLength}} / {{currentAccounts.length}}</p></h2>
     <h3>Sub Account(s) Selected: <p style="color: rgb(76, 0, 255); display: inline;">{{activeSubsLength}} / {{subAccountsLength}}</p></h3>
@@ -15,7 +15,7 @@
       </mat-form-field>
   </div>
   <div>
-    <div *ngIf="userAccountsDetails.accounts.length > 0 && userAccountsDetails.currentAccounts.length > 0" fxFlex fxLayout="row" 
+    <div *ngIf="userAccountsDetails.accounts.length > 0 && userAccountsDetails.currentAccounts.length > 0" fxLayout="row" 
       fxLayout.lt-md="column">
       <div fxFlex.gt-sm='20' style="margin: 10px;">
         <span class="toggleHeader">Bank Accounts</span>
@@ -161,5 +161,6 @@
     <p style="text-align: center;">Please select a current account(s) on the home page to view transactions!</p>
   </div>
 </div>
+<div [ngStyle.lt-md]="{'height': '30px'}"></div>
 
 
