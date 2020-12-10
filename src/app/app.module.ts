@@ -117,7 +117,8 @@ import { GoalsUnlockedComponent } from './goals/goals-unlocked/goals-unlocked.co
     MatTreeModule,
     MatCheckboxModule,
     MatBadgeModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatSlideToggleModule
   ],
   // exports: [
   //   MatFormFieldModule,

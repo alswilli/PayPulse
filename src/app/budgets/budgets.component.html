@@ -74,15 +74,16 @@
           <div fxFlex='70'>
             <button mat-raised-button color="primary" id="addButton" (click)="onAddBudgetClicked();">Add New Budget</button>
           </div>
-          <button mat-button (click)="accordion.openAll()">Expand All</button>
-          <button mat-button (click)="accordion.closeAll()">Collapse All</button>
+          <button mat-button (click)="expandAllAccordions()">Expand All</button>
+          <button mat-button (click)="closeAllAccordions()">Collapse All</button>
         </div>
         <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
         <div *ngIf="!isLoading"> 
+          <h3 style="margin-left: 5px; margin-right: 5px;">Budgeted: </h3>
           <div *ngIf="budgets.length === 0">
             <p>No budgets added! Please add a budget using the 'Add New Budget' button above</p>
           </div>
-            <mat-accordion class="example-headers-align" multi>
+            <mat-accordion #accordion1="matAccordion" class="example-headers-align" multi>
               <div class="budgetList" [ngStyle.lt-md]="{'max-height': '400px', 'overflow-y': 'auto'}" style="margin-bottom: 20px; padding-bottom: 10px">
                 <mat-expansion-panel *ngFor="let budget of budgets; let i = index;" style="margin-left: 5px; margin-right: 5px">
                   <mat-expansion-panel-header id="{{'budgetHeader' + i}}">
@@ -118,10 +119,10 @@
 
             <div style="height: 400px; overflow-y: auto; margin-bottom: 30px; padding-bottom: 20px">
               <div>
-                <mat-accordian class="example-headers-align">
+                <mat-accordion #accordion2="matAccordion" class="example-headers-align" multi>
                   <mat-expansion-panel style="margin-left: 5px; margin-right: 5px;">
                     <mat-expansion-panel-header>
-                      <h4>Income</h4>
+                      <h4>Income ({{incomeTransactions.length}})</h4>
                     </mat-expansion-panel-header>
                     <div *ngIf="incomeTransactions.length == 0">
                       <p style="margin: auto; text-align: center">There are no income transactions to report!</p>
@@ -160,21 +161,26 @@
                             <th mat-header-cell *matHeaderCellDef style="background-color: grey; color: white; margin: auto"> <b>Category</b> </th>
                             <td mat-cell *matCellDef="let row"> {{row.category}} </td>
                           </ng-container>
+
+                          <ng-container matColumnDef="date">
+                            <th mat-header-cell *matHeaderCellDef style="background-color: grey; color: white; margin: auto"> <b>Date</b> </th>
+                            <td mat-cell *matCellDef="let row"> {{row.date}} </td>
+                          </ng-container>
                       
-                          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: ['amount', 'bankAccountName', 'transactionName', 'category']"></tr>
-                          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                          <tr mat-header-row *matHeaderRowDef="incomeDisplayedColumns; sticky: ['amount', 'bankAccountName', 'transactionName', 'date']"></tr>
+                          <tr mat-row *matRowDef="let row; columns: incomeDisplayedColumns;"></tr>
                         </table>
                       </div> 
                     </div>
                   </mat-expansion-panel>
-                </mat-accordian>
+                </mat-accordion>
               </div>
               
               <div>
-                <mat-accordian class="example-headers-align">
+                <mat-accordion #accordion3="matAccordion" class="example-headers-align" multi>
                   <mat-expansion-panel style="margin-left: 5px; margin-right: 5px;">
                     <mat-expansion-panel-header>
-                      <h4>Untracked Transactions</h4>
+                      <h4>Untracked Transactions ({{untrackedTransactions.length}})</h4>
                     </mat-expansion-panel-header>
                     <div *ngIf="untrackedTransactions.length == 0">
                       <p style="margin: auto; text-align: center">There are no untracked transactions to report!</p>
@@ -213,14 +219,19 @@
                             <th mat-header-cell *matHeaderCellDef style="background-color: grey; color: white; margin: auto"> <b>Category</b> </th>
                             <td mat-cell *matCellDef="let row"> {{row.category}} </td>
                           </ng-container>
+
+                          <ng-container matColumnDef="date">
+                            <th mat-header-cell *matHeaderCellDef style="background-color: grey; color: white; margin: auto"> <b>Date</b> </th>
+                            <td mat-cell *matCellDef="let row"> {{row.date}} </td>
+                          </ng-container>
                       
-                          <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: ['amount', 'bankAccountName', 'transactionName', 'category']"></tr>
-                          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                          <tr mat-header-row *matHeaderRowDef="untrackedDisplayedColumns; sticky: ['amount', 'bankAccountName', 'category', 'date']"></tr>
+                          <tr mat-row *matRowDef="let row; columns: untrackedDisplayedColumns;"></tr>
                         </table>
                       </div> 
                     </div>
                   </mat-expansion-panel>
-                </mat-accordian>
+                </mat-accordion>
               </div>
             </div>
 

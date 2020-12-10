@@ -27,7 +27,9 @@ export interface TransactionData {
   styleUrls: ['./budgets.component.scss']
 })
 export class BudgetsComponent implements OnInit {
-  @ViewChild(MatAccordion) accordion: MatAccordion;
+  @ViewChild('accordion1') accordion1: MatAccordion;
+  @ViewChild('accordion2') accordion2: MatAccordion;
+  @ViewChild('accordion3') accordion3: MatAccordion;
   @ViewChild('to') matSelectTo: MatSelect;
   @ViewChild('from') matSelectFrom: MatSelect;
 
@@ -59,7 +61,8 @@ export class BudgetsComponent implements OnInit {
   transactionIds = {};
   incomeDataSource: MatTableDataSource<TransactionData>;
   untrackedDataSource: MatTableDataSource<TransactionData>;
-  displayedColumns: string[] = ['bankAccountName', 'transactionName', 'category', 'amount'];
+  incomeDisplayedColumns: string[] = ['bankAccountName', 'amount', 'transactionName', 'date'];
+  untrackedDisplayedColumns: string[] = ['bankAccountName', 'amount', 'category', 'date'];
   // dataEmpty = true;
   dates = {
     "01":["January", 31],
@@ -92,6 +95,7 @@ export class BudgetsComponent implements OnInit {
   currentAccounts: any[] = [];
   newlyCompletedGoals = [];
   userGoalData: any;
+  transactionsArray: any[];
 
   constructor(public dialog: MatDialog,
     private accountService: AccountService,
@@ -200,6 +204,7 @@ export class BudgetsComponent implements OnInit {
     )
     .subscribe(transactionsArray => {
       console.log(transactionsArray)
+      this.transactionsArray = transactionsArray
       this.transactions = []
       var j = 0
       for (let transactions of transactionsArray) {
@@ -224,26 +229,7 @@ export class BudgetsComponent implements OnInit {
       console.log(this.transactions)
       console.log(this.incomeTransactions)
       this.onGetTransactions();
-      var j = 0
-      for (let transactions of transactionsArray) {
-        if (transactions != null) {
-          for (let transaction of transactions) {
-            if (!(transaction.transaction_id in this.transactionIds)) {
-              if (transaction.amount >= 0) {
-                const newTransaction = {
-                  amount: transaction.amount,
-                  transactionName: transaction.name,
-                  category: transaction.category,
-                  date: transaction.date,
-                  bankAccountName: this.currentAccounts[j].institutionName
-                };
-                this.untrackedTransactions.push(newTransaction)
-              }
-            } 
-          }
-        }
-        j += 1
-      }
+      this.getUntrackedTransactions(transactionsArray);
       console.log(this.transactionIds)
       console.log(this.untrackedTransactions)
 
@@ -320,6 +306,7 @@ export class BudgetsComponent implements OnInit {
         }
         forkJoin(btFromObservables)
           .subscribe(transactionsArray => {
+            this.transactionsArray = transactionsArray
             this.transactions = []
             for (let transactions of transactionsArray) {
               if (transactions != null) {
@@ -329,6 +316,10 @@ export class BudgetsComponent implements OnInit {
               }
             }
             this.onGetTransactions();
+            this.getUntrackedTransactions(transactionsArray);
+            this.untrackedDataSource.data = this.untrackedTransactions;
+            console.log(this.transactionIds)
+            console.log(this.untrackedTransactions)
         });
       });
       // TO SIDE
@@ -392,6 +383,7 @@ export class BudgetsComponent implements OnInit {
         }
         forkJoin(btToObservables)
           .subscribe(transactionsArray => {
+            this.transactionsArray = transactionsArray
             this.transactions = []
             for (let transactions of transactionsArray) {
               if (transactions != null) {
@@ -401,6 +393,10 @@ export class BudgetsComponent implements OnInit {
               }
             }
             this.onGetTransactions();
+            this.getUntrackedTransactions(transactionsArray);
+            this.untrackedDataSource.data = this.untrackedTransactions;
+            console.log(this.transactionIds)
+            console.log(this.untrackedTransactions)
         });
       });
       for (let budget of this.budgets) {
@@ -410,34 +406,13 @@ export class BudgetsComponent implements OnInit {
         console.log((budget.total / (Number(budget.amount) * this.totalMonthsActive)))
       }
       // this.incomeTransactions = []
-      this.incomeTransactions.push({
-        amount: 0,
-        transactionName: 'test',
-        category: 'test',
-        date: 'test',
-        bankAccountName: 'test'
-      })
-      this.incomeTransactions.push({
-        amount: 0,
-        transactionName: 'test',
-        category: 'test',
-        date: 'test',
-        bankAccountName: 'test'
-      })
-      this.incomeTransactions.push({
-        amount: 0,
-        transactionName: 'test',
-        category: 'test',
-        date: 'test',
-        bankAccountName: 'test'
-      })
-      this.incomeTransactions.push({
-        amount: 0,
-        transactionName: 'test',
-        category: 'test',
-        date: 'test',
-        bankAccountName: 'test'
-      })
+      // this.incomeTransactions.push({
+      //   amount: 0,
+      //   transactionName: 'test',
+      //   category: 'test',
+      //   date: 'test',
+      //   bankAccountName: 'test'
+      // })
       this.incomeDataSource = new MatTableDataSource(this.incomeTransactions);
       this.untrackedDataSource = new MatTableDataSource(this.untrackedTransactions);
     });
@@ -459,6 +434,47 @@ export class BudgetsComponent implements OnInit {
   //     // s.option.selected = true;
   //   });
   // }
+
+  getUntrackedTransactions(transactionsArray) {
+    this.untrackedTransactions = []
+    var j = 0
+    for (let transactions of transactionsArray) {
+      if (transactions != null) {
+        for (let transaction of transactions) {
+          // console.log(transaction.transaction_id)
+          if (!(transaction.transaction_id in this.transactionIds)) {
+            if (transaction.amount >= 0) {
+              const newTransaction = {
+                amount: transaction.amount,
+                transactionName: transaction.name,
+                category: transaction.category,
+                date: transaction.date,
+                bankAccountName: this.currentAccounts[j].institutionName
+              };
+              this.untrackedTransactions.push(newTransaction)
+            }
+          } 
+        }
+      }
+      j += 1
+    }
+  }
+
+  updateTransactionIds(){
+    this.transactionIds = []
+
+    for (let budget of this.budgets) {
+      var mainCategory = budget.mainCategory;
+      for (let transaction of this.transactions) {
+        for (let category of transaction.category) {
+          if (category === mainCategory && transaction.amount >= 0) {
+            this.transactionIds[transaction.transaction_id] = null
+            break;
+          }
+        }
+      }
+    }
+  }
 
   truncateVal(val) {
     console.log(val)
@@ -483,6 +499,7 @@ export class BudgetsComponent implements OnInit {
   onGetTransactions() {
     console.log(this.transactions);
       this.pieData = [];
+      this.transactionIds = []
       // var entered = false;
 
       for (let budget of this.budgets) {
@@ -493,12 +510,13 @@ export class BudgetsComponent implements OnInit {
             if (category === mainCategory && transaction.amount >= 0) {
               this.transactionIds[transaction.transaction_id] = null
               console.log("Amount: ", transaction.amount)
-              total += transaction.amount;
+              total = this.roundNumber( total + transaction.amount, 2 );
+              // total += transaction.amount;
               break;
             }
           }
         }
-        total = this.truncateVal(total);
+        // total = this.truncateVal(total);
         console.log("Total: ", total)
         budget.total = total;
 
@@ -600,41 +618,12 @@ export class BudgetsComponent implements OnInit {
       // this.categoriesLoading = false;
       this.totalBudgetedExpenses = 0
       for (let dataVal of this.pieData) {
-        this.totalBudgetedExpenses += dataVal.total;
+        this.totalBudgetedExpenses = this.roundNumber( this.totalBudgetedExpenses + dataVal.total, 2 );
         // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
       }
+      
 
-      this.budgetSets = new Object();
-      for (let budget of this.budgets) {
-        var currIndex = 4;
-        if (budget.category3 !== "") {
-          if (currIndex == 4) {
-            currIndex = 3;
-          }
-        }
-        else if (budget.category2 !== "" && budget.category3 === "") {
-          if (currIndex >= 3) {
-            currIndex = 2;
-          }
-        }
-        else if (budget.category !== "" && budget.category2 === "") {
-          if (currIndex >= 2) {
-            currIndex = 1;
-          }
-        }
-        // Now figure out what to do with it
-        if (budget.category in this.budgetSets) {
-          if (currIndex === this.budgetSets[budget.category][1]) {
-            this.budgetSets[budget.category][0] += Number(budget.amount);
-          }
-          else if (currIndex < this.budgetSets[budget.category][1]) {
-            this.budgetSets[budget.category] = [Number(budget.amount), currIndex];
-          }
-        }
-        else {
-          this.budgetSets[budget.category] = [Number(budget.amount), currIndex];
-        }
-      }
+      this.updateBudgetSets(this.budgets)
 
       // var i = 0;
       // while (i < budgetSets.keys().length) {
@@ -652,6 +641,45 @@ export class BudgetsComponent implements OnInit {
         console.log(this.totalMonthsActive)
         console.log((budget.total / (Number(budget.amount) * this.totalMonthsActive)))
       }
+  }
+
+  roundNumber(number, decimals) {
+    var newnumber = new Number(number+'').toFixed(parseInt(decimals));
+    return parseFloat(newnumber); 
+  }
+
+  updateBudgetSets(budgets) {
+    this.budgetSets = new Object();
+    for (let budget of budgets) {
+      var currIndex = 4;
+      if (budget.category3 !== "") {
+        if (currIndex == 4) {
+          currIndex = 3;
+        }
+      }
+      else if (budget.category2 !== "" && budget.category3 === "") {
+        if (currIndex >= 3) {
+          currIndex = 2;
+        }
+      }
+      else if (budget.category !== "" && budget.category2 === "") {
+        if (currIndex >= 2) {
+          currIndex = 1;
+        }
+      }
+      // Now figure out what to do with it
+      if (budget.category in this.budgetSets) {
+        if (currIndex === this.budgetSets[budget.category][1]) {
+          this.budgetSets[budget.category][0] += Number(budget.amount);
+        }
+        else if (currIndex < this.budgetSets[budget.category][1]) {
+          this.budgetSets[budget.category] = [Number(budget.amount), currIndex];
+        }
+      }
+      else {
+        this.budgetSets[budget.category] = [Number(budget.amount), currIndex];
+      }
+    }
   }
 
   // Notes:
@@ -675,6 +703,8 @@ export class BudgetsComponent implements OnInit {
           }
         }
         result.total = total;
+
+        // this.updateUntrackedTransactions('add', result)
 
         var parents = []
         var bestIndex = 4;
@@ -797,34 +827,7 @@ export class BudgetsComponent implements OnInit {
               this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
               this.budgets.push(result);
 
-              var currIndex = 4;
-              if (result.category3 !== "") {
-                if (currIndex == 4) {
-                  currIndex = 3;
-                }
-              }
-              else if (result.category2 !== "" && result.category3 === "") {
-                if (currIndex >= 3) {
-                  currIndex = 2;
-                }
-              }
-              else if (result.category !== "" && result.category2 === "") {
-                if (currIndex >= 2) {
-                  currIndex = 1;
-                }
-              }
-              // Now figure out what to do with it
-              if (result.category in this.budgetSets) {
-                if (currIndex === this.budgetSets[result.category][1]) {
-                  this.budgetSets[result.category][0] += Number(result.amount);
-                }
-                else if (currIndex < this.budgetSets[result.category][1]) {
-                  this.budgetSets[result.category] = [Number(result.amount), currIndex];
-                }
-              }
-              else {
-                this.budgetSets[result.category] = [Number(result.amount), currIndex];
-              }
+              this.updateBudgetSets(this.budgets)
 
               this.totalBudget = 0;
               for (let key in this.budgetSets) {
@@ -834,7 +837,7 @@ export class BudgetsComponent implements OnInit {
 
               this.totalBudgetedExpenses = 0;
               for (let dataVal of this.pieData) {
-                this.totalBudgetedExpenses += dataVal.total;
+                this.totalBudgetedExpenses = this.roundNumber( this.totalBudgetedExpenses + dataVal.total, 2 );
                 // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
               }
 
@@ -843,6 +846,9 @@ export class BudgetsComponent implements OnInit {
               // }
 
               // Close dialogue ref
+              this.updateTransactionIds();
+              this.getUntrackedTransactions(this.transactionsArray)
+              this.untrackedDataSource.data = this.untrackedTransactions;
               this.addBudgetRef.close();
             })
           }
@@ -857,34 +863,7 @@ export class BudgetsComponent implements OnInit {
         if (finishAdd) {
           this.budgets.push(result);
 
-          var currIndex = 4;
-          if (result.category3 !== "") {
-            if (currIndex == 4) {
-              currIndex = 3;
-            }
-          }
-          else if (result.category2 !== "" && result.category3 === "") {
-            if (currIndex >= 3) {
-              currIndex = 2;
-            }
-          }
-          else if (result.category !== "" && result.category2 === "") {
-            if (currIndex >= 2) {
-              currIndex = 1;
-            }
-          }
-          // Now figure out what to do with it
-          if (result.category in this.budgetSets) {
-            if (currIndex === this.budgetSets[result.category][1]) {
-              this.budgetSets[result.category][0] += Number(result.amount);
-            }
-            else if (currIndex < this.budgetSets[result.category][1]) {
-              this.budgetSets[result.category] = [Number(result.amount), currIndex];
-            }
-          }
-          else {
-            this.budgetSets[result.category] = [Number(result.amount), currIndex];
-          }
+          this.updateBudgetSets(this.budgets)
 
           this.totalBudget = 0;
           for (let key in this.budgetSets) {
@@ -894,7 +873,7 @@ export class BudgetsComponent implements OnInit {
 
           this.totalBudgetedExpenses = 0;
           for (let dataVal of this.pieData) {
-            this.totalBudgetedExpenses += dataVal.total;
+            this.totalBudgetedExpenses = this.roundNumber( this.totalBudgetedExpenses + dataVal.total, 2 );
             // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
           }
 
@@ -903,6 +882,9 @@ export class BudgetsComponent implements OnInit {
           // }
 
           // Close dialogue ref
+          this.updateTransactionIds();
+          this.getUntrackedTransactions(this.transactionsArray)
+          this.untrackedDataSource.data = this.untrackedTransactions;
           this.addBudgetRef.close();
         }
       });
@@ -918,6 +900,9 @@ export class BudgetsComponent implements OnInit {
         if (index > -1) {
           this.budgets.splice(index, 1);
         }
+        this.updateTransactionIds();
+        this.getUntrackedTransactions(this.transactionsArray)
+        this.untrackedDataSource.data = this.untrackedTransactions;
 
         var total = 0;
         for (let transaction of this.transactions) {
@@ -929,6 +914,8 @@ export class BudgetsComponent implements OnInit {
           }
         }
         result.total = total;
+
+        // this.updateUntrackedTransactions('delete', result)
 
         var parents = []
         var bestIndex = 4;
@@ -1065,36 +1052,7 @@ export class BudgetsComponent implements OnInit {
           }
         }
 
-        var currIndex = 4;
-        if (result.category3 !== "") {
-          if (currIndex == 4) {
-            currIndex = 3;
-          }
-        }
-        else if (result.category2 !== "" && result.category3 === "") {
-          if (currIndex >= 3) {
-            currIndex = 2;
-          }
-        }
-        else if (result.category !== "" && result.category2 === "") {
-          if (currIndex >= 2) {
-            currIndex = 1;
-          }
-        }
-        // Now figure out what to do with it
-        if (currIndex === this.budgetSets[result.category][1]) {
-          if (this.budgetSets[result.category][0] === Number(result.amount)) {
-            if (parents.length > 0) {
-              this.budgetSets[result.category] = [sameLevelAmount, bestIndex];
-            } 
-            else {
-              delete this.budgetSets[result.category];
-            }
-          }
-          else {
-            this.budgetSets[result.category][0] -= Number(result.amount)
-          }
-        }
+        this.updateBudgetSets(this.budgets)
 
         this.totalBudget = 0;
         for (let key in this.budgetSets) {
@@ -1104,7 +1062,7 @@ export class BudgetsComponent implements OnInit {
 
         this.totalBudgetedExpenses = 0;
         for (let dataVal of this.pieData) {
-          this.totalBudgetedExpenses += dataVal.total;
+          this.totalBudgetedExpenses = this.roundNumber( this.totalBudgetedExpenses + dataVal.total, 2 );
           // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
         }
 
@@ -1130,6 +1088,8 @@ export class BudgetsComponent implements OnInit {
           }
         }
         result.total = total;
+
+        // this.updateUntrackedTransactions('edit', result)
 
         var newParentPresent = false;
         console.log(result.category)
@@ -1170,6 +1130,10 @@ export class BudgetsComponent implements OnInit {
             break;
           }
         }
+
+        this.updateTransactionIds();
+        this.getUntrackedTransactions(this.transactionsArray)
+        this.untrackedDataSource.data = this.untrackedTransactions;
 
         // New category
         var parents = []
@@ -1462,74 +1426,7 @@ export class BudgetsComponent implements OnInit {
           }
         }
 
-        if (result.category !== oldCategory) { 
-          // Figure out delete
-          if (oldcurrIndex === this.budgetSets[oldCategory][1]) {
-            if (this.budgetSets[oldCategory][0] === Number(oldAmount)) {
-              if (oldparents.length > 0) {
-                this.budgetSets[oldCategory] = [oldsameLevelAmount, oldbestIndex];
-              } 
-              else {
-                delete this.budgetSets[oldCategory];
-              } 
-            }
-            else {
-              this.budgetSets[oldCategory][0] -= Number(oldAmount)
-            }
-          }
-          // Figure out push
-          if (result.category in this.budgetSets) {
-            if (currIndex === this.budgetSets[result.category][1]) {
-              this.budgetSets[result.category][0] += Number(result.amount);
-            }
-            else if (currIndex < this.budgetSets[result.category][1]) {
-              this.budgetSets[result.category] = [Number(result.amount), currIndex];
-            }
-          }
-          else {
-            this.budgetSets[result.category] = [Number(result.amount), currIndex];
-          }
-        }
-        else {
-          // if (oldParents) {
-          
-          // }
-          // else {
-
-          // }
-          console.log("using old amount")
-          console.log(oldparents)
-          this.budgetSets[oldCategory] = [Number(oldsameLevelAmount), oldbestIndex];
-          // // Only changed amount
-          // if (oldcurrIndex === currIndex) {
-          //   if (oldcurrIndex === this.budgetSets[result.category][1]) {
-          //     this.budgetSets[result.category][0] += Number(result.amount) - Number(oldAmount);
-          //   }
-          // }
-          // else {
-          //   // Delete
-          //   if (oldcurrIndex === this.budgetSets[result.category][1]) {
-          //     // this.budgetSets[oldCategory][0] -= Number(oldAmount);
-          //     if (this.budgetSets[oldCategory][0] === Number(oldAmount)) {
-          //       if (oldparents.length > 0) {
-          //         this.budgetSets[oldCategory] = [Number(oldsameLevelAmount), oldbestIndex];
-          //       }
-          //     }
-          //     else {
-          //         delete this.budgetSets[oldCategory];
-          //     }
-          //   }
-          //   // Push
-          //   if (result in this.budgetSets) {
-          //     if (currIndex === this.budgetSets[result.category][1]) {
-          //       this.budgetSets[result.category][0] += Number(result.amount)
-          //     }
-          //   }
-          //   else {
-          //     this.budgetSets[result.category] = [Number(result.amount), currIndex];
-          //   }
-          // }
-        }
+        this.updateBudgetSets(this.budgets)
 
         this.totalBudget = 0;
         for (let key in this.budgetSets) {
@@ -1539,7 +1436,7 @@ export class BudgetsComponent implements OnInit {
 
         this.totalBudgetedExpenses = 0;
         for (let dataVal of this.pieData) {
-          this.totalBudgetedExpenses += dataVal.total;
+          this.totalBudgetedExpenses = this.roundNumber( this.totalBudgetedExpenses + dataVal.total, 2 );
           // this.totalBudget += Number(dataVal.amount); DOESN'T WORK FOR ZERO Totals
         }
       
@@ -1553,4 +1450,16 @@ export class BudgetsComponent implements OnInit {
     var scrollElem= document.querySelector('#moveTop');
     scrollElem.scrollIntoView();  
    }
+
+  expandAllAccordions() {
+    this.accordion1.openAll()
+    this.accordion2.openAll()
+    this.accordion3.openAll()
+  }
+
+  closeAllAccordions() {
+    this.accordion1.closeAll()
+    this.accordion2.closeAll()
+    this.accordion3.closeAll()
+  }
 }
