@@ -96,142 +96,145 @@
       </div>
     </div>
   </div>
-  <div [ngStyle.lt-md]="{'margin': 'auto', 'max-width': '673px'}" *ngIf="listValue.length > 0 && currentAccounts.length > 0" style="border: 1px solid rgb(209, 209, 209); margin: 10px;">
-    <!-- <h2 *ngIf="listValue.length > 0" style="margin: 10px;"><span style="color: rgb(3, 192, 3)">{{currentAccountName}}</span> - Summary:</h2> -->
-    <h2 *ngIf="listValue.length > 0 && currentAccounts.length > 0" style="margin: 10px;"> Budgeting Summary: </h2>
-    <div fxLayout="row" fxLayout.lt-md="column" class="outerCardDiv"
-    [ngStyle.lt-md]=
-      "{'width': '100%',
-        'height': 'auto'}">
-      <mat-card [ngStyle.lt-md]=
-      "{'margin': '10px', 
-      'margin-bottom': '30px', 
-      'background-color': 'rgb(245, 244, 244)', 
-      'width': 'auto'}" class="card" *ngFor="let component of majorComponents">
-        <mat-card-header class="cardHeader">
-          <mat-card-title class="mainCardTitle"> <h3>{{component.name}}</h3> </mat-card-title>
-          <!-- <h3 class="mainCardTitle"> {{component.name}} </h3> -->
-          <mat-card-subtitle class="cardsubtitle"> {{component.description}} </mat-card-subtitle>
-        </mat-card-header>
-        <mat-card-content class="cardContent" fxLayoutAlign="center">
-          <mat-card class="innerCard" fxFlex *ngFor="let card of component.cards">
-            <mat-card-header class="innerCardHeader">
-              <mat-card-title> {{card.name}} </mat-card-title>
+  
+  <div [ngStyle.lt-md]="{'margin': '10px'}">
+    <div [ngStyle.lt-md]="{'margin': 'auto', 'max-width': '673px'}" *ngIf="listValue.length > 0 && currentAccounts.length > 0" style="border: 1px solid rgb(209, 209, 209); margin: 10px;">
+      <!-- <h2 *ngIf="listValue.length > 0" style="margin: 10px;"><span style="color: rgb(3, 192, 3)">{{currentAccountName}}</span> - Summary:</h2> -->
+        <h2 *ngIf="listValue.length > 0 && currentAccounts.length > 0" style="margin: 10px;"> Budgeting Summary: </h2>
+        <div fxLayout="row" fxLayout.lt-md="column" class="outerCardDiv"
+        [ngStyle.lt-md]=
+          "{'width': '100%',
+            'height': 'auto'}">
+          <mat-card [ngStyle.lt-md]=
+          "{'margin': '10px', 
+          'margin-bottom': '30px', 
+          'background-color': 'rgb(245, 244, 244)', 
+          'width': 'auto'}" class="card" *ngFor="let component of majorComponents">
+            <mat-card-header class="cardHeader">
+              <mat-card-title class="mainCardTitle"> <h3>{{component.name}}</h3> </mat-card-title>
+              <!-- <h3 class="mainCardTitle"> {{component.name}} </h3> -->
+              <mat-card-subtitle class="cardsubtitle"> {{component.description}} </mat-card-subtitle>
             </mat-card-header>
-            <mat-card-content class="innerCardContent" fxLayoutAlign="center">
-              <div *ngIf="component.name === 'Transactions' && card.name === 'Recent Transactions'">
-                <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
-                <div *ngIf="!isLoading"> 
-                  <div *ngIf="parsedTransactions.length === 0">
-                    <p>No recent transactions in the last 30 days!</p>
-                  </div>
-                  <div>
-                  <!-- <div style="margin: 30px;" *ngFor="let recentData of parsedTransactions"> -->
-                    <!-- <span><b>Bank Account Name:</b> {{recentData.mainAccountName}} </span>
-                    <span><b>Sub Account Name:</b> {{recentData.accountName}} </span>
-                    <span><b>Amount:</b> {{recentData.amount}} </span>
-                    <span><b>Transaction Name:</b> {{recentData.transactionName}} </span>
-                    <span><b>Category:</b> {{recentData.category}} </span>
-                    <span><b>Date:</b> {{recentData.date}} </span> -->
-                    <mat-expansion-panel style="margin-bottom: 30px;" *ngFor="let recentData of parsedTransactions; let i = index">
-                      <mat-expansion-panel-header id="{{'budgetHeader' + i}}">
-                        <div>
-                          <p style="margin: 0px;"><b>{{recentData.transactionName}}</b> </p>
-                          <p style="margin: 0px; color: green;"><b>$ {{recentData.amount}}</b> </p>
-                        </div>
-                      </mat-expansion-panel-header>
-                      <p style="margin: 0px;"><b>Bank Account Name:</b> {{recentData.mainAccountName}} </p>
-                      <p style="margin: 0px;"><b>Sub Account Name:</b> {{recentData.accountName}} </p>
-                      <!-- <p style="margin: 0px;"><b>Amount:</b> {{recentData.amount}} </p> -->
-                      <!-- <p style="margin: 0px;"><b>Transaction Name:</b> {{recentData.transactionName}} </p> -->
-                      <p style="margin: 0px;"><b>Category:</b> {{recentData.category}} </p>
-                      <p style="margin: 0px;"><b>Date:</b> {{recentData.date}} </p>
-                    </mat-expansion-panel>
-                  </div>
-                </div>
-              </div>
-              <div *ngIf="component.name === 'Budgets' && card.name === 'Top Budgets'" style="width: 100%; height: 100%;">
-                <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
-                <div *ngIf="!isLoading"> 
-                  <div *ngIf="top3Budgets.length === 0">
-                    <p>No recent budgets in the last 30 days!</p>
-                  </div>
-                  <div *ngFor="let budget of top3Budgets" fxLayoutAlign="space-between center" style="max-width: 374px; height: 100%; margin: auto; margin-bottom: 30px">
-                    <p style="margin: 0px;" *ngIf="budget.mainCategory === budget.category3">
-                      {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
-                    </p>
-                    <p style="margin: 0px;" *ngIf="budget.mainCategory === budget.category2">
-                      {{ budget.category }}: <b>{{ budget.category2 }}</b> 
-                    </p>
-                    <p style="margin: 0px;" *ngIf="budget.mainCategory === budget.category">
-                      <b>{{ budget.category }}</b> 
-                    </p>
-                    <span style="margin: 0px;" *ngIf="(budget.total / (budget.amount)) >= 1 || (budget.amount) == 0" style="color: red;">
-                      <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
-                    </span>
-                    <span style="margin: 0px;" *ngIf="!((budget.total / (budget.amount)) >= 1) && (budget.total / (budget.amount)) >= 0.75" style="color: orange;">
-                      <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
-                    </span>
-                    <span style="margin: 0px;" *ngIf="!((budget.total / (budget.amount)) >= 0.75) && (budget.total / (budget.amount)) >= 0" style="color: green;">
-                      <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
-                    </span>
-                  </div>
-                  <!-- <mat-list *ngFor="let budget of top3Budgets" style="width: 100%; height: 100%;">
-                    <mat-list-item>
-                      
-                    </mat-list-item>
-                  </mat-list> -->
-                  <!-- <div *ngFor="let budget of top3Budgets">
-                    <p fxFlex *ngIf="budget.mainCategory === budget.category3">
-                      {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
-                    </p>
-                    <p fxFlex *ngIf="budget.mainCategory === budget.category2">
-                      {{ budget.category }}: <b>{{ budget.category2 }}</b> 
-                    </p>
-                    <p fxFlex *ngIf="budget.mainCategory === budget.category">
-                      <b>{{ budget.category }}</b> 
-                    </p>
-                    <span fxFlex></span>
-                    <p fxLayoutAlign="end center" style="margin-right: 10px;">
-                      <span *ngIf="(budget.total / (budget.amount)) >= 1" style="color: red;">
-                        <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
-                      </span>
-                      <span *ngIf="!((budget.total / (budget.amount)) >= 1) && (budget.total / (budget.amount)) >= 0.75" style="color: orange;">
-                        <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
-                      </span>
-                      <span *ngIf="!((budget.total / (budget.amount)) >= 0.75) && (budget.total / (budget.amount)) >= 0" style="color: green;">
-                        <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
-                      </span>
-                    </p>
-                  </div> -->
-                </div>
-              </div>
-              <div *ngIf="component.name === 'Goals' && card.name === 'Completed Goals'">
-                <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
-                <div *ngIf="!isLoading"> 
-                  <div *ngIf="recentlyCompletedGoals.length === 0">
-                    <p>No completed goals in the last 30 days!</p>
-                  </div>
-                  <div *ngIf="recentlyCompletedGoals.length > 0">
-                    <div *ngFor="let goal of recentlyCompletedGoals" style="margin-bottom: 30px;">
-                      <div class="goal-image">
-                        <img [src]="goal.imagePath" [alt]="goal.goalName" 
-                        matTooltip="{{goal.goalDescription}}" matTooltipPosition="above">
+            <mat-card-content class="cardContent" fxLayoutAlign="center">
+              <mat-card class="innerCard" fxFlex *ngFor="let card of component.cards">
+                <mat-card-header class="innerCardHeader">
+                  <mat-card-title> {{card.name}} </mat-card-title>
+                </mat-card-header>
+                <mat-card-content class="innerCardContent" fxLayoutAlign="center">
+                  <div *ngIf="component.name === 'Transactions' && card.name === 'Recent Transactions'">
+                    <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+                    <div *ngIf="!isLoading"> 
+                      <div *ngIf="parsedTransactions.length === 0">
+                        <p>No recent transactions in the last 30 days!</p>
                       </div>
-                      <p style="text-align: center"><b>{{goal.goalName}}</b></p>
+                      <div>
+                      <!-- <div style="margin: 30px;" *ngFor="let recentData of parsedTransactions"> -->
+                        <!-- <span><b>Bank Account Name:</b> {{recentData.mainAccountName}} </span>
+                        <span><b>Sub Account Name:</b> {{recentData.accountName}} </span>
+                        <span><b>Amount:</b> {{recentData.amount}} </span>
+                        <span><b>Transaction Name:</b> {{recentData.transactionName}} </span>
+                        <span><b>Category:</b> {{recentData.category}} </span>
+                        <span><b>Date:</b> {{recentData.date}} </span> -->
+                        <mat-expansion-panel style="margin-bottom: 30px;" *ngFor="let recentData of parsedTransactions; let i = index">
+                          <mat-expansion-panel-header id="{{'budgetHeader' + i}}">
+                            <div>
+                              <p style="margin: 0px;"><b>{{recentData.transactionName}}</b> </p>
+                              <p style="margin: 0px; color: green;"><b>$ {{recentData.amount}}</b> </p>
+                            </div>
+                          </mat-expansion-panel-header>
+                          <p style="margin: 0px;"><b>Bank Account Name:</b> {{recentData.mainAccountName}} </p>
+                          <p style="margin: 0px;"><b>Sub Account Name:</b> {{recentData.accountName}} </p>
+                          <!-- <p style="margin: 0px;"><b>Amount:</b> {{recentData.amount}} </p> -->
+                          <!-- <p style="margin: 0px;"><b>Transaction Name:</b> {{recentData.transactionName}} </p> -->
+                          <p style="margin: 0px;"><b>Category:</b> {{recentData.category}} </p>
+                          <p style="margin: 0px;"><b>Date:</b> {{recentData.date}} </p>
+                        </mat-expansion-panel>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                  <div *ngIf="component.name === 'Budgets' && card.name === 'Top Budgets'" style="width: 100%; height: 100%;">
+                    <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+                    <div *ngIf="!isLoading"> 
+                      <div *ngIf="top3Budgets.length === 0">
+                        <p>No recent budgets in the last 30 days!</p>
+                      </div>
+                      <div *ngFor="let budget of top3Budgets" fxLayoutAlign="space-between center" style="max-width: 374px; height: 100%; margin: auto; margin-bottom: 30px">
+                        <p style="margin: 0px;" *ngIf="budget.mainCategory === budget.category3">
+                          {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
+                        </p>
+                        <p style="margin: 0px;" *ngIf="budget.mainCategory === budget.category2">
+                          {{ budget.category }}: <b>{{ budget.category2 }}</b> 
+                        </p>
+                        <p style="margin: 0px;" *ngIf="budget.mainCategory === budget.category">
+                          <b>{{ budget.category }}</b> 
+                        </p>
+                        <span style="margin: 0px;" *ngIf="(budget.total / (budget.amount)) >= 1 || (budget.amount) == 0" style="color: red;">
+                          <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
+                        </span>
+                        <span style="margin: 0px;" *ngIf="!((budget.total / (budget.amount)) >= 1) && (budget.total / (budget.amount)) >= 0.75" style="color: orange;">
+                          <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
+                        </span>
+                        <span style="margin: 0px;" *ngIf="!((budget.total / (budget.amount)) >= 0.75) && (budget.total / (budget.amount)) >= 0" style="color: green;">
+                          <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
+                        </span>
+                      </div>
+                      <!-- <mat-list *ngFor="let budget of top3Budgets" style="width: 100%; height: 100%;">
+                        <mat-list-item>
+                          
+                        </mat-list-item>
+                      </mat-list> -->
+                      <!-- <div *ngFor="let budget of top3Budgets">
+                        <p fxFlex *ngIf="budget.mainCategory === budget.category3">
+                          {{ budget.category }}: {{ budget.category2 }}: <b>{{ budget.category3 }}</b> 
+                        </p>
+                        <p fxFlex *ngIf="budget.mainCategory === budget.category2">
+                          {{ budget.category }}: <b>{{ budget.category2 }}</b> 
+                        </p>
+                        <p fxFlex *ngIf="budget.mainCategory === budget.category">
+                          <b>{{ budget.category }}</b> 
+                        </p>
+                        <span fxFlex></span>
+                        <p fxLayoutAlign="end center" style="margin-right: 10px;">
+                          <span *ngIf="(budget.total / (budget.amount)) >= 1" style="color: red;">
+                            <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
+                          </span>
+                          <span *ngIf="!((budget.total / (budget.amount)) >= 1) && (budget.total / (budget.amount)) >= 0.75" style="color: orange;">
+                            <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
+                          </span>
+                          <span *ngIf="!((budget.total / (budget.amount)) >= 0.75) && (budget.total / (budget.amount)) >= 0" style="color: green;">
+                            <b>$ {{ budget.total }} / {{ (budget.amount) }}</b>
+                          </span>
+                        </p>
+                      </div> -->
+                    </div>
+                  </div>
+                  <div *ngIf="component.name === 'Goals' && card.name === 'Completed Goals'">
+                    <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+                    <div *ngIf="!isLoading"> 
+                      <div *ngIf="recentlyCompletedGoals.length === 0">
+                        <p>No completed goals in the last 30 days!</p>
+                      </div>
+                      <div *ngIf="recentlyCompletedGoals.length > 0">
+                        <div *ngFor="let goal of recentlyCompletedGoals" style="margin-bottom: 30px;">
+                          <div class="goal-image">
+                            <img [src]="goal.imagePath" [alt]="goal.goalName" 
+                            matTooltip="{{goal.goalDescription}}" matTooltipPosition="above">
+                          </div>
+                          <p style="text-align: center"><b>{{goal.goalName}}</b></p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
             </mat-card-content>
+            <mat-card-actions class="cardActions">
+              <button mat-button *ngIf="component.name === 'Transactions'" class="manageButton" routerLink='/transactions'>Manage {{component.name}}</button>
+              <button mat-button *ngIf="component.name === 'Budgets'" class="manageButton" routerLink='/budgets'>Manage {{component.name}}</button>
+              <button mat-button *ngIf="component.name === 'Goals'" class="manageButton" routerLink='/goals'>Manage {{component.name}}</button>
+            </mat-card-actions>
           </mat-card>
-        </mat-card-content>
-        <mat-card-actions class="cardActions">
-          <button mat-button *ngIf="component.name === 'Transactions'" class="manageButton" routerLink='/transactions'>Manage {{component.name}}</button>
-          <button mat-button *ngIf="component.name === 'Budgets'" class="manageButton" routerLink='/budgets'>Manage {{component.name}}</button>
-          <button mat-button *ngIf="component.name === 'Goals'" class="manageButton" routerLink='/goals'>Manage {{component.name}}</button>
-        </mat-card-actions>
-      </mat-card>
+        </div>
     </div>
   </div>
   <div *ngIf="listValue.length > 0 && currentAccounts.length == 0">
