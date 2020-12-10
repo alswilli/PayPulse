@@ -407,7 +407,7 @@ export class GoalService {
               var total = 0;
               for (let transaction of transactions) {
                 for (let category of transaction.category) {
-                  if (category === mainCategory) {
+                  if (category === mainCategory && transaction.amount >= 0) {
                     total += transaction.amount;
                     break;
                   }

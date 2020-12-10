@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
-import { MatAccordion, MatDialog, MatSelect, MatSelectChange } from '@angular/material';
+import { MatAccordion, MatDialog, MatSelect, MatSelectChange, MatTableDataSource } from '@angular/material';
 import { AddBudgetComponent } from './add-budget/add-budget.component';
 import { AccountService } from '../services/account.service';
 import { mergeMap } from 'rxjs/operators';
@@ -13,6 +13,13 @@ import { basename } from 'path';
 import { forkJoin, Observable } from 'rxjs';
 import { GoalService } from '../services/goal.service';
 import { AuthService } from '../services/auth.service';
+
+export interface TransactionData {
+  amount: string;
+  transactionName: string;
+  category: string;
+  date: string;
+}
 
 @Component({
   selector: 'app-budgets',
@@ -47,6 +54,12 @@ export class BudgetsComponent implements OnInit {
   initialLoad: boolean = true;
   allGoals = [];
   allUserGoals = [];
+  incomeTransactions = [];
+  untrackedTransactions = [];
+  transactionIds = {};
+  incomeDataSource: MatTableDataSource<TransactionData>;
+  untrackedDataSource: MatTableDataSource<TransactionData>;
+  displayedColumns: string[] = ['bankAccountName', 'transactionName', 'category', 'amount'];
   // dataEmpty = true;
   dates = {
     "01":["January", 31],
@@ -188,15 +201,51 @@ export class BudgetsComponent implements OnInit {
     .subscribe(transactionsArray => {
       console.log(transactionsArray)
       this.transactions = []
+      var j = 0
       for (let transactions of transactionsArray) {
         if (transactions != null) {
           for (let transaction of transactions) {
             this.transactions.push(transaction);
+            if (transaction.amount < 0) {
+              const newTransaction = {
+                amount: transaction.amount,
+                transactionName: transaction.name,
+                category: transaction.category,
+                date: transaction.date,
+                bankAccountName: this.currentAccounts[j].institutionName
+              };
+              this.incomeTransactions.push(newTransaction)
+            }
           }
         }
+        j += 1
       }
+
       console.log(this.transactions)
+      console.log(this.incomeTransactions)
       this.onGetTransactions();
+      var j = 0
+      for (let transactions of transactionsArray) {
+        if (transactions != null) {
+          for (let transaction of transactions) {
+            if (!(transaction.transaction_id in this.transactionIds)) {
+              if (transaction.amount >= 0) {
+                const newTransaction = {
+                  amount: transaction.amount,
+                  transactionName: transaction.name,
+                  category: transaction.category,
+                  date: transaction.date,
+                  bankAccountName: this.currentAccounts[j].institutionName
+                };
+                this.untrackedTransactions.push(newTransaction)
+              }
+            } 
+          }
+        }
+        j += 1
+      }
+      console.log(this.transactionIds)
+      console.log(this.untrackedTransactions)
 
       // FROM SIDE
       this.matSelectFrom.selectionChange.subscribe((s: MatSelectChange) => {   
@@ -360,6 +409,37 @@ export class BudgetsComponent implements OnInit {
         console.log(this.totalMonthsActive)
         console.log((budget.total / (Number(budget.amount) * this.totalMonthsActive)))
       }
+      // this.incomeTransactions = []
+      this.incomeTransactions.push({
+        amount: 0,
+        transactionName: 'test',
+        category: 'test',
+        date: 'test',
+        bankAccountName: 'test'
+      })
+      this.incomeTransactions.push({
+        amount: 0,
+        transactionName: 'test',
+        category: 'test',
+        date: 'test',
+        bankAccountName: 'test'
+      })
+      this.incomeTransactions.push({
+        amount: 0,
+        transactionName: 'test',
+        category: 'test',
+        date: 'test',
+        bankAccountName: 'test'
+      })
+      this.incomeTransactions.push({
+        amount: 0,
+        transactionName: 'test',
+        category: 'test',
+        date: 'test',
+        bankAccountName: 'test'
+      })
+      this.incomeDataSource = new MatTableDataSource(this.incomeTransactions);
+      this.untrackedDataSource = new MatTableDataSource(this.untrackedTransactions);
     });
   }
 
@@ -410,7 +490,8 @@ export class BudgetsComponent implements OnInit {
         var total = 0;
         for (let transaction of this.transactions) {
           for (let category of transaction.category) {
-            if (category === mainCategory) {
+            if (category === mainCategory && transaction.amount >= 0) {
+              this.transactionIds[transaction.transaction_id] = null
               console.log("Amount: ", transaction.amount)
               total += transaction.amount;
               break;
@@ -587,7 +668,7 @@ export class BudgetsComponent implements OnInit {
         var total = 0;
         for (let transaction of this.transactions) {
           for (let category of transaction.category) {
-            if (category === result.mainCategory) {
+            if (category === result.mainCategory && transaction.amount >= 0) {
               total += transaction.amount;
               break;
             }
@@ -841,7 +922,7 @@ export class BudgetsComponent implements OnInit {
         var total = 0;
         for (let transaction of this.transactions) {
           for (let category of transaction.category) {
-            if (category === result.mainCategory) {
+            if (category === result.mainCategory && transaction.amount >= 0) {
               total += transaction.amount;
               break;
             }
@@ -1042,7 +1123,7 @@ export class BudgetsComponent implements OnInit {
         var total = 0;
         for (let transaction of this.transactions) {
           for (let category of transaction.category) {
-            if (category === result.mainCategory) {
+            if (category === result.mainCategory && transaction.amount >= 0) {
               total += transaction.amount;
               break;
             }
