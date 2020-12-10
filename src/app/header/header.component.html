@@ -1,4 +1,4 @@
-<mat-sidenav-container *ngIf="loggingIn" style="height: 100vh" class="example-container">
+<mat-sidenav-container class="sideNavContainer" [ngStyle]="{'background-color': '#' + bgColor}">
   <mat-sidenav class="side" fxLayout="column" mode="side" [(opened)]="opened">
     <a class="sideContent" mat-button routerLink='/home' (click)="onMenuClick()" routerLinkActive='active'> Home </a>
     <a class="sideContent" mat-button routerLink='/transactions' (click)="onMenuClick()" routerLinkActive='active'> Transactions </a>
@@ -13,7 +13,7 @@
     <!-- <div style="height: 75px;"></div> -->
   </mat-sidenav>
 
-  <mat-sidenav-content [ngStyle]="{'background-color': '#' + bgColor}">
+  <mat-sidenav-content>
     <mat-toolbar color="primary" *ngIf="!loggingIn" style="position: fixed; z-index: 2;">
       <!-- Show the side nav when the screen size is lt-md -->
       <button class="menuButton" mat-icon-button (click)="onMenuClick()" fxHide="true" fxShow.lt-md="true">
@@ -43,49 +43,6 @@
   </mat-sidenav-content>
 </mat-sidenav-container>
 
-<mat-sidenav-container *ngIf="!loggingIn" class="example-container">
-  <mat-sidenav class="side" fxLayout="column" mode="side" [(opened)]="opened">
-    <a class="sideContent" mat-button routerLink='/home' (click)="onMenuClick()" routerLinkActive='active'> Home </a>
-    <a class="sideContent" mat-button routerLink='/transactions' (click)="onMenuClick()" routerLinkActive='active'> Transactions </a>
-    <a class="sideContent" mat-button routerLink='/budgets' (click)="onMenuClick()" routerLinkActive='active'> Budgets </a>
-    <a class="sideContent" mat-button routerLink='/goals' (click)="onMenuClick()" routerLinkActive='active' (click)="toggleBadgeVisibility()">
-        <span [matBadge]="numNotifications" matBadgeColor="warn" matBadgeOverlap="false" [matBadgeHidden]="hidden"> Goals </span> 
-    </a>
-    <!-- <a class="sideContent" mat-button routerLink='/sharing' (click)="onMenuClick()" routerLinkActive='active'> Sharing </a>
-    <a class="sideContent" mat-button routerLink='/advice' (click)="onMenuClick()" routerLinkActive='active'> Advice </a> -->
-    <a class="sideContent" mat-button (click)="logOut()"> Log Out </a>
-    <a mat-button (click)="onMenuClick()" class="xStyle"> X </a>
-    <!-- <div style="height: 75px;"></div> -->
-  </mat-sidenav>
 
-  <mat-sidenav-content [ngStyle]="{'background-color': '#' + bgColor}">
-    <mat-toolbar color="primary" *ngIf="!loggingIn" style="position: fixed; z-index: 2;">
-      <!-- Show the side nav when the screen size is lt-md -->
-      <button class="menuButton" mat-icon-button (click)="onMenuClick()" fxHide="true" fxShow.lt-md="true">
-        <mat-icon>menu</mat-icon>
-      </button>
-      <span fxFlex fxLayoutAlign.lt-md="center"><a class="apptitle" routerLink='/home'>PayPulse</a></span>
-      <!-- Show the buttons when the screen size is gt-md -->
-      <div fxFlex="60" fxLayout="row" fxLayoutAlign="center center" fxShow="true" fxHide.lt-md="true">
-        <a mat-button routerLink='/home' routerLinkActive='active'> Home </a>
-        <a mat-button routerLink='/transactions' routerLinkActive='active'> Transactions </a>
-        <a mat-button routerLink='/budgets' routerLinkActive='active'> Budgets </a>
-        <a mat-button routerLink='/goals' routerLinkActive='active' (click)="toggleBadgeVisibility()">
-          <span [matBadge]="numNotifications" matBadgeColor="warn" matBadgeOverlap="false" [matBadgeHidden]="hidden"> Goals </span>
-        </a>
-        <!-- <a mat-button routerLink='/sharing' routerLinkActive='active'> Sharing </a>
-        <a mat-button routerLink='/advice' routerLinkActive='active'> Advice </a> -->
-      </div>
-      <div fxFlex="20" fxLayoutAlign="end center" fxShow="true" fxHide.lt-md="true">
-        <a mat-button (click)="logOut()"> Log Out </a>
-      </div>
-    </mat-toolbar>
-
-    <!-- <div style="height: 75px;"></div> -->
-
-    <router-outlet></router-outlet>
-
-  </mat-sidenav-content>
-</mat-sidenav-container>
 
 

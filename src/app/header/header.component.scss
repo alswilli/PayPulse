@@ -45,3 +45,8 @@ a {
     display: flex; 
     flex-direction: column;
   }
+
+.sideNavContainer {
+    min-height: -webkit-fill-available;
+    min-height: 100vh;
+}
