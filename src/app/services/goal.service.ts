@@ -68,6 +68,8 @@ export class GoalService {
   totalBudgetAmount: number = 0;
   pairs: any;
   numMonthsAhead: number;
+  untrackedTransactions: any[];
+  transactionIds = {};
 
   constructor(private http: HttpClient,
     private authService: AuthService,
@@ -140,8 +142,8 @@ export class GoalService {
         var oldDate = new Date(JSON.parse(localStorage.getItem('JWT'))["lastUpdated"])
         var currDate = new Date();
         this.totalBudgetAmount = 0
-        // var oldDate = new Date("2020-10-21T01:14:54.483Z");
-        // var currDate = new Date("2020-11-22T01:14:54.483Z"); 
+        var oldDate = new Date("2020-10-21T01:14:54.483Z");
+        var currDate = new Date("2020-11-22T01:14:54.483Z"); 
         console.log(oldDate)
         console.log(currDate)
         console.log(budgets.length)
@@ -302,6 +304,7 @@ export class GoalService {
         var nineRowIndex = null
         var oneYearRowIndex = null
         var budgetBusterIndex = null
+        var expertBudgeteerIndex = null
         for (let goal of allGoals) {
           if (goal.goalName == "Budget Manager - All Months") {
             console.log("found all months")
@@ -378,6 +381,7 @@ export class GoalService {
             for (let ug of allUserGoals) {
               if (ug.goalId == goal._id) {
                 expertBudgeteerId = ug._id
+                expertBudgeteerIndex = index
                 break
               }
               index += 1
@@ -402,6 +406,7 @@ export class GoalService {
         
         for (let transactions of transactionsDataArray) {
           console.log("inside transactions loop")
+          this.transactionIds = {}
           if (accountsIndex < accountIds.length) {
             // Per month
             for (let budget of this.budgets) {
@@ -410,6 +415,7 @@ export class GoalService {
               for (let transaction of transactions) {
                 for (let category of transaction.category) {
                   if (category === mainCategory && transaction.amount >= 0) {
+                    this.transactionIds[transaction.transaction_id] = null
                     total = this.roundNumber(total + transaction.amount, 2)
                     // total += transaction.amount;
                     break;
@@ -426,6 +432,33 @@ export class GoalService {
           }
           console.log("Monthly Total: ", monthlyTotal)
           console.log("Total Budget Amount: ", this.totalBudgetAmount)
+
+          this.untrackedTransactions = []
+          for (let transaction of transactions) {
+            if (!(transaction.transaction_id in this.transactionIds)) {
+              if (transaction.amount >= 0) {
+                this.untrackedTransactions.push(transaction)
+              }
+            }
+          }
+
+          if (this.numMonthsAhead > 0 && this.budgets.length > 0) {
+            console.log("in expert budgeteer")
+            if (this.untrackedTransactions.length == 0) {
+              console.log("updating expert budgeteer")
+              var retObj = {}
+              if (allUserGoals[expertBudgeteerIndex].numTimesAchieved == 0) {
+                retObj['done'] = "Done"
+                retObj["numTimesAchieved"] = allUserGoals[expertBudgeteerIndex].numTimesAchieved+1
+                usergoalObservables.push(this.updateUserGoal(expertBudgeteerId, retObj))
+              }
+              else if (allUserGoals[budgetBusterIndex].goalProgress == 100) {
+                retObj['done'] = "Already Done"
+                retObj["numTimesAchieved"] = allUserGoals[expertBudgeteerIndex].numTimesAchieved+1
+                usergoalObservables.push(this.updateUserGoal(expertBudgeteerId, retObj))
+              }
+            } 
+          }
 
           var currBudgetMargin = this.roundNumber(monthlyTotal - this.totalBudgetAmount, 2)
           // var currBudgetMargin = monthlyTotal - this.totalBudgetAmount

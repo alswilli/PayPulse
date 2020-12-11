@@ -308,16 +308,30 @@ export class BudgetsComponent implements OnInit {
           .subscribe(transactionsArray => {
             this.transactionsArray = transactionsArray
             this.transactions = []
+            this.incomeTransactions = []
+            var j = 0
             for (let transactions of transactionsArray) {
               if (transactions != null) {
                 for (let transaction of transactions) {
                   this.transactions.push(transaction);
+                  if (transaction.amount < 0) {
+                    const newTransaction = {
+                      amount: transaction.amount,
+                      transactionName: transaction.name,
+                      category: transaction.category,
+                      date: transaction.date,
+                      bankAccountName: this.currentAccounts[j].institutionName
+                    };
+                    this.incomeTransactions.push(newTransaction)
+                  }
                 }
               }
+              j += 1
             }
             this.onGetTransactions();
             this.getUntrackedTransactions(transactionsArray);
             this.untrackedDataSource.data = this.untrackedTransactions;
+            this.incomeDataSource.data = this.incomeTransactions;
             console.log(this.transactionIds)
             console.log(this.untrackedTransactions)
         });
@@ -385,16 +399,30 @@ export class BudgetsComponent implements OnInit {
           .subscribe(transactionsArray => {
             this.transactionsArray = transactionsArray
             this.transactions = []
+            this.incomeTransactions = []
+            var j = 0
             for (let transactions of transactionsArray) {
               if (transactions != null) {
                 for (let transaction of transactions) {
                   this.transactions.push(transaction);
+                  if (transaction.amount < 0) {
+                    const newTransaction = {
+                      amount: transaction.amount,
+                      transactionName: transaction.name,
+                      category: transaction.category,
+                      date: transaction.date,
+                      bankAccountName: this.currentAccounts[j].institutionName
+                    };
+                    this.incomeTransactions.push(newTransaction)
+                  }
                 }
               }
+              j += 1
             }
             this.onGetTransactions();
             this.getUntrackedTransactions(transactionsArray);
             this.untrackedDataSource.data = this.untrackedTransactions;
+            this.incomeDataSource.data = this.incomeTransactions;
             console.log(this.transactionIds)
             console.log(this.untrackedTransactions)
         });

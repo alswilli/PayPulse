@@ -138,11 +138,11 @@
                         <mat-expansion-panel style="margin-bottom: 30px;" *ngFor="let recentData of parsedTransactions; let i = index">
                           <mat-expansion-panel-header id="{{'budgetHeader' + i}}">
                             <div>
-                              <p style="margin: 0px;"><b>{{recentData.transactionName}}</b> </p>
                               <p style="margin: 0px;">
                                 <b *ngIf="recentData.amount > 0">$ {{-recentData.amount}}</b> 
                                 <b *ngIf="!(recentData.amount > 0)" style="color: green">$ {{-recentData.amount}}</b>
                               </p>
+                              <p style="margin: 0px;">{{recentData.transactionName}}</p>
                             </div>
                           </mat-expansion-panel-header>
                           <p style="margin: 0px;"><b>Bank Account Name:</b> {{recentData.mainAccountName}} </p>
