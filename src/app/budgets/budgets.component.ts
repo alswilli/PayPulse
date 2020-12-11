@@ -563,7 +563,8 @@ export class BudgetsComponent implements OnInit {
         if (newBudgetIndex === bestIndex) {
           sameLevel = true;
           for (let pbudget of parents) {
-            sameLevelTotal += pbudget.total;
+            sameLevelTotal = this.roundNumber( sameLevelTotal + pbudget.total, 2 );
+            // sameLevelTotal += pbudget.total;
           }
         }
 
@@ -588,8 +589,8 @@ export class BudgetsComponent implements OnInit {
             // Update current value
             if (sameLevel) {
               console.log("SAME LEVEL");
-              this.pieData[parentIndex].total += budget.total;
-              // this.pieData[parentIndex].amount += Number(budget.amount);
+              this.pieData[parentIndex].total = this.roundNumber( this.pieData[parentIndex].total + budget.total, 2 );
+              // this.pieData[parentIndex].total += budget.total;
               this.pieChartService.sendNewPieDataEvent(this.pieData);
             }
             else {
@@ -631,7 +632,8 @@ export class BudgetsComponent implements OnInit {
       // }
       this.totalBudget = 0;
       for (let key in this.budgetSets) {
-        this.totalBudget += this.budgetSets[key][0];
+        this.totalBudget = this.roundNumber( this.totalBudget + this.budgetSets[key][0], 2 );
+        // this.totalBudget += this.budgetSets[key][0];
       }
       // this.totalBudget = this.totalBudget * this.totalMonthsActive;
       console.log(this.budgetSets)
@@ -670,7 +672,8 @@ export class BudgetsComponent implements OnInit {
       // Now figure out what to do with it
       if (budget.category in this.budgetSets) {
         if (currIndex === this.budgetSets[budget.category][1]) {
-          this.budgetSets[budget.category][0] += Number(budget.amount);
+          this.budgetSets[budget.category][0] = this.roundNumber( this.budgetSets[budget.category][0] + Number(budget.amount), 2 );
+          // this.budgetSets[budget.category][0] += Number(budget.amount);
         }
         else if (currIndex < this.budgetSets[budget.category][1]) {
           this.budgetSets[budget.category] = [Number(budget.amount), currIndex];
@@ -697,7 +700,8 @@ export class BudgetsComponent implements OnInit {
         for (let transaction of this.transactions) {
           for (let category of transaction.category) {
             if (category === result.mainCategory && transaction.amount >= 0) {
-              total += transaction.amount;
+              total = this.roundNumber( total + transaction.amount, 2 );
+              // total += transaction.amount;
               break;
             }
           }
@@ -751,7 +755,8 @@ export class BudgetsComponent implements OnInit {
           sameLevel = true;
         }
         for (let pbudget of parents) {
-          sameLevelTotal += pbudget.total;
+          sameLevelTotal = this.roundNumber( sameLevelTotal + pbudget.total, 2 );
+          // sameLevelTotal += pbudget.total;
         }
 
         // If new budget is parent (and not already present) OR parent not on graph yet
@@ -777,7 +782,8 @@ export class BudgetsComponent implements OnInit {
             if (sameLevel) {
               console.log("SAME LEVEL");
               console.log(bestIndex)
-              this.pieData[parentIndex].total += result.total;
+              this.pieData[parentIndex].total = this.roundNumber( this.pieData[parentIndex].total + result.total, 2 );
+              // this.pieData[parentIndex].total += result.total;
               this.pieChartService.sendNewPieDataEvent(this.pieData);
             }
             else {
@@ -831,7 +837,8 @@ export class BudgetsComponent implements OnInit {
 
               this.totalBudget = 0;
               for (let key in this.budgetSets) {
-                this.totalBudget += this.budgetSets[key][0];
+                this.totalBudget = this.roundNumber( this.totalBudget + this.budgetSets[key][0], 2 );
+                // this.totalBudget += this.budgetSets[key][0];
               }
               console.log(this.budgetSets)
 
@@ -867,7 +874,8 @@ export class BudgetsComponent implements OnInit {
 
           this.totalBudget = 0;
           for (let key in this.budgetSets) {
-            this.totalBudget += this.budgetSets[key][0];
+            this.totalBudget = this.roundNumber( this.totalBudget + this.budgetSets[key][0], 2 );
+            // this.totalBudget += this.budgetSets[key][0];
           }
           console.log(this.budgetSets)
 
@@ -908,7 +916,8 @@ export class BudgetsComponent implements OnInit {
         for (let transaction of this.transactions) {
           for (let category of transaction.category) {
             if (category === result.mainCategory && transaction.amount >= 0) {
-              total += transaction.amount;
+              total = this.roundNumber( total + transaction.amount, 2 );
+              // total += transaction.amount;
               break;
             }
           }
@@ -963,8 +972,10 @@ export class BudgetsComponent implements OnInit {
           sameLevel = true;
         }
         for (let pbudget of parents) {
-          sameLevelTotal += pbudget.total;
-          sameLevelAmount += Number(pbudget.amount);
+          sameLevelTotal = this.roundNumber( sameLevelTotal + pbudget.total, 2 );
+          // sameLevelTotal += pbudget.total;
+          sameLevelAmount = this.roundNumber( sameLevelAmount + Number(pbudget.amount), 2 );
+          // sameLevelAmount += Number(pbudget.amount);
         }
 
         console.log(this.pieData)
@@ -994,8 +1005,8 @@ export class BudgetsComponent implements OnInit {
                 console.log("SAME LEVEL");
                 console.log(bestIndex)
                 console.log(dataVal, result.total)
-                // dataVal.total -= result.total;
-                dataVal.total -= result.total //Math.ceil(num * 100) / 100; 
+                dataVal.total = this.roundNumber( dataVal.total - result.total, 2 );
+                // dataVal.total -= result.total //Math.ceil(num * 100) / 100; 
                 var strTotal = dataVal.total.toString();
                 var containsDecimal = false;
                 for (let num of strTotal) {
@@ -1056,7 +1067,8 @@ export class BudgetsComponent implements OnInit {
 
         this.totalBudget = 0;
         for (let key in this.budgetSets) {
-          this.totalBudget += this.budgetSets[key][0];
+          this.totalBudget = this.roundNumber( this.totalBudget + this.budgetSets[key][0], 2 );
+          // this.totalBudget += this.budgetSets[key][0];
         }
         console.log(this.budgetSets)
 
@@ -1082,7 +1094,8 @@ export class BudgetsComponent implements OnInit {
         for (let transaction of this.transactions) {
           for (let category of transaction.category) {
             if (category === result.mainCategory && transaction.amount >= 0) {
-              total += transaction.amount;
+              total = this.roundNumber( total + transaction.amount, 2 );
+              // total += transaction.amount;
               break;
             }
           }
@@ -1182,8 +1195,10 @@ export class BudgetsComponent implements OnInit {
           sameLevel = true;
         }
         for (let pbudget of parents) {
-          sameLevelTotal += pbudget.total;
-          sameLevelAmount += Number(pbudget.amount);
+          sameLevelTotal = this.roundNumber( sameLevelTotal + pbudget.total, 2 );
+          // sameLevelTotal += pbudget.total;
+          sameLevelAmount = this.roundNumber( sameLevelAmount + Number(pbudget.amount), 2 );
+          // sameLevelAmount += Number(pbudget.amount);
         }
 
         // Old Category
@@ -1236,8 +1251,10 @@ export class BudgetsComponent implements OnInit {
         var oldsameLevelTotal = 0;
         var oldsameLevelAmount = 0;
         for (let pbudget of oldparents) {
-          oldsameLevelTotal += pbudget.total;
-          oldsameLevelAmount += Number(pbudget.amount);
+          oldsameLevelTotal = this.roundNumber( oldsameLevelTotal + pbudget.total, 2 );
+          // oldsameLevelTotal += pbudget.total;
+          oldsameLevelAmount = this.roundNumber( oldsameLevelAmount + Number(pbudget.amount), 2 );
+          // oldsameLevelAmount += Number(pbudget.amount);
         }
 
         // Only delete from graph if no other budgets with same parent present in list
@@ -1430,7 +1447,8 @@ export class BudgetsComponent implements OnInit {
 
         this.totalBudget = 0;
         for (let key in this.budgetSets) {
-          this.totalBudget += this.budgetSets[key][0];
+          this.totalBudget = this.roundNumber( this.totalBudget + this.budgetSets[key][0], 2 );
+          // this.totalBudget += this.budgetSets[key][0];
         }
         console.log(this.budgetSets)
 

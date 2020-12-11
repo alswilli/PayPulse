@@ -213,7 +213,8 @@ export class GoalService {
                 level = 2
               }
               if (mainBudgets[budget.category] == level) {
-                mainBudgets[budget.category] += Number(budget.amount)
+                mainBudgets[budget.category] = this.roundNumber(mainBudgets[budget.category] + Number(budget.amount), 2)
+                // mainBudgets[budget.category] += Number(budget.amount)
               }
               else if (mainBudgets[budget.category] < level) {
                 mainBudgets[budget.category] = Number(budget.amount)
@@ -225,7 +226,8 @@ export class GoalService {
           }
           this.totalBudgetAmount = 0
           for (let key of Object.keys(mainBudgets)) {
-            this.totalBudgetAmount += mainBudgets[key]
+            this.totalBudgetAmount = this.roundNumber(this.totalBudgetAmount + mainBudgets[key], 2)
+            // this.totalBudgetAmount += mainBudgets[key]
           }
 
           console.log("Pairs: ", this.pairs)
@@ -408,12 +410,14 @@ export class GoalService {
               for (let transaction of transactions) {
                 for (let category of transaction.category) {
                   if (category === mainCategory && transaction.amount >= 0) {
-                    total += transaction.amount;
+                    total = this.roundNumber(total + transaction.amount, 2)
+                    // total += transaction.amount;
                     break;
                   }
                 }
               }
-              monthlyTotal += total;
+              monthlyTotal = this.roundNumber(monthlyTotal + total, 2)
+              // monthlyTotal += total;
             }
             accountsIndex += 1
             if (accountsIndex < accountIds.length) {
@@ -423,7 +427,8 @@ export class GoalService {
           console.log("Monthly Total: ", monthlyTotal)
           console.log("Total Budget Amount: ", this.totalBudgetAmount)
 
-          var currBudgetMargin = monthlyTotal - this.totalBudgetAmount
+          var currBudgetMargin = this.roundNumber(monthlyTotal - this.totalBudgetAmount, 2)
+          // var currBudgetMargin = monthlyTotal - this.totalBudgetAmount
 
           if (this.numMonthsAhead > 0 && this.budgets.length > 0) {
             console.log("in budget buster")

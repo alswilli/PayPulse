@@ -380,13 +380,19 @@ export class HomeComponent implements OnInit {
       for (let transaction of this.transactions) {
         for (let category of transaction.category) {
           if (category === mainCategory && transaction.amount >= 0) {
-            total += transaction.amount;
+            total = this.roundNumber( total + transaction.amount, 2 );
+            // total += transaction.amount;
             break;
           }
         }
       }
       budget.total = total;
     } 
+  }
+
+  roundNumber(number, decimals) {
+    var newnumber = new Number(number+'').toFixed(parseInt(decimals));
+    return parseFloat(newnumber); 
   }
 
   truncateVal(val) {
@@ -419,15 +425,18 @@ export class HomeComponent implements OnInit {
       sortedBudgets.push(budget);
     }
     sortedBudgets.sort((a, b) => {
-      var diffA = Number(a.amount) - a.total;
-      var diffB = Number(b.amount) - b.total;
+      var diffA = this.roundNumber( Number(a.amount) - a.total, 2 );
+      var diffB = this.roundNumber( Number(b.amount) - b.total, 2 );
+      // var diffA = Number(a.amount) - a.total;
+      // var diffB = Number(b.amount) - b.total;
       if(diffA > diffB) return 1;
       if(diffA <= diffB) return -1;
     });
     var i = 0;
     this.top3Budgets = [];
     while (i < 3 && sortedBudgets[i]) {
-      var truncatedTotal = this.truncateVal(sortedBudgets[i].total)
+      var truncatedTotal = this.roundNumber( sortedBudgets[i].total, 2 );
+      // var truncatedTotal = this.truncateVal(sortedBudgets[i].total)
       sortedBudgets[i].total = truncatedTotal;
       this.top3Budgets.push(sortedBudgets[i]);
       i += 1;
