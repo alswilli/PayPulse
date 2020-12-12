@@ -5,8 +5,12 @@
   <div *ngIf="userAccountsDetails.accounts.length == 0">
     <p style="text-align: center;">No accounts added! Please add an account to see budgets</p>
   </div>
+  <div *ngIf="itemsDetails.validRes != null" style="text-align: center;">
+    <p>There are invalid credentials or an expired account token for 1 or more of your accounts!</p> 
+    <p>Please reauthenticate the accounts on the home page to gain back functionality.</p>
+  </div>
   <!-- <mat-spinner *ngIf="initialLoad" style="margin: auto;"></mat-spinner> -->
-  <div [hidden]="initialLoad || userAccountsDetails.accounts.length == 0 || this.userAccountsDetails.currentAccounts.length == 0">
+  <div [hidden]="initialLoad || userAccountsDetails.accounts.length == 0 || this.userAccountsDetails.currentAccounts.length == 0 || itemsDetails.validRes != null">
     <!-- <div fxLayoutAlign="center bottom">
       <mat-form-field>
         <mat-label>From:</mat-label>
@@ -240,7 +244,7 @@
       <!-- <div fxFlex='1'></div> -->
     </div>
   </div>
-  <div *ngIf="userAccountsDetails.accounts.length > 0 && userAccountsDetails.currentAccounts.length == 0">
+  <div *ngIf="userAccountsDetails.accounts.length > 0 && userAccountsDetails.currentAccounts.length == 0 && itemsDetails.validRes == null">
     <p style="text-align: center;">Please select a current account(s) on the home page to view budgets!</p>
   </div>
 </div>

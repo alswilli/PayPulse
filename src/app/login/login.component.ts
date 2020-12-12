@@ -249,12 +249,14 @@ export class LoginComponent implements OnInit {
                   }
                   this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
                   this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
+                  this.authService.storeItemsDetails({validRes: this.validRes})
                   this.router.navigate(['/home']);
                 }
                 else {
                   this.authService.update().subscribe(res => {
                     this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
                     this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
+                    this.authService.storeItemsDetails({validRes: this.validRes})
                     this.router.navigate(['/home']);
                   })
                 }
@@ -409,12 +411,14 @@ export class LoginComponent implements OnInit {
                           }
                           this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
                           this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
+                          this.authService.storeItemsDetails({validRes: this.validRes})
                           this._ngZone.run(() => this.router.navigate(['/home']))
                         }
                         else {
                           this.authService.update().subscribe(res => {
                             this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
                             this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
+                            this.authService.storeItemsDetails({validRes: this.validRes})
                             this._ngZone.run(() => this.router.navigate(['/home']))
                           })
                         }

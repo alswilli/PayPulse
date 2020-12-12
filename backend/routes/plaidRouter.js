@@ -124,29 +124,22 @@ plaidRouter.route("/accounts/create_link_token")
   // })
 });
 
-// plaidRouter.route("/create_link_token")
-// .options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
-// .post(cors.corsWithOptions, authenticate.verifyUser, async (request, response, next) => {
-//   // 1. Grab the client_user_id by searching for the current user in your database
-//   const user = await User.find({
-//     _id: request.userId
-//   });
-//   const clientUserId = user.id;
-//   // 2. Create a link_token for the given user
-//   const linkTokenResponse = await client.createLinkToken({
-//     user: {
-//       client_user_id: clientUserId,
-//     },
-//     client_name: 'My App',
-//     products: ['transactions'],
-//     country_codes: ['US'],
-//     language: 'en',
-//     webhook: 'https://sample.webhook.com',
-//   });
-//   const link_token = linkTokenResponse.link_token;
-//   // 3. Send the data to the client
-//   response.json({ link_token: link_token });
-// });
+
+plaidRouter.route("/accounts/resetItem/:accountId")
+.options(cors.corsWithOptions, (req,res) => { res.sendStatus(200); })
+.put(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+  Account.findById(req.params.accountId)
+    .then(account => {
+      ACCESS_TOKEN = account.accessToken;
+      console.log(ACCESS_TOKEN);
+      client.resetLogin(ACCESS_TOKEN)
+        .then(res => {
+          // res.json({ message: "Account item reset" });
+          console.log("done")
+        })
+      })
+});
+
 
 // @route POST plaid/accounts/add
 // @desc Trades public token for access token and stores credentials in database

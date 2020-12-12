@@ -196,6 +196,7 @@ export class TransactionsComponent implements OnInit {
   subAccountsLength: number;
   activeSubsLength: number;
   activeCurrentsLength: number;
+  itemsDetails: any;
 
   constructor(private accountService: AccountService,
     private database: ChecklistDatabase) {
@@ -215,6 +216,7 @@ export class TransactionsComponent implements OnInit {
     console.log("ngInit");
 
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
+    this.itemsDetails = JSON.parse(localStorage.getItem('Items Details'));
     console.log("Current Account Details: ", this.userAccountsDetails)
     this.accounts = this.userAccountsDetails.accounts;
     this.currentAccounts = this.userAccountsDetails.currentAccounts;

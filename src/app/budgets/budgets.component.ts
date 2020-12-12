@@ -96,6 +96,7 @@ export class BudgetsComponent implements OnInit {
   newlyCompletedGoals = [];
   userGoalData: any;
   transactionsArray: any[];
+  itemsDetails: any;
 
   constructor(public dialog: MatDialog,
     private accountService: AccountService,
@@ -113,6 +114,7 @@ export class BudgetsComponent implements OnInit {
     this.allUserGoals = JSON.parse(localStorage.getItem('User Goals Details'))['usergoals'];
     this.newlyCompletedGoals = JSON.parse(localStorage.getItem('User Goals Details'))['newlyCompletedGoals'];
     this.userGoalData = JSON.parse(localStorage.getItem('User Goals Details'))['goaldata'];
+    this.itemsDetails = JSON.parse(localStorage.getItem('Items Details'));
     this.initialLoad = false;
     this.currentAccounts = this.userAccountsDetails.currentAccounts
     for (let currAccount of this.currentAccounts) {

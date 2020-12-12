@@ -24,6 +24,7 @@ import { NgxPlaidLinkService } from 'ngx-plaid-link';
 import { Observable, forkJoin, of } from 'rxjs';
 import { GoalService } from '../services/goal.service';
 import { UserGoal } from '../shared/usergoal';
+import { Router } from '@angular/router';
 // import 'rxjs/add/operator/switchMap';
 
 @Component({
@@ -60,6 +61,7 @@ export class HomeComponent implements OnInit {
   borderVal: string;
   recentlyCompletedUserGoals: UserGoal[];
   recentlyCompletedGoals: Goal[];
+  newlyCompletedGoals: any[];
 
   clientForm: FormGroup;
   listValue: Account[] = [];
@@ -87,6 +89,9 @@ export class HomeComponent implements OnInit {
   userGoalsDetails: any;
   allGoals: any;
   allUserGoals: any;
+  itemsDetails: any;
+  userGoalData: any;
+  validRes: any;
 
   constructor(private transactionService: TransactionService,
     private accountService: AccountService,
@@ -95,7 +100,8 @@ export class HomeComponent implements OnInit {
     private fb: FormBuilder,
     private budgetService: BudgetService,
     private plaidLinkService: NgxPlaidLinkService,
-    private goalService: GoalService) { }
+    private goalService: GoalService,
+    private router: Router) { }
     
 
   ngOnChanges(changes: SimpleChanges) {
@@ -124,6 +130,9 @@ export class HomeComponent implements OnInit {
     this.userGoalsDetails = JSON.parse(localStorage.getItem('User Goals Details'));
     this.allGoals = this.userGoalsDetails.goals;
     this.allUserGoals = this.userGoalsDetails.usergoals;
+    this.userGoalData = this.userGoalsDetails.goaldata;
+    this.newlyCompletedGoals = this.userGoalsDetails.newlyCompletedGoals;
+    this.itemsDetails = JSON.parse(localStorage.getItem('Items Details'));
 
     // if (this.userAccountsDetails.accounts.length > 1) {
     //   this.listValue.push(['All', true]);
@@ -276,7 +285,59 @@ export class HomeComponent implements OnInit {
       console.log("no currrent accounts")
       this.marginVal = '10';
       this.borderVal = '1px solid rgb(209, 209, 209)';
-      this.isLoading = false;
+
+      let linkObservables: Observable<any>[] = [];
+      for (var i = 0; i < (this.accounts).length; i++) {
+        if (!this.accounts[i].itemValid) {
+          console.log("Need to update item")
+          linkObservables.push(this.accountService.getItemPublicToken(this.accounts[i]._id, i))
+        }
+        else {
+          linkObservables.push(of(null))
+        }
+      }
+      forkJoin(linkObservables).subscribe(resArray => {
+        console.log(resArray)
+        for (let res of resArray) {
+          console.log(res)
+          if (res != null) {
+            this.i = res.index
+            console.log(this.i)
+            var publicToken = res.public_token;
+            console.log("Public Token: ", publicToken)
+            var updateConfig: PlaidConfig = {
+              apiVersion: "v2",
+              clientName:"PayPulse",
+              env: "sandbox",
+              token: publicToken,
+              webhook: "https://507ec71083932519eb6c52a27bbe8afd.m.pipedream.net",
+              product: ["auth", "transactions"],
+              countryCodes: ['US', 'CA', 'GB'],
+              key: "ea1ee62219264cf290c12041f96bba",
+              onSuccess: this.onUpdateSuccess,
+              onExit: this.onUpdateExit
+            };
+            console.log(updateConfig)
+            this.plaidLinkService
+            .createPlaid(
+              Object.assign({}, updateConfig, {
+                onSuccess: (token, metadata) => this.onUpdateSuccess(token, metadata),
+                onExit: (error, metadata) => this.onUpdateExit(error, metadata),
+                onEvent: (eventName, metadata) => this.onUpdateEvent(eventName, metadata)
+              })
+            )
+            .then((handler: PlaidLinkHandler) => {
+              console.log(res.index)
+              this.updatePlaidLinkHandlers[res.index] = handler;
+              console.log(this.updatePlaidLinkHandlers)
+              // this.open();
+            });
+          }
+        }
+        this.userAccountsIds = this.userAccountsDetails.ids
+
+        this.isLoading = false;
+      })
     }
     else {
       // May need something here later
@@ -480,7 +541,7 @@ export class HomeComponent implements OnInit {
   onAccountSelected(listItem) {
     var accountName = listItem.institutionName
     var valid = listItem.itemValid
-    if (!this.removeAccounts && valid && !this.isLoading) {
+    if (!this.removeAccounts && this.itemsDetails.validRes == null && !this.isLoading) {
       console.log(accountName);
       var found = false
       var index = 0
@@ -873,6 +934,49 @@ export class HomeComponent implements OnInit {
   onUpdateSuccess(token, metadata) {
     console.log("We got a token:", token);
     console.log("We got metadata:", metadata);
+    var accountName = metadata.institution.name
+    var isCurrent = false
+    var index = 0
+    for (let account of this.accounts) {
+      if (account.institutionName == accountName) {
+        if (account.current == true){ 
+          isCurrent = true
+        }
+        break
+      }
+      index += 1
+    }
+    // No update to access token needed
+    var update = {itemValid: true};
+    this.accountService.updateItemInvalidAccount(this.userAccountsIds[index], update)
+    .subscribe(res => {
+      this.accounts[index].itemValid = true
+      if (isCurrent) {
+        for (let currAccount of this.currentAccounts) {
+          if (currAccount.institutionName == accountName) {
+            currAccount.itemValid = true
+            break
+          }
+        }
+      }
+      this.itemsDetails.validRes[index] = null
+      var allItemsValid = true
+      for (let item of this.itemsDetails.validRes) {
+        if (item != null) {
+          allItemsValid = false
+          break
+        }
+      }
+      if (allItemsValid) {
+        console.log(this.userGoalData)
+        this.gatherGoalUpdateData()
+      }
+      else {
+        this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
+        this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accounts, ids: this.userAccountsIds});
+        this.authService.storeItemsDetails({validRes: this.itemsDetails.validRes})
+      }
+    })
   }
 
   onUpdateEvent(eventName, metadata) {
@@ -889,4 +993,67 @@ export class HomeComponent implements OnInit {
     var scrollElem= document.querySelector('#moveTop');
     scrollElem.scrollIntoView();  
    }
+
+  gatherGoalUpdateData(){
+    this.goalService.checkAndUpdateUserGoals(this.userAccountsIds, this.allGoals, this.allUserGoals, this.userGoalData)
+    .pipe(
+      mergeMap(checkRes => {
+        console.log("IIIIIIII")
+        this.newlyCompletedGoals = checkRes[1]
+        var index = 0;
+        let itemValidObservables: Observable<any>[] = [];
+        var foundInvalid = false;
+        console.log(checkRes)
+        for (let res of checkRes[0]) {
+          console.log(res)
+          if (res == "item invalid") { //item invalid
+            foundInvalid = true;
+            var update = {itemValid: false};
+            itemValidObservables.push(this.accountService.updateItemInvalidAccount(this.userAccountsIds[index], update))
+          }
+          else {
+            itemValidObservables.push(of(null))
+          }
+        }
+        if (foundInvalid) {
+          console.log("JJJJJJJJ")
+          console.log(itemValidObservables)
+          return forkJoin(itemValidObservables)
+        }
+        else {
+          return of(null)
+        } 
+      }),
+      mergeMap(validRes => {
+        console.log("LLLLLLLL")
+        this.validRes = validRes;
+        return this.goalService.updateGoalData(this.userGoalData)
+      })
+    )
+    .subscribe(goalDataRes => {
+      console.log("made it to the end")
+      this.authService.update().subscribe(res => {
+        this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
+        this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accounts, ids: this.userAccountsIds});
+        this.authService.storeItemsDetails({validRes: this.validRes})
+        this.reloadComponent();
+        // this.router.navigate(['/home']);
+        // this.ngOnInit()
+      })
+    })
+  }
+
+  reloadComponent() {
+    console.log("reloading page")
+    this.router.routeReuseStrategy.shouldReuseRoute = () => false;
+    this.router.onSameUrlNavigation = 'reload';
+    this.router.navigate(['/home']);
+  }
+
+  resetItems() {
+    this.accountService.resetItems(this.userAccountsIds)
+    .subscribe(res => {
+      console.log("items have been reset!")
+    })
+  }
 }

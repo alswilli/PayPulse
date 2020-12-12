@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Account } from '../shared/account';
 import { Transaction } from '../shared/transaction';
 
-import { Observable, Subject } from 'rxjs';
+import { forkJoin, Observable, of, Subject } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { baseURL } from '../shared/baseurl';
@@ -127,6 +127,23 @@ export class AccountService {
   updateItemInvalidAccount(accountId: string, update: object) {
     return this.http.put(baseURL + 'plaid/accounts/' + accountId, update);
       // .pipe(catchError(this.processHTTPMsgService.handleError));
+  }
+
+  resetItems(accountIds) {
+    console.log("resetting items")
+    console.log(accountIds)
+    let resetObservables: Observable<any>[] = [];
+    for (let accountId of accountIds) {
+      resetObservables.push(this.resetItem(accountId))
+    }
+    if (resetObservables.length == 0) {
+      return of(null)
+    }
+    return forkJoin(resetObservables)
+  }
+
+  resetItem(accountId: string) {
+    return this.http.put(baseURL + 'plaid/accounts/resetItem/' + accountId, null);
   }
 
   getTransactions(accountId: string, postsPerPage: number, currentPage: number, subAccountIds: string[]) {

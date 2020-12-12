@@ -40,6 +40,7 @@ export class GoalsComponent implements OnInit {
   goalsUnlocked: boolean;
   goalsUnlockedRef: any;
   newlyUnlockedGoals = [];
+  itemsDetails: any;
 
   constructor(private goalService: GoalService,
     public dialog: MatDialog) { }
@@ -51,6 +52,7 @@ export class GoalsComponent implements OnInit {
     this.allGoals = [];
     this.userAccountsDetails = JSON.parse(localStorage.getItem('User Accounts Details'));
     this.currentAccounts = this.userAccountsDetails.currentAccounts;
+    this.itemsDetails = JSON.parse(localStorage.getItem('Items Details'));
     for (let account of this.currentAccounts) {
       this.currentAccountIds.push(account._id);
     }

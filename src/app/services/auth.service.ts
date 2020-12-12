@@ -140,6 +140,14 @@ export class AuthService {
     this.clearNewlyCompletedGoals();
     localStorage.removeItem("User Goals Details")
   }
+
+  storeItemsDetails(details: any) {
+    localStorage.setItem("Items Details", JSON.stringify(details));
+  }
+
+  destroyItemsDetails() {
+    localStorage.removeItem("Items Details");
+  }
  
    signUp(user: any): Observable<any> {
      return this.http.post(baseURL + 'users/signup', user)
@@ -206,6 +214,7 @@ export class AuthService {
     this.destroyUserCredentials();
     this.destroyUserAccountsDetails();
     this.destroyGoalsDetails();
+    this.destroyItemsDetails()
     this.router.navigate(['/login']);
     clearTimeout(this.nodeTimer)
     this.clearTokenTimer();

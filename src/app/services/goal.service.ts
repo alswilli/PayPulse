@@ -70,6 +70,7 @@ export class GoalService {
   numMonthsAhead: number;
   untrackedTransactions: any[];
   transactionIds = {};
+  mainBudgets = {}
 
   constructor(private http: HttpClient,
     private authService: AuthService,
@@ -113,6 +114,31 @@ export class GoalService {
     return forkJoin(addObservables)
   }
 
+  updateMainBudgets(budgets) {
+    this.mainBudgets = {}
+    for (let budget of budgets) {
+      if (budget.category in this.mainBudgets) {
+        var level = 3;
+        if (budget.mainCategory == budget.category) {
+          level = 1
+        }
+        else if (budget.mainCategory == budget.category2) {
+          level = 2
+        }
+        if (this.mainBudgets[budget.category] == level) {
+          this.mainBudgets[budget.category] = this.roundNumber(this.mainBudgets[budget.category] + Number(budget.amount), 2)
+          // mainBudgets[budget.category] += Number(budget.amount)
+        }
+        else if (this.mainBudgets[budget.category] < level) {
+          this.mainBudgets[budget.category] = Number(budget.amount)
+        }
+      }
+      else {
+        this.mainBudgets[budget.category] = Number(budget.amount)
+      }
+    }
+  }
+
   checkAndUpdateUserGoals(accountIds, allGoals, allUserGoals, userGoalData) {
     /*
     If (prev date is same month and year as current date) {
@@ -139,11 +165,12 @@ export class GoalService {
       .pipe( mergeMap(budgets => {
         console.log("11111111")
         this.budgets = budgets;
+        console.log(budgets)
         var oldDate = new Date(JSON.parse(localStorage.getItem('JWT'))["lastUpdated"])
         var currDate = new Date();
         this.totalBudgetAmount = 0
-        // var oldDate = new Date("2020-10-21T01:14:54.483Z");
-        // var currDate = new Date("2020-11-22T01:14:54.483Z"); 
+        // var oldDate = new Date("2020-11-21T01:14:54.483Z");
+        // var currDate = new Date("2020-12-11T01:14:54.483Z"); 
         console.log(oldDate)
         console.log(currDate)
         console.log(budgets.length)
@@ -204,9 +231,9 @@ export class GoalService {
             currentMonthName = this.dates[currentMonth][0]
             i = i - 1;
           }
-          var mainBudgets = {}
+          this.mainBudgets = {}
           for (let budget of budgets) {
-            if (budget.category in mainBudgets) {
+            if (budget.category in this.mainBudgets) {
               var level = 3;
               if (budget.mainCategory == budget.category) {
                 level = 1
@@ -214,21 +241,21 @@ export class GoalService {
               else if (budget.mainCategory == budget.category2) {
                 level = 2
               }
-              if (mainBudgets[budget.category] == level) {
-                mainBudgets[budget.category] = this.roundNumber(mainBudgets[budget.category] + Number(budget.amount), 2)
+              if (this.mainBudgets[budget.category] == level) {
+                this.mainBudgets[budget.category] = this.roundNumber(this.mainBudgets[budget.category] + Number(budget.amount), 2)
                 // mainBudgets[budget.category] += Number(budget.amount)
               }
-              else if (mainBudgets[budget.category] < level) {
-                mainBudgets[budget.category] = Number(budget.amount)
+              else if (this.mainBudgets[budget.category] < level) {
+                this.mainBudgets[budget.category] = Number(budget.amount)
               }
             }
             else {
-              mainBudgets[budget.category] = Number(budget.amount)
+              this.mainBudgets[budget.category] = Number(budget.amount)
             }
           }
           this.totalBudgetAmount = 0
-          for (let key of Object.keys(mainBudgets)) {
-            this.totalBudgetAmount = this.roundNumber(this.totalBudgetAmount + mainBudgets[key], 2)
+          for (let key of Object.keys(this.mainBudgets)) {
+            this.totalBudgetAmount = this.roundNumber(this.totalBudgetAmount + this.mainBudgets[key], 2)
             // this.totalBudgetAmount += mainBudgets[key]
           }
 
@@ -403,6 +430,9 @@ export class GoalService {
             break
           }
         }
+
+        this.updateMainBudgets(this.budgets)
+        console.log(this.mainBudgets)
         
         for (let transactions of transactionsDataArray) {
           console.log("inside transactions loop")
@@ -410,20 +440,23 @@ export class GoalService {
           if (accountsIndex < accountIds.length) {
             // Per month
             for (let budget of this.budgets) {
-              var mainCategory = budget.mainCategory;
-              var total = 0;
-              for (let transaction of transactions) {
-                for (let category of transaction.category) {
-                  if (category === mainCategory && transaction.amount >= 0) {
-                    this.transactionIds[transaction.transaction_id] = null
-                    total = this.roundNumber(total + transaction.amount, 2)
-                    // total += transaction.amount;
-                    break;
+              if (budget.mainCategory in this.mainBudgets) {
+                var mainCategory = budget.mainCategory;
+                var total = 0;
+                for (let transaction of transactions) {
+                  for (let category of transaction.category) {
+                    if (category == mainCategory && transaction.amount >= 0) {
+                      console.log(transaction)
+                      this.transactionIds[transaction.transaction_id] = null
+                      total = this.roundNumber(total + transaction.amount, 2)
+                      // total += transaction.amount;
+                      break;
+                    }
                   }
                 }
+                monthlyTotal = this.roundNumber(monthlyTotal + total, 2)
+                // monthlyTotal += total;
               }
-              monthlyTotal = this.roundNumber(monthlyTotal + total, 2)
-              // monthlyTotal += total;
             }
             accountsIndex += 1
             if (accountsIndex < accountIds.length) {

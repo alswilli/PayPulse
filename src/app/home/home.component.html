@@ -16,7 +16,7 @@
         <mat-spinner *ngIf="firstLoad" style="margin: auto"></mat-spinner>
         <mat-selection-list *ngIf="!firstLoad" style="margin:10px;">
           <mat-list-option class="mat-primary" *ngFor="let list of listValue; let i = index" (click)="onAccountSelected(list);" 
-          [selected]="preSelection.indexOf(list.institutionName) > -1" [value]="list.institutionName" [disabled]="removeAccounts || !list.itemValid || isLoading">
+          [selected]="preSelection.indexOf(list.institutionName) > -1" [value]="list.institutionName" [disabled]="removeAccounts || isLoading || itemsDetails.validRes != null">
             <div fxLayout="row">
               <div *ngIf="removeAccounts">
                 <mat-icon class="trashIcon" (click)="onDeleteIconClicked(list.institutionName);">delete</mat-icon> 
@@ -78,10 +78,6 @@
         </mr-ngx-plaid-link-button> -->
         <button mat-flat-button (click)="open()"> Add Account</button>
         <button mat-flat-button *ngIf="listValue.length > 0" id="removeAccountButton" class="addDeleteButtons" (click)="onRemoveAccountClicked();">Remove Accounts</button>
-        <div *ngIf="invalidItem">
-          <p>There are invalid credentials or an expired account token for 1 or more of your accounts! 
-            Please reauthenticate the accounts by pressing the 'Update Account' buttons above to gain back functionality.</p>
-        </div>
       </div>
     </div>
     <div fxFlex="50" [ngStyle]="{'margin': marginVal + 'px', 'border': borderVal}">
@@ -96,9 +92,14 @@
       </div>
     </div>
   </div>
+
+  <div *ngIf="itemsDetails.validRes != null" style="margin: 10px; text-align: center">
+    <p>There are invalid credentials or an expired account token for 1 or more of your accounts!</p> 
+    <p>Please reauthenticate the accounts by pressing the 'Update Account' buttons above to gain back functionality.</p>
+  </div>
   
   <div [ngStyle.lt-md]="{'margin': '10px'}">
-    <div [ngStyle.lt-md]="{'margin': 'auto', 'max-width': '673px'}" *ngIf="listValue.length > 0 && currentAccounts.length > 0" style="border: 1px solid rgb(209, 209, 209); margin: 10px;">
+    <div [ngStyle.lt-md]="{'margin': 'auto', 'max-width': '673px'}" *ngIf="listValue.length > 0 && currentAccounts.length > 0 && itemsDetails.validRes == null" style="border: 1px solid rgb(209, 209, 209); margin: 10px;">
       <!-- <h2 *ngIf="listValue.length > 0" style="margin: 10px;"><span style="color: rgb(3, 192, 3)">{{currentAccountName}}</span> - Summary:</h2> -->
         <h2 *ngIf="listValue.length > 0 && currentAccounts.length > 0" style="margin: 10px;"> Budgeting Summary: </h2>
         <div fxLayout="row" fxLayout.lt-md="column" class="outerCardDiv"
@@ -240,10 +241,11 @@
         </div>
     </div>
   </div>
-  <div *ngIf="listValue.length > 0 && currentAccounts.length == 0">
+  <div *ngIf="listValue.length > 0 && currentAccounts.length == 0 && itemsDetails.validRes == null">
     <p>Please select a current account(s) to view home page data!</p>
   </div>
 </div>
+<!-- <button (click)="resetItems()">Reset Items</button> -->
 <div [ngStyle.lt-md]="{'height': '30px'}"></div>
 
 

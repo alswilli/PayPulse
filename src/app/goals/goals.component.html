@@ -1,5 +1,5 @@
 <span id="moveTop"></span>
-<div style="height: 85px;"></div>
+<div style="height: 75px;"></div>
 <!-- <h2 style="margin: 10px;"></h2> -->
 
 <!-- <h2 style="margin: 10px;">Recently Completed Goals:</h2>
@@ -69,7 +69,12 @@
   </mat-card>
 </div>
 
-<div style="max-width: 1400px; margin: auto" [ngStyle.lt-md]="{'margin': 'auto', 'max-width': '693px'}">
+<div *ngIf="itemsDetails.validRes != null" style="text-align: center;">
+  <p>There are invalid credentials or an expired account token for 1 or more of your accounts!</p> 
+  <p>Please reauthenticate the accounts on the home page to gain back functionality.</p>
+</div>
+
+<div *ngIf="itemsDetails.validRes == null" style="max-width: 1400px; margin: auto" [ngStyle.lt-md]="{'margin': 'auto', 'max-width': '693px'}">
   <!-- <p>NOTE: Goals functionality is currently still under construction!</p> -->
   <h2 style="margin: 10px;">Goals:</h2>
   <mat-spinner *ngIf="initialLoad" style="margin: auto;"></mat-spinner>
