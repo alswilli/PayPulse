@@ -15,12 +15,15 @@
             <mat-error *ngIf="formErrors.username">{{formErrors.username}}</mat-error>
           </mat-form-field>
         </p>
-        <p>
+        <p style="margin-bottom: 0px">
           <mat-form-field fxLayoutAlign="center">
-            <input matInput formControlName="password" placeholder="Password" type="text" required>
+            <input matInput #pswdCheckboxText formControlName="password" placeholder="Password" type="password" required>
             <mat-error *ngIf="formErrors.password">{{formErrors.password}}</mat-error>
           </mat-form-field>
         </p>
+        <div fxLayoutAlign="center" style="margin-bottom: 10px">
+          <input type="checkbox" id="passwordCheckbox" (click)="togglePasswordShow()"><span>Show Password</span>
+        </div>
         <div fxLayoutAlign="center">
           <button style="background-color:lightgrey; margin: auto;" type="submit"
            mat-button [disabled]="loginForm.invalid">Log in</button>

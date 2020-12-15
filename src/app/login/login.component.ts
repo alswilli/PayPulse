@@ -26,6 +26,7 @@ interface UserGoalResponse {
 export class LoginComponent implements OnInit {
 
   @ViewChild('loginform') loginFormDirective;
+  @ViewChild('pswdCheckboxText') pswdCheckboxText;
 
   loginForm: FormGroup;
   errMess: string;
@@ -460,5 +461,15 @@ export class LoginComponent implements OnInit {
     var scrollElem= document.querySelector('#moveTop');
     scrollElem.scrollIntoView();  
    }
+
+  togglePasswordShow() {
+    var x = this.pswdCheckboxText.nativeElement
+    console.log(x)
+    if (this.pswdCheckboxText.nativeElement.type === "password") {
+      x.type = "text";
+    } else {
+      x.type = "password";
+    }
+  }
 
 }
