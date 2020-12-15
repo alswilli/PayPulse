@@ -1,7 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialog } from '@angular/material';
 import { Router } from "@angular/router";
 import { AuthService } from '../services/auth.service';
+import { SuccessDialogComponent } from '../success-dialog/success-dialog.component';
 
 @Component({
   selector: 'app-create-account',
@@ -14,10 +16,13 @@ export class CreateAccountComponent implements OnInit {
 
   createAccountForm: FormGroup;
   errMess: string;
+  accountCreatedRef: any;
+  isLoading = false;
 
   constructor(private fb: FormBuilder,
     private router: Router,
-    private authService: AuthService) { 
+    private authService: AuthService,
+    public dialog: MatDialog) { 
     this.createForm();
   }
 
@@ -90,22 +95,33 @@ export class CreateAccountComponent implements OnInit {
 
   onSubmit() {
     // this.feedback = this.feedbackForm.value;
+    this.isLoading = true;
     console.log("User account getting created: ", this.createAccountForm.value);
     var user = this.createAccountForm.value;
     this.authService.signUp(user).subscribe(res => {
+      this.isLoading = false;
       if (res.success) {
-        this.router.navigate(['/login']);
+        this.accountCreatedRef = this.dialog.open(SuccessDialogComponent, {data: {username: this.createAccountForm.value.username}});
+        this.accountCreatedRef.componentInstance.onClose
+          .subscribe(result => {
+            this.accountCreatedRef.close()
+            this.router.navigate(['/login']);
+          })
       }
-    });
+    },
+      error => {
+        this.isLoading = false;
+      }
+    );
 
-    this.createAccountFormDirective.resetForm();
-    this.createAccountForm.reset({
-      email: '',
-      password: '',
-      firstname: '',
-      lastname: '',
-      username: ''
-    });
+    // this.createAccountFormDirective.resetForm();
+    //         this.createAccountForm.reset({
+    //           email: '',
+    //           password: '',
+    //           firstname: '',
+    //           lastname: '',
+    //           username: ''
+    //         });
   }
 
   gotoTop() {

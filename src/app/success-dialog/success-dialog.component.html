@@ -1,0 +1,12 @@
+<div>
+  <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
+  <div *ngIf="!isLoading">
+    <mat-dialog-content class="mat-typography" style="text-align: center;">
+      <h3>Successfully created account! </h3>
+      <h3>Welcome to PayPulse, <b>{{data.username}}</b>!</h3>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button class="mat-primary" (click)="closeDialog();" cdkFocusInitial>Close</button>
+    </mat-dialog-actions>
+  </div>
+</div>

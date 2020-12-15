@@ -65,6 +65,7 @@ import { AddBudgetComponent } from './budgets/add-budget/add-budget.component';
 import { DeleteBudgetComponent } from './budgets/delete-budget/delete-budget.component';
 import { TokenExpiredComponent } from './token-expired/token-expired.component';
 import { GoalsUnlockedComponent } from './goals/goals-unlocked/goals-unlocked.component';
+import { SuccessDialogComponent } from './success-dialog/success-dialog.component';
 
 @NgModule({
   declarations: [
@@ -86,7 +87,8 @@ import { GoalsUnlockedComponent } from './goals/goals-unlocked/goals-unlocked.co
     AddBudgetComponent,
     DeleteBudgetComponent,
     TokenExpiredComponent,
-    GoalsUnlockedComponent
+    GoalsUnlockedComponent,
+    SuccessDialogComponent
   ],
   imports: [
     BrowserModule,
@@ -153,7 +155,8 @@ import { GoalsUnlockedComponent } from './goals/goals-unlocked/goals-unlocked.co
     AddBudgetComponent,
     DeleteBudgetComponent,
     TokenExpiredComponent,
-    GoalsUnlockedComponent
+    GoalsUnlockedComponent,
+    SuccessDialogComponent
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA,

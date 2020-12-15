@@ -1,47 +1,51 @@
 <span id="moveTop"></span>
-<div>
+<div style="margin: 10px">
+  <h1 style="text-align: center; color: rgb(95, 124, 255); font-size: 70px;">PayPulse</h1>
   <mat-card style="max-width: 500px; margin: auto; margin-top: 50px;">
     <mat-card-title fxLayoutAlign="center">Create Account</mat-card-title>
-    <form style="max-width: 500px" novalidate [formGroup]="createAccountForm" #createaccountform="ngForm" (ngSubmit)="onSubmit()" fxLayout="column">
-      <p>
-        <mat-form-field fxLayoutAlign="center">
-          <input matInput formControlName="email" placeholder="Email" type="text" required>
-          <mat-error *ngIf="formErrors.email">{{formErrors.email}}</mat-error>
-        </mat-form-field>
-      </p>
-      <p>
-        <mat-form-field fxLayoutAlign="center">
-          <input matInput formControlName="password" placeholder="Password" type="text" required>
-          <mat-error *ngIf="formErrors.password">{{formErrors.password}}</mat-error>
-        </mat-form-field>
-      </p>
-      <p>
-        <mat-form-field fxLayoutAlign="center">
-          <input matInput formControlName="firstname" placeholder="First Name" type="text" required>
-          <mat-error *ngIf="formErrors.firstname">{{formErrors.firstname}}</mat-error>
-        </mat-form-field>
-      </p>
-      <p>
-        <mat-form-field fxLayoutAlign="center">
-          <input matInput formControlName="lastname" placeholder="Last Name" type="text" required>
-          <mat-error *ngIf="formErrors.password">{{formErrors.lastname}}</mat-error>
-        </mat-form-field>
-      </p>
-      <p>
-        <mat-form-field fxLayoutAlign="center">
-          <input matInput formControlName="username" placeholder="Username" type="text" required>
-          <mat-error *ngIf="formErrors.password">{{formErrors.username}}</mat-error>
-        </mat-form-field>
-      </p>
-      <div fxLayoutAlign="center">
-        <button style="background-color:lightgrey; margin: auto;" type="submit"
-         mat-button [disabled]="createAccountForm.invalid">Create Account</button>
-      </div>
-      <p></p>
-      <div fxLayoutAlign="center">
-        <button style="background-color:lightgrey; margin: auto;" type="submit"
-         mat-button routerLink='/login'>Cancel</button>
-      </div>
-    </form>
+    <mat-spinner *ngIf="isLoading" style="margin: auto;"></mat-spinner>
+    <div *ngIf="!isLoading">
+      <form style="max-width: 500px" novalidate [formGroup]="createAccountForm" #createaccountform="ngForm" (ngSubmit)="onSubmit()" fxLayout="column">
+        <p>
+          <mat-form-field fxLayoutAlign="center">
+            <input matInput formControlName="email" placeholder="Email" type="text" required>
+            <mat-error *ngIf="formErrors.email">{{formErrors.email}}</mat-error>
+          </mat-form-field>
+        </p>
+        <p>
+          <mat-form-field fxLayoutAlign="center">
+            <input matInput formControlName="password" placeholder="Password" type="text" required>
+            <mat-error *ngIf="formErrors.password">{{formErrors.password}}</mat-error>
+          </mat-form-field>
+        </p>
+        <p>
+          <mat-form-field fxLayoutAlign="center">
+            <input matInput formControlName="firstname" placeholder="First Name" type="text" required>
+            <mat-error *ngIf="formErrors.firstname">{{formErrors.firstname}}</mat-error>
+          </mat-form-field>
+        </p>
+        <p>
+          <mat-form-field fxLayoutAlign="center">
+            <input matInput formControlName="lastname" placeholder="Last Name" type="text" required>
+            <mat-error *ngIf="formErrors.password">{{formErrors.lastname}}</mat-error>
+          </mat-form-field>
+        </p>
+        <p>
+          <mat-form-field fxLayoutAlign="center">
+            <input matInput formControlName="username" placeholder="Username" type="text" required>
+            <mat-error *ngIf="formErrors.password">{{formErrors.username}}</mat-error>
+          </mat-form-field>
+        </p>
+        <div fxLayoutAlign="center" style="margin: 10px">
+          <button style="background-color:lightgrey; margin: auto;" type="submit"
+          mat-button [disabled]="createAccountForm.invalid">Create Account</button>
+        </div>
+        <!-- <p></p> -->
+        <div fxLayoutAlign="center">
+          <button style="background-color: red; color: white; margin: auto;" type="submit"
+          mat-button routerLink='/login' >Cancel</button>
+        </div>
+      </form>
+    </div>
   </mat-card>
 </div>

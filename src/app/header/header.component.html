@@ -13,7 +13,7 @@
     <!-- <div style="height: 75px;"></div> -->
   </mat-sidenav>
 
-  <mat-sidenav-content>
+  <mat-sidenav-content style="overflow: hidden">
     <mat-toolbar color="primary" *ngIf="!loggingIn" style="position: fixed; z-index: 2;">
       <!-- Show the side nav when the screen size is lt-md -->
       <button class="menuButton" mat-icon-button (click)="onMenuClick()" fxHide="true" fxShow.lt-md="true">

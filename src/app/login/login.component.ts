@@ -40,6 +40,7 @@ export class LoginComponent implements OnInit {
   newlyCompletedGoals: any[];
   userGoalData: GoalData;
   validRes: any;
+  isLoading = false;
 
   constructor(private fb: FormBuilder,
     private router: Router,
@@ -122,6 +123,7 @@ export class LoginComponent implements OnInit {
     // this.feedback = this.feedbackForm.value;
     console.log("User logging in: ", this.loginForm.value);
     var user = this.loginForm.value;
+    this.isLoading = true;
     this.authService.logIn(user).subscribe(res => {
       if (res.success) {
         this.accountService.getAccounts().subscribe(res => {
@@ -250,6 +252,7 @@ export class LoginComponent implements OnInit {
                   this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
                   this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                   this.authService.storeItemsDetails({validRes: this.validRes})
+                  this.isLoading = false;
                   this.router.navigate(['/home']);
                 }
                 else {
@@ -257,6 +260,7 @@ export class LoginComponent implements OnInit {
                     this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
                     this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                     this.authService.storeItemsDetails({validRes: this.validRes})
+                    this.isLoading = false;
                     this.router.navigate(['/home']);
                   })
                 }
@@ -276,6 +280,7 @@ export class LoginComponent implements OnInit {
   facebookLogin(){
     console.log("submit login to facebook");
     // FB.login();
+    this.isLoading = true;
     FB.login((response)=>
         {
           console.log('submitLogin',response);
@@ -412,6 +417,7 @@ export class LoginComponent implements OnInit {
                           this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
                           this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                           this.authService.storeItemsDetails({validRes: this.validRes})
+                          this.isLoading = false;
                           this._ngZone.run(() => this.router.navigate(['/home']))
                         }
                         else {
@@ -419,6 +425,7 @@ export class LoginComponent implements OnInit {
                             this.authService.storeGoalsDetails({goals: this.allGoals, usergoals: this.allUserGoals, newlyCompletedGoals: this.newlyCompletedGoals, goaldata: this.userGoalData});
                             this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                             this.authService.storeItemsDetails({validRes: this.validRes})
+                            this.isLoading = false;
                             this._ngZone.run(() => this.router.navigate(['/home']))
                           })
                         }
@@ -427,6 +434,10 @@ export class LoginComponent implements OnInit {
                 });
               }             
             }); //this._ngZone.run(() => this.router.navigate(['/home']));
+          }
+          else {
+            console.log("facebook error")
+            this.isLoading = false;
           }
       });
   }

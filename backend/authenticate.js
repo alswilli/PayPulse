@@ -28,16 +28,65 @@ exports.jwtPassport = passport.use(new JwtStrategy(opts,
         console.log("JWT payload: ", jwt_payload);
         User.findOne({_id: jwt_payload._id}, (err, user) => {
             if (err) {
+                console.log("error fnding user")
                 return done(err, false);
             }
             else if (user) {
+                console.log("user found")
                 return done(null, user);
             }
             else {
+                console.log("no user found")
                 return done(null, false);
             }
         });
     }));
+
+// exports.verifyLocal = passport.use(new LocalStrategy(
+//     (username, password, done) => {
+//       console.log("omg")
+//       User.findOne({ username: username }, function(err, user) {
+//         if (err) { return done(err); }
+//         if (!user) {
+//           return done(null, false, { message: 'Incorrect username.' });
+//         }
+//         if (!user.validPassword(password)) {
+//           return done(null, false, { message: 'Incorrect password.' });
+//         }
+//         return done(null, user);
+//       });
+//     }
+//   ));
+
+// exports.verifyLocal2 = passport.authenticate('local', (err, user, info) => {
+//     console.log("here")
+//     console.log(err, user, info)
+//     if (err) {
+//       console.log("aa")
+//       return next(err);
+//     }
+
+//     if (!user) {
+//     //   res.statusCode = 401;
+//       console.log("bb")
+//       // res.setHeader('Content-Type', 'application/json');
+//       return next({success: false, status: 'Login Unsuccessful!', err: info});
+//     }
+//     req.logIn(user, (err) => {
+//       if (err) {
+//         // res.statusCode = 401;
+//         console.log("cc")
+//         // res.setHeader('Content-Type', 'application/json');
+//         return next({success: false, status: 'Login Unsuccessful!', err: 'Could not log in user!'});          
+//       }
+
+//       var token = authenticate.getToken({_id: req.user._id});
+//     //   res.statusCode = 200;
+//     //   res.setHeader('Content-Type', 'application/json');
+//       return next({success: true, status: 'Login Successful!', admin: user.admin, 
+//         token: token, userId: user._id, lastUpdated: user.lastUpdated, exp: 3600});
+//     }); 
+//   });
 
 exports.verifyUser = passport.authenticate('jwt', {session: false});
 
