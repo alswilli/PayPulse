@@ -3,7 +3,10 @@
 <div style="margin: 10px">
   <mat-card style="max-width: 500px; margin: auto; margin-top: 50px;">
     <mat-card-title fxLayoutAlign="center">Log in</mat-card-title>
-    <mat-spinner *ngIf="isLoading" style="margin: auto;"></mat-spinner>
+    <div *ngIf="isLoading">
+      <mat-spinner style="margin: auto;"></mat-spinner>
+      <p style="text-align: center">{{loadingText}}</p>
+    </div>
     <div *ngIf="!isLoading">
       <form style="max-width: 500px;" novalidate [formGroup]="loginForm" #loginform="ngForm" (ngSubmit)="onSubmit()" fxLayout="column">
         <p>

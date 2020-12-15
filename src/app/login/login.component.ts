@@ -41,6 +41,7 @@ export class LoginComponent implements OnInit {
   userGoalData: GoalData;
   validRes: any;
   isLoading = false;
+  loadingText: any;
 
   constructor(private fb: FormBuilder,
     private router: Router,
@@ -124,9 +125,11 @@ export class LoginComponent implements OnInit {
     console.log("User logging in: ", this.loginForm.value);
     var user = this.loginForm.value;
     this.isLoading = true;
+    this.loadingText = "Checking login credentials..."
     this.authService.logIn(user).subscribe(res => {
       if (res.success) {
         this.accountService.getAccounts().subscribe(res => {
+          this.loadingText = "Fetching user account data..."
           if (res.success) {
               this.accountIds = [];
               this.accountsData = res.accountsData
@@ -201,6 +204,7 @@ export class LoginComponent implements OnInit {
                       }
                     }
                     console.log("HHHHHHHH")
+                    this.loadingText = "Updating goals progress..."
                     return this.goalService.checkAndUpdateUserGoals(this.accountIds, this.allGoals, this.allUserGoals, this.userGoalData)
                 }),
                 mergeMap(checkRes => {
@@ -268,7 +272,11 @@ export class LoginComponent implements OnInit {
           }
         });
       }
-    });
+    },
+    error => {
+      this.isLoading = false;
+    }
+    );
 
     // this.loginFormDirective.resetForm();
     // this.loginForm.reset({
@@ -281,6 +289,7 @@ export class LoginComponent implements OnInit {
     console.log("submit login to facebook");
     // FB.login();
     this.isLoading = true;
+    this.loadingText = "Checking login credentials..."
     FB.login((response)=>
         {
           console.log('submitLogin',response);
@@ -292,6 +301,7 @@ export class LoginComponent implements OnInit {
             this.authService.logInFacebook(response.authResponse).subscribe(res => {
               if (res.success) {
                 this.accountService.getAccounts().subscribe(res => {
+                  this.loadingText = "Fetching user account data..."
                   if (res.success) {
                       this.accountIds = [];
                       this.accountsData = res.accountsData
@@ -366,6 +376,7 @@ export class LoginComponent implements OnInit {
                               }
                             }
                             console.log("HHHHHHHH")
+                            this.loadingText = "Updating goals progress..."
                             return this.goalService.checkAndUpdateUserGoals(this.accountIds, this.allGoals, this.allUserGoals, this.userGoalData)
                         }),
                         mergeMap(checkRes => {
@@ -433,6 +444,9 @@ export class LoginComponent implements OnInit {
                   }
                 });
               }             
+            },
+            error => {
+              this.isLoading = false;
             }); //this._ngZone.run(() => this.router.navigate(['/home']));
           }
           else {
