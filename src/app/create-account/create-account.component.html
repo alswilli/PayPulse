@@ -14,7 +14,7 @@
         </p>
         <p>
           <mat-form-field fxLayoutAlign="center">
-            <input matInput formControlName="password" placeholder="Password" type="text" required>
+            <input matInput #pswdCheckboxText formControlName="password" placeholder="Password" type="password" required>
             <mat-error *ngIf="formErrors.password">{{formErrors.password}}</mat-error>
           </mat-form-field>
         </p>
@@ -30,12 +30,15 @@
             <mat-error *ngIf="formErrors.password">{{formErrors.lastname}}</mat-error>
           </mat-form-field>
         </p>
-        <p>
+        <p style="margin-bottom: 0px">
           <mat-form-field fxLayoutAlign="center">
             <input matInput formControlName="username" placeholder="Username" type="text" required>
             <mat-error *ngIf="formErrors.password">{{formErrors.username}}</mat-error>
           </mat-form-field>
         </p>
+        <div fxLayoutAlign="center" style="margin-bottom: 10px">
+          <input type="checkbox" id="passwordCheckbox" (click)="togglePasswordShow()"><span>Show Password</span>
+        </div>
         <div fxLayoutAlign="center" style="margin: 10px">
           <button style="background-color:lightgrey; margin: auto;" type="submit"
           mat-button [disabled]="createAccountForm.invalid">Create Account</button>

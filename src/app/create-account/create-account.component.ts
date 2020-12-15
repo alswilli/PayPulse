@@ -19,6 +19,8 @@ export class CreateAccountComponent implements OnInit {
   accountCreatedRef: any;
   isLoading = false;
 
+  @ViewChild('pswdCheckboxText') pswdCheckboxText;
+
   constructor(private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
@@ -128,5 +130,15 @@ export class CreateAccountComponent implements OnInit {
     var scrollElem= document.querySelector('#moveTop');
     scrollElem.scrollIntoView();  
    }
+
+   togglePasswordShow() {
+    var x = this.pswdCheckboxText.nativeElement
+    console.log(x)
+    if (this.pswdCheckboxText.nativeElement.type === "password") {
+      x.type = "text";
+    } else {
+      x.type = "password";
+    }
+  }
 
 }
