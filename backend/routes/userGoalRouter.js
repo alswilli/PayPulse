@@ -25,7 +25,7 @@ userGoalRouter.route("/:userId")
     })
     .catch(error => {
       res.status(500).json({
-        message: "Fetching user goals failed!"
+        message: "Server Error: Fetching all user goals for the user failed!"
       });
     });
 })

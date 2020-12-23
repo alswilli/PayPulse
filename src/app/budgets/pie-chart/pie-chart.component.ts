@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import * as d3 from 'd3';
 import { Subscription } from 'rxjs';
 import { PieChartService } from 'src/app/services/pie-chart.service';
@@ -19,22 +19,25 @@ export class PieChartComponent implements OnInit {
   //   {"Framework": "Ember", "Stars": "21471", "Released": "2011"},
   // ];
   @Input() data: any[];
+  @ViewChild('box') box: ElementRef;
   private svg;
-  private margin = 50;
-  private width = 750;
-  private height = 562;
+  private margin = 95;
+  width = 500;
+  height = 500;
   // The radius of the pie chart is half the smallest side
-  private radius = Math.min(this.width, this.height) / 2 - this.margin;
+  radius = Math.min(this.width, this.height) / 2 - this.margin;
   private colors;
   private path;
   private arc;
   private pie;
+  private tooltip;
   newDataEventSubscription: Subscription;
 
   constructor(private pieChartService: PieChartService) { }
 
   ngOnInit(): void {
     console.log("In the pie chart component")
+    this.modifyData();
     this.createSvg();
     this.createColors();
     this.createPie();
@@ -57,10 +60,82 @@ export class PieChartComponent implements OnInit {
     d3.selectAll("#mypiechart").remove();
     d3.selectAll("#mypiecharttext").remove();
     // this.createSvg();
+    this.modifyData()
     this.createColors();
     this.createPie();
     this.drawChart();
 
+  }
+
+  roundNumber(number, decimals) {
+    var newnumber = new Number(number+'').toFixed(parseInt(decimals));
+    return parseFloat(newnumber); 
+  }
+
+  compare(a,b) {
+    if (a.total < b.total)
+       return -1;
+    if (a.total > b.total)
+      return 1;
+    return 0;
+  }
+
+  private modifyData() {
+    console.log(this.data)
+    var newData = []
+    var grandTotal = 0
+    var other = {"category" : "Other",
+                 "total" : 0}
+    var length = 0
+    for (let dataObj of this.data) {
+      grandTotal += dataObj.total
+      length += 1
+    }
+
+    if (length > 5) {
+      console.log("MORE THAN 5")
+      this.data.sort(this.compare)
+      var count = length - 5 - 1
+      for (let dataObj of this.data) {
+        if (count > 0) {
+          other.total = this.roundNumber(other.total + dataObj.total, 2)
+          count -= 1
+        }
+        else{
+          if (dataObj.total < grandTotal / 10) {
+            other.total = this.roundNumber(other.total + dataObj.total, 2)
+          }
+          else{
+            newData.push(dataObj)
+          }
+        }
+      }
+      newData.push(other)
+    }
+    else {
+      var otherCount = 0
+      console.log("LESS THAN OR EQUAL TO 5")
+      for (let dataObj of this.data) {
+        if (dataObj.total < grandTotal / 10) {
+          other.total = this.roundNumber(other.total + dataObj.total, 2)
+          otherCount += 1
+          if (otherCount === 1) {
+            other.category = dataObj.category
+          }
+        }
+        else{
+          newData.push(dataObj)
+        }
+      }
+  
+      if (other.total > 0) {
+        if (otherCount > 1) {
+          other.category = "Other"
+        }
+        newData.push(other)
+      }
+    }
+    this.data = newData
   }
 
   private createSvg(): void {
@@ -68,12 +143,16 @@ export class PieChartComponent implements OnInit {
     .append("svg")
     // .attr("width", this.width)
     // .attr("height", this.height)
-    .attr("viewBox", `0 0 562 480`)
+    .attr("viewBox", `0 0 500 400`)
+    // .style("height", "100%")
     .append("g")
     .attr(
       "transform",
-      "translate(" + this.width / 2.7 + "," + this.height / 2.42 + ")"
+      "translate(" + 250 + "," + 200 + ")"
     );
+
+    this.tooltip = d3.select("figure#pie") // or d3.select('#bar')
+    .append('div').attr('class', 'tooltip').style('display', 'none').style('opacity', 0);
   }
 
   private createColors(): void {
@@ -89,10 +168,17 @@ export class PieChartComponent implements OnInit {
   }
 
   private drawChart(): void {
+    var width = this.width
+    var height = this.height
+    var radius = this.radius + this.margin/3
+    var box = this.box
 
     var arc = d3.arc()
     .innerRadius(0)
     .outerRadius(this.radius);
+
+    console.log(d3.select('.chart-tooltip'))
+    var tooltip = this.tooltip;
 
     // Build the pie chart
     this.svg
@@ -100,6 +186,60 @@ export class PieChartComponent implements OnInit {
     .data(this.pie(this.data))
     .enter()
     .append('path')
+    .attr('fill', (d, i) => {
+      console.log("COLOR: ", this.colors(i))
+      return this.colors(i);
+    })
+    .on('mouseover', function (d, i) {
+      d3.select(this).transition()
+               .duration(50)
+               .attr('opacity', '0.8');
+      // tooltip.style('top', (arc.centroid(d)[1]) + 'px').style('left', (arc.centroid(d)[0]) + 'px')
+      // tooltip.style('top', (d3.mouse(this)[1] + top + height/2) + 'px').style('left', (d3.mouse(this)[0] + left + width/2) + 'px')
+      //   .style('display', 'block').style('opacity', 1).style('height', '40px')
+      //   .style('position', 'absolute')
+      //   .style('text-align', 'center')
+      //   .style('padding', '0.5rem')
+      //   .style('background', '#FFFFFF')
+      //   .style('color', '#313639')
+      //   .style('border', '1px solid #313639')
+      //   .style('border-radius', '8px')
+      //   .style('pointer-events', 'none')
+      //   .style('font-size', '1.3rem')
+      //   .html(`name: ${d.name}<br>value: ${d.value}<br>`);
+    })
+    .on('mousemove', function (s) {
+      // console.log(arc.centroid(s))
+      // console.log(d3.mouse(this))
+      // console.log(box.nativeElement.clientWidth)
+      // var relVal = box.nativeElement.clientWidth
+      var top = box.nativeElement.offsetTop
+      var left = box.nativeElement.offsetLeft
+      var width = box.nativeElement.offsetWidth
+      var height = box.nativeElement.offsetHeight
+      // console.log(s)
+
+      tooltip.style('top', (d3.mouse(this)[1] + top + height/2) + 'px').style('left', (d3.mouse(this)[0] + left + width/2) + 'px')
+        .style('display', 'block').style('opacity', 1).style('height', '40px')
+        .style('position', 'absolute')
+        .style('text-align', 'center')
+        .style('padding', '0.5rem')
+        .style('background', '#FFFFFF')
+        .style('color', '#313639')
+        .style('border', '1px solid #313639')
+        .style('border-radius', '8px')
+        .style('pointer-events', 'none')
+        .style('font-size', '1.3rem')
+        .html(`<b>Category:</b> ${s.data.category}<br><b>Total:</b> <span>$ ${s.data.total}</span></br>`);
+    })
+    .on('mouseout', function () {
+      d3.select(this).transition()
+               .duration(50)
+               .attr('opacity', '1');
+      tooltip.style('display', 'none').style('opacity', 0);
+    })
+        
+    // })
     .transition()
     // .delay(function(d, i) {
     //   return i * 1000
@@ -120,10 +260,6 @@ export class PieChartComponent implements OnInit {
     //   .outerRadius(this.radius)
     // )
 
-    .attr('fill', (d, i) => {
-      console.log("COLOR: ", this.colors(i))
-      return this.colors(i);
-    })
     // .style('fill', 'darkOrange')
     .attr("stroke", "#121926")
     .style("stroke-width", "1px")
@@ -143,10 +279,44 @@ export class PieChartComponent implements OnInit {
     .delay(function(d, i) {
       return 1000
     })
-    .text(d => d.data.mainCategory + ", " +  d.data.total)
-    .attr("transform", d => "translate(" + labelLocation.centroid(d) + ")")
-    .style("text-anchor", "middle")
-    .style("font-size", 15)
+    // .text(d => d.data.mainCategory + ", " +  d.data.total)
+    .text(d => d.data.category)
+    .attr("transform", function(d) {
+      return "translate(" + 
+        ( (radius - 12) * Math.sin( ((d.endAngle - d.startAngle) / 2) + d.startAngle ) ) +
+        ", " +
+        ( -1 * (radius - 12) * Math.cos( ((d.endAngle - d.startAngle) / 2) + d.startAngle ) ) +
+      ")";
+
+      // var c = arc.centroid(d),
+      //     x = c[0],
+      //     y = c[1],
+      //     // pythagorean theorem for hypotenuse
+      //     h = Math.sqrt(x*x + y*y);
+      // return "translate(" + (x/h * radius) +  ',' +
+      //  (y/h * radius) +  ")"; 
+
+      // return "translate(" + labelLocation.centroid(d) + ")"
+    })
+    // .style("text-anchor", "middle")
+    // .attr("text-anchor", function(d) {
+    //   // are we past the center?
+    //   return (d.endAngle + d.startAngle)/2 > Math.PI ?
+    //       "end" : "start";
+    // })
+    .style("text-anchor", function(d) {
+      var rads = ((d.endAngle - d.startAngle) / 2) + d.startAngle;
+      if ( (rads > 7 * Math.PI / 4 && rads < Math.PI / 4) || (rads > 3 * Math.PI / 4 && rads < 5 * Math.PI / 4) ) {
+        return "middle";
+      } else if (rads >= Math.PI / 4 && rads <= 3 * Math.PI / 4) {
+        return "start";
+      } else if (rads >= 5 * Math.PI / 4 && rads <= 7 * Math.PI / 4) {
+        return "end";
+      } else {
+        return "middle";
+      }
+    })
+    .style("font-size", 11)
     .attr("id", "mypiecharttext");
 
   }

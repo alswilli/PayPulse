@@ -22,7 +22,7 @@ goalRouter.route("/")
     })
     .catch(error => {
       res.status(500).json({
-        message: "Fetching goals failed!"
+        message: "Server Error: Fetching all goals for the user failed!"
       });
     });
 })

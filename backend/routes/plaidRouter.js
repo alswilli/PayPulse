@@ -304,54 +304,32 @@ plaidRouter.route("/accounts")
     Account.find({ userId: req.user.id, current: true })
     .then(accounts => {
       console.log(accounts)
-      // if (account.length > 0) {
-      //   var editedAccount = {
-      //     _id: account[0]._id,
-      //     userId: account[0].userId,
-      //     institutionId: account[0].institutionId,
-      //     institutionName: account[0].institutionName,
-      //     subAccounts: account[0].subAccounts,
-      //     current: account[0].current
-      //   };
-      //   res.json(editedAccount);
-      // }
-      // else {
-      //   res.json(account);
-      // }
-      // res.json(accounts);
       for (let account of accounts) {
         account.accessToken = null;
         account.itemId = null;
       }
       res.json(accounts);
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      console.log("Something went wrong when retrieving the current accounts for the given user");
+      res.status(500).json({ message: "Server Error: Something went wrong when retrieving the current accounts for the given user" });
+    });
   }
   else {
     console.log("all");
     Account.find( { userId: req.user.id })
     .then(accounts => {
       console.log(accounts)
-      // var editedAccounts = [];
-      // for (let account of accounts) {
-      //   var editedAccount = {
-      //     _id: account._id,
-      //     userId: account.userId,
-      //     institutionId: account.institutionId,
-      //     institutionName: account.institutionName,
-      //     subAccounts: account.subAccounts,
-      //     current: account.current
-      //   };
-      //   editedAccounts.push(editedAccount);
-      // }
-      // res.json({success: true, numAccounts: accounts.length, accountsData: editedAccounts});
       for (let account of accounts) {
         account.accessToken = null;
         account.itemId = null;
       }
       res.json({success: true, numAccounts: accounts.length, accountsData: accounts});
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      console.log("Something went wrong when retrieving all accounts for the given user");
+      res.status(500).json({ message: "Server Error: Something went wrong when retrieving all accounts for the given user" });
+    });
   }
 });
 
