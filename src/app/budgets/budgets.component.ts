@@ -58,11 +58,14 @@ export class BudgetsComponent implements OnInit {
   allUserGoals = [];
   incomeTransactions = [];
   untrackedTransactions = [];
+  budgetTableTransactions = [];
   transactionIds = {};
   incomeDataSource: MatTableDataSource<TransactionData>;
   untrackedDataSource: MatTableDataSource<TransactionData>;
+  budgetTableDataSources: MatTableDataSource<TransactionData>[];
   incomeDisplayedColumns: string[] = ['bankAccountName', 'amount', 'transactionName', 'date'];
   untrackedDisplayedColumns: string[] = ['bankAccountName', 'amount', 'category', 'date'];
+  budgetTableDisplayedColumns: string[] = ['bankAccountName', 'amount', 'category', 'date'];
   // dataEmpty = true;
   dates = {
     "01":["January", 31],
@@ -212,7 +215,11 @@ export class BudgetsComponent implements OnInit {
       for (let transactions of transactionsArray) {
         if (transactions != null) {
           for (let transaction of transactions) {
-            this.transactions.push(transaction);
+            let t = {
+              ...transaction, 
+              bankAccountName: this.currentAccounts[j].institutionName
+            }
+            this.transactions.push(t);
             if (transaction.amount < 0) {
               const newTransaction = {
                 amount: transaction.amount,
@@ -232,6 +239,7 @@ export class BudgetsComponent implements OnInit {
       console.log(this.incomeTransactions)
       this.onGetTransactions();
       this.getUntrackedTransactions(transactionsArray);
+      // this.getBudgetTableTransactions(transactionsArray);
       console.log(this.transactionIds)
       console.log(this.untrackedTransactions)
 
@@ -315,7 +323,11 @@ export class BudgetsComponent implements OnInit {
             for (let transactions of transactionsArray) {
               if (transactions != null) {
                 for (let transaction of transactions) {
-                  this.transactions.push(transaction);
+                  let t = {
+                    ...transaction, 
+                    bankAccountName: this.currentAccounts[j].institutionName
+                  }
+                  this.transactions.push(t);
                   if (transaction.amount < 0) {
                     const newTransaction = {
                       amount: transaction.amount,
@@ -332,8 +344,13 @@ export class BudgetsComponent implements OnInit {
             }
             this.onGetTransactions();
             this.getUntrackedTransactions(transactionsArray);
+            // this.getBudgetTableTransactions(transactionsArray);
             this.untrackedDataSource.data = this.untrackedTransactions;
             this.incomeDataSource.data = this.incomeTransactions;
+            for (let i = 0; i < this.budgetTableDataSources.length; i++) {
+              let transactions = this.budgetTableTransactions[i]
+              this.budgetTableDataSources[i].data = transactions
+            }
             console.log(this.transactionIds)
             console.log(this.untrackedTransactions)
         });
@@ -406,7 +423,11 @@ export class BudgetsComponent implements OnInit {
             for (let transactions of transactionsArray) {
               if (transactions != null) {
                 for (let transaction of transactions) {
-                  this.transactions.push(transaction);
+                  let t = {
+                    ...transaction, 
+                    bankAccountName: this.currentAccounts[j].institutionName
+                  }
+                  this.transactions.push(t);
                   if (transaction.amount < 0) {
                     const newTransaction = {
                       amount: transaction.amount,
@@ -423,8 +444,13 @@ export class BudgetsComponent implements OnInit {
             }
             this.onGetTransactions();
             this.getUntrackedTransactions(transactionsArray);
+            // this.getBudgetTableTransactions(transactionsArray);
             this.untrackedDataSource.data = this.untrackedTransactions;
             this.incomeDataSource.data = this.incomeTransactions;
+            for (let i = 0; i < this.budgetTableDataSources.length; i++) {
+              let transactions = this.budgetTableTransactions[i]
+              this.budgetTableDataSources[i].data = transactions
+            }
             console.log(this.transactionIds)
             console.log(this.untrackedTransactions)
         });
@@ -445,6 +471,18 @@ export class BudgetsComponent implements OnInit {
       // })
       this.incomeDataSource = new MatTableDataSource(this.incomeTransactions);
       this.untrackedDataSource = new MatTableDataSource(this.untrackedTransactions);
+      this.budgetTableDataSources = []
+      console.log("oranges: ", this.budgetTableTransactions)
+      for (let transactions of this.budgetTableTransactions) {
+        if (transactions.length > 0) {
+          this.budgetTableDataSources.push(new MatTableDataSource(transactions))
+        }
+        else {
+          this.budgetTableDataSources.push(new MatTableDataSource([]))
+        }
+        console.log("apples: ", transactions)
+      }
+      console.log(this.budgetTableDataSources)
     });
   }
 
@@ -463,6 +501,33 @@ export class BudgetsComponent implements OnInit {
   //     // console.log(s);
   //     // s.option.selected = true;
   //   });
+  // }
+
+  // getBudgetTableTransactions(transactionsArray) {
+  //   this.budgetTableTransactions = []
+  //   var j = 0
+  //   for (let i = 0; i < transactionsArray.length; i++) {
+  //     let transactions = transactionsArray[i]
+  //     this.budgetTableTransactions[i] = []
+  //     if (transactions != null) {
+  //       for (let transaction of transactions) {
+  //         // console.log(transaction.transaction_id)
+  //         if (transaction.transaction_id in this.transactionIds) {
+  //           if (transaction.amount >= 0) {
+  //             const newTransaction = {
+  //               amount: transaction.amount,
+  //               transactionName: transaction.name,
+  //               category: transaction.category,
+  //               date: transaction.date,
+  //               bankAccountName: this.currentAccounts[j].institutionName
+  //             };
+  //             this.budgetTableTransactions[i].push(newTransaction)
+  //           }
+  //         } 
+  //       }
+  //     }
+  //     j += 1
+  //   }
   // }
 
   getUntrackedTransactions(transactionsArray) {
@@ -506,6 +571,34 @@ export class BudgetsComponent implements OnInit {
     }
   }
 
+  updateBudgetTableTransactions() {
+    this.budgetTableTransactions = []
+    // var entered = false;
+
+    for (let i = 0; i < this.budgets.length; i++) {
+      let budget = this.budgets[i]
+      var mainCategory = budget.mainCategory;
+      this.budgetTableTransactions[i] = []
+      for (let transaction of this.transactions) {
+        for (let category of transaction.category) {
+          if (category === mainCategory && transaction.amount >= 0) {
+            const newTransaction = {
+              amount: transaction.amount,
+              transactionName: transaction.name,
+              category: transaction.category,
+              date: transaction.date,
+              bankAccountName: transaction.bankAccountName
+              // bankAccountName: this.currentAccounts[j].institutionName
+            };
+            this.budgetTableTransactions[i].push(newTransaction)
+            // total += transaction.amount;
+            break;
+          }
+        }
+      }
+  ``}
+  }
+
   truncateVal(val) {
     console.log(val)
     var strVal = String(val);
@@ -527,20 +620,32 @@ export class BudgetsComponent implements OnInit {
   }
 
   onGetTransactions() {
-    console.log(this.transactions);
+      console.log(this.transactions);
       this.pieData = [];
       this.transactionIds = []
+      this.budgetTableTransactions = []
       // var entered = false;
 
-      for (let budget of this.budgets) {
+      for (let i = 0; i < this.budgets.length; i++) {
+        let budget = this.budgets[i]
         var mainCategory = budget.mainCategory;
         var total = 0;
+        this.budgetTableTransactions[i] = []
         for (let transaction of this.transactions) {
           for (let category of transaction.category) {
             if (category === mainCategory && transaction.amount >= 0) {
               this.transactionIds[transaction.transaction_id] = null
               console.log("Amount: ", transaction.amount)
               total = this.roundNumber( total + transaction.amount, 2 );
+              const newTransaction = {
+                amount: transaction.amount,
+                transactionName: transaction.name,
+                category: transaction.category,
+                date: transaction.date,
+                bankAccountName: transaction.bankAccountName
+                // bankAccountName: this.currentAccounts[j].institutionName
+              };
+              this.budgetTableTransactions[i].push(newTransaction)
               // total += transaction.amount;
               break;
             }
@@ -885,6 +990,11 @@ export class BudgetsComponent implements OnInit {
               // Close dialogue ref
               this.updateTransactionIds();
               this.getUntrackedTransactions(this.transactionsArray)
+              this.updateBudgetTableTransactions()
+              for (let i = 0; i < this.budgetTableDataSources.length; i++) {
+                let transactions = this.budgetTableTransactions[i]
+                this.budgetTableDataSources[i].data = transactions
+              }
               this.untrackedDataSource.data = this.untrackedTransactions;
               this.addBudgetRef.close();
             })
@@ -922,6 +1032,11 @@ export class BudgetsComponent implements OnInit {
           // Close dialogue ref
           this.updateTransactionIds();
           this.getUntrackedTransactions(this.transactionsArray)
+          this.updateBudgetTableTransactions()
+          for (let i = 0; i < this.budgetTableDataSources.length; i++) {
+            let transactions = this.budgetTableTransactions[i]
+            this.budgetTableDataSources[i].data = transactions
+          }
           this.untrackedDataSource.data = this.untrackedTransactions;
           this.addBudgetRef.close();
         }
@@ -940,6 +1055,11 @@ export class BudgetsComponent implements OnInit {
         }
         this.updateTransactionIds();
         this.getUntrackedTransactions(this.transactionsArray)
+        this.updateBudgetTableTransactions()
+        for (let i = 0; i < this.budgetTableDataSources.length; i++) {
+          let transactions = this.budgetTableTransactions[i]
+          this.budgetTableDataSources[i].data = transactions
+        }
         this.untrackedDataSource.data = this.untrackedTransactions;
 
         var total = 0;
@@ -1176,6 +1296,11 @@ export class BudgetsComponent implements OnInit {
 
         this.updateTransactionIds();
         this.getUntrackedTransactions(this.transactionsArray)
+        this.updateBudgetTableTransactions()
+        for (let i = 0; i < this.budgetTableDataSources.length; i++) {
+          let transactions = this.budgetTableTransactions[i]
+          this.budgetTableDataSources[i].data = transactions
+        }
         this.untrackedDataSource.data = this.untrackedTransactions;
 
         // New category

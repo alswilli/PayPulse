@@ -59,6 +59,7 @@ export class PieChartComponent implements OnInit {
     this.data = newData;
     d3.selectAll("#mypiechart").remove();
     d3.selectAll("#mypiecharttext").remove();
+    // d3.selectAll("#mypiecharttext2").remove();
     // this.createSvg();
     this.modifyData()
     this.createColors();
@@ -85,11 +86,23 @@ export class PieChartComponent implements OnInit {
     var newData = []
     var grandTotal = 0
     var other = {"category" : "Other",
-                 "total" : 0}
+                 "total" : 0,
+                 "percentage" : 0}
     var length = 0
+    let vals = []
     for (let dataObj of this.data) {
+      vals.push(dataObj.total)
       grandTotal += dataObj.total
       length += 1
+    }
+
+    for (let i = 0; i < vals.length; i++) {
+      vals[i] = this.roundNumber((vals[i] / grandTotal)*100, 2)
+    }
+    
+    for (let i = 0; i < this.data.length; i++) {
+      this.data[i].percentage = vals[i]
+      console.log(this.data[i].percentage)
     }
 
     if (length > 5) {
@@ -99,11 +112,13 @@ export class PieChartComponent implements OnInit {
       for (let dataObj of this.data) {
         if (count > 0) {
           other.total = this.roundNumber(other.total + dataObj.total, 2)
+          other.percentage = this.roundNumber(other.percentage + dataObj.percentage, 2)
           count -= 1
         }
         else{
           if (dataObj.total < grandTotal / 10) {
             other.total = this.roundNumber(other.total + dataObj.total, 2)
+            other.percentage = this.roundNumber(other.percentage + dataObj.percentage, 2)
           }
           else{
             newData.push(dataObj)
@@ -118,6 +133,7 @@ export class PieChartComponent implements OnInit {
       for (let dataObj of this.data) {
         if (dataObj.total < grandTotal / 10) {
           other.total = this.roundNumber(other.total + dataObj.total, 2)
+          other.percentage = this.roundNumber(other.percentage + dataObj.percentage, 2)
           otherCount += 1
           if (otherCount === 1) {
             other.category = dataObj.category
@@ -220,7 +236,7 @@ export class PieChartComponent implements OnInit {
       // console.log(s)
 
       tooltip.style('top', (d3.mouse(this)[1] + top + height/2) + 'px').style('left', (d3.mouse(this)[0] + left + width/2) + 'px')
-        .style('display', 'block').style('opacity', 1).style('height', '40px')
+        .style('display', 'block').style('opacity', 1).style('height', '70px')
         .style('position', 'absolute')
         .style('text-align', 'center')
         .style('padding', '0.5rem')
@@ -230,7 +246,7 @@ export class PieChartComponent implements OnInit {
         .style('border-radius', '8px')
         .style('pointer-events', 'none')
         .style('font-size', '1.3rem')
-        .html(`<b>Category:</b> ${s.data.category}<br><b>Total:</b> <span>$ ${s.data.total}</span></br>`);
+        .html(`<b>Category:</b> ${s.data.category}<br><b>Total:</b> <span>$ ${s.data.total}</span></br><b>Percentage:</b> <span> ${s.data.percentage}%</span>`);
     })
     .on('mouseout', function () {
       d3.select(this).transition()

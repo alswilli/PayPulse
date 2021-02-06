@@ -112,6 +112,54 @@
                       </span>
                     </p>
                   </mat-expansion-panel-header>
+
+                  <div *ngIf="budgetTableTransactions[i].length == 0">
+                    <p style="margin: auto; text-align: center">There are no transactions to report!</p>
+                  </div>
+                  <div *ngIf="budgetTableTransactions[i].length > 0">
+                    <!-- <div>{{budgetTableTransactions[i]}}</div> 
+                    <div>{{budgetTableDataSources[i]}}</div>  -->
+                    <div class="example-table-container" style="max-height: 200px; overflow-y: auto;">
+                      <table mat-table class="example-table" [dataSource]="budgetTableDataSources[i]">
+            
+                        <ng-container matColumnDef="amount">
+                          <th mat-header-cell *matHeaderCellDef style="background-color: grey; color: white; margin: auto"> <b>Amount</b> </th>
+                          <td mat-cell *matCellDef="let row">
+                            <div *ngIf="row.amount > 0">
+                              $ {{-row.amount}} 
+                            </div>
+                            <div *ngIf="!(row.amount > 0)" style="color: green">
+                              $ {{-row.amount}} 
+                            </div>
+                          </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="bankAccountName">
+                          <th mat-header-cell *matHeaderCellDef style="background-color: grey; color: white; margin: auto"> <b>Bank Account Name</b> </th>
+                          <td mat-cell *matCellDef="let row"> {{row.bankAccountName}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="transactionName">
+                          <th mat-header-cell *matHeaderCellDef style="background-color: grey; color: white; margin: auto"> <b>Transaction Name</b> </th>
+                          <td mat-cell *matCellDef="let row"> {{row.transactionName}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="category">
+                          <th mat-header-cell *matHeaderCellDef style="background-color: grey; color: white; margin: auto"> <b>Category</b> </th>
+                          <td mat-cell *matCellDef="let row"> {{row.category}} </td>
+                        </ng-container>
+
+                        <ng-container matColumnDef="date">
+                          <th mat-header-cell *matHeaderCellDef style="background-color: grey; color: white; margin: auto"> <b>Date</b> </th>
+                          <td mat-cell *matCellDef="let row"> {{row.date}} </td>
+                        </ng-container>
+                    
+                        <tr mat-header-row *matHeaderRowDef="budgetTableDisplayedColumns; sticky: ['amount', 'bankAccountName', 'category', 'date']"></tr>
+                        <tr mat-row *matRowDef="let row; columns: budgetTableDisplayedColumns;"></tr>
+                      </table>
+                    </div> 
+                  </div>
+                  
                   <button mat-raised-button style="background-color: grey; color: white;" id="{{'editButton' + i}}" (click)="onEditBudgetClicked(budget, i);">Edit Budget</button>
                   <button mat-raised-button color="warn" style="margin: 10px;" id="{{'deleteButton' + i}}" (click)="onDeleteBudgetClicked(budget);">Delete Budget</button>
               
