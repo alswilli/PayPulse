@@ -991,7 +991,7 @@ export class BudgetsComponent implements OnInit {
               this.updateTransactionIds();
               this.getUntrackedTransactions(this.transactionsArray)
               this.updateBudgetTableTransactions()
-              if (this.budgets.length === 1) {
+              if (this.budgetTableTransactions.length > this.budgetTableDataSources.length) {
                 console.log("remake")
                 this.budgetTableDataSources = []
                 console.log("oranges: ", this.budgetTableTransactions)
@@ -1051,7 +1051,7 @@ export class BudgetsComponent implements OnInit {
           this.updateTransactionIds();
           this.getUntrackedTransactions(this.transactionsArray)
           this.updateBudgetTableTransactions()
-          if (this.budgets.length === 1) {
+          if (this.budgetTableTransactions.length > this.budgetTableDataSources.length) {
             console.log("remake")
             this.budgetTableDataSources = []
             console.log("oranges: ", this.budgetTableTransactions)
