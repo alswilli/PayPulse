@@ -1,9 +1,9 @@
 <mat-sidenav-container class="sideNavContainer" [ngStyle]="{'background-color': '#' + bgColor}">
   <mat-sidenav class="side" fxLayout="column" mode="side" [(opened)]="opened">
-    <a class="sideContent" mat-button routerLink='/home' (click)="onMenuClick()" routerLinkActive='active'> Home </a>
-    <a class="sideContent" mat-button routerLink='/transactions' (click)="onMenuClick()" routerLinkActive='active'> Transactions </a>
-    <a class="sideContent" mat-button routerLink='/budgets' (click)="onMenuClick()" routerLinkActive='active'> Budgets </a>
-    <a class="sideContent" mat-button routerLink='/goals' (click)="onMenuClick()" routerLinkActive='active' (click)="toggleBadgeVisibility()">
+    <a class="sideContent" mat-button routerLink='/homepage' (click)="onMenuClick()" routerLinkActive='active'> Home </a>
+    <a class="sideContent" mat-button routerLink='/transactionspage' (click)="onMenuClick()" routerLinkActive='active'> Transactions </a>
+    <a class="sideContent" mat-button routerLink='/budgetspage' (click)="onMenuClick()" routerLinkActive='active'> Budgets </a>
+    <a class="sideContent" mat-button routerLink='/goalspage' (click)="onMenuClick()" routerLinkActive='active' (click)="toggleBadgeVisibility()">
         <span [matBadge]="numNotifications" matBadgeColor="warn" matBadgeOverlap="false" [matBadgeHidden]="hidden"> Goals </span> 
     </a>
     <!-- <a class="sideContent" mat-button routerLink='/sharing' (click)="onMenuClick()" routerLinkActive='active'> Sharing </a>
@@ -19,13 +19,13 @@
       <button class="menuButton" mat-icon-button (click)="onMenuClick()" fxHide="true" fxShow.lt-md="true">
         <mat-icon>menu</mat-icon>
       </button>
-      <span fxFlex fxLayoutAlign.lt-md="center"><a class="apptitle" routerLink='/home'>PayPulse</a></span>
+      <span fxFlex fxLayoutAlign.lt-md="center"><a class="apptitle" routerLink='/homepage'>PayPulse</a></span>
       <!-- Show the buttons when the screen size is gt-md -->
       <div fxFlex="60" fxLayout="row" fxLayoutAlign="center center" fxShow="true" fxHide.lt-md="true">
-        <a mat-button routerLink='/home' routerLinkActive='active'> Home </a>
-        <a mat-button routerLink='/transactions' routerLinkActive='active'> Transactions </a>
-        <a mat-button routerLink='/budgets' routerLinkActive='active'> Budgets </a>
-        <a mat-button routerLink='/goals' routerLinkActive='active' (click)="toggleBadgeVisibility()">
+        <a mat-button routerLink='/homepage' routerLinkActive='active'> Home </a>
+        <a mat-button routerLink='/transactionspage' routerLinkActive='active'> Transactions </a>
+        <a mat-button routerLink='/budgetspage' routerLinkActive='active'> Budgets </a>
+        <a mat-button routerLink='/goalspage' routerLinkActive='active' (click)="toggleBadgeVisibility()">
           <span [matBadge]="numNotifications" matBadgeColor="warn" matBadgeOverlap="false" [matBadgeHidden]="hidden"> Goals </span>
         </a>
         <!-- <a mat-button routerLink='/sharing' routerLinkActive='active'> Sharing </a>

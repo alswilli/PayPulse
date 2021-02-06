@@ -991,10 +991,28 @@ export class BudgetsComponent implements OnInit {
               this.updateTransactionIds();
               this.getUntrackedTransactions(this.transactionsArray)
               this.updateBudgetTableTransactions()
-              for (let i = 0; i < this.budgetTableDataSources.length; i++) {
-                let transactions = this.budgetTableTransactions[i]
-                this.budgetTableDataSources[i].data = transactions
+              if (this.budgets.length === 1) {
+                console.log("remake")
+                this.budgetTableDataSources = []
+                console.log("oranges: ", this.budgetTableTransactions)
+                for (let transactions of this.budgetTableTransactions) {
+                  if (transactions.length > 0) {
+                    this.budgetTableDataSources.push(new MatTableDataSource(transactions))
+                  }
+                  else {
+                    this.budgetTableDataSources.push(new MatTableDataSource([]))
+                  }
+                  console.log("apples: ", transactions)
+                }
               }
+              else {
+                console.log("no remake")
+                for (let i = 0; i < this.budgetTableDataSources.length; i++) {
+                  let transactions = this.budgetTableTransactions[i]
+                  this.budgetTableDataSources[i].data = transactions
+                }
+              }
+
               this.untrackedDataSource.data = this.untrackedTransactions;
               this.addBudgetRef.close();
             })
@@ -1033,9 +1051,26 @@ export class BudgetsComponent implements OnInit {
           this.updateTransactionIds();
           this.getUntrackedTransactions(this.transactionsArray)
           this.updateBudgetTableTransactions()
-          for (let i = 0; i < this.budgetTableDataSources.length; i++) {
-            let transactions = this.budgetTableTransactions[i]
-            this.budgetTableDataSources[i].data = transactions
+          if (this.budgets.length === 1) {
+            console.log("remake")
+            this.budgetTableDataSources = []
+            console.log("oranges: ", this.budgetTableTransactions)
+            for (let transactions of this.budgetTableTransactions) {
+              if (transactions.length > 0) {
+                this.budgetTableDataSources.push(new MatTableDataSource(transactions))
+              }
+              else {
+                this.budgetTableDataSources.push(new MatTableDataSource([]))
+              }
+              console.log("apples: ", transactions)
+            }
+          }
+          else {
+            console.log("no remake")
+            for (let i = 0; i < this.budgetTableDataSources.length; i++) {
+              let transactions = this.budgetTableTransactions[i]
+              this.budgetTableDataSources[i].data = transactions
+            }
           }
           this.untrackedDataSource.data = this.untrackedTransactions;
           this.addBudgetRef.close();

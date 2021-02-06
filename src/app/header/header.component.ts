@@ -39,7 +39,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.bgColor = 'f7fbff'
           console.log("Log in screen opened!");
         }
-        else if (event.url === '/createAccount' || event.url === '/linkAccount') {
+        else if (event.url === '/createAccountpage' || event.url === '/linkAccountpage') {
           this.loggingIn = true;
           this.bgColor = 'f7fbff'
         } 

@@ -1047,7 +1047,7 @@ export class HomeComponent implements OnInit {
     console.log("reloading page")
     this.router.routeReuseStrategy.shouldReuseRoute = () => false;
     this.router.onSameUrlNavigation = 'reload';
-    this.router.navigate(['/home']);
+    this.router.navigate(['/homepage']);
   }
 
   resetItems() {

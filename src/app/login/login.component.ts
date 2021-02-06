@@ -258,7 +258,7 @@ export class LoginComponent implements OnInit {
                   this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                   this.authService.storeItemsDetails({validRes: this.validRes})
                   this.isLoading = false;
-                  this.router.navigate(['/home']);
+                  this.router.navigate(['/homepage']);
                 }
                 else {
                   this.authService.update().subscribe(res => {
@@ -266,7 +266,7 @@ export class LoginComponent implements OnInit {
                     this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                     this.authService.storeItemsDetails({validRes: this.validRes})
                     this.isLoading = false;
-                    this.router.navigate(['/home']);
+                    this.router.navigate(['/homepage']);
                   })
                 }
               })
@@ -430,7 +430,7 @@ export class LoginComponent implements OnInit {
                           this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                           this.authService.storeItemsDetails({validRes: this.validRes})
                           this.isLoading = false;
-                          this._ngZone.run(() => this.router.navigate(['/home']))
+                          this._ngZone.run(() => this.router.navigate(['/homepage']))
                         }
                         else {
                           this.authService.update().subscribe(res => {
@@ -438,7 +438,7 @@ export class LoginComponent implements OnInit {
                             this.authService.storeUserAccountsDetails({currentAccounts: this.currentAccounts, accounts: this.accountsData, ids: this.accountIds});
                             this.authService.storeItemsDetails({validRes: this.validRes})
                             this.isLoading = false;
-                            this._ngZone.run(() => this.router.navigate(['/home']))
+                            this._ngZone.run(() => this.router.navigate(['/homepage']))
                           })
                         }
                       })

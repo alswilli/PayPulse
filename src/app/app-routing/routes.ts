@@ -12,13 +12,13 @@ import { LinkAccountComponent } from '../link-account/link-account.component';
 
 export const routes: Routes = [
   { path: 'login',  component: LoginComponent },
-  { path: 'home',  component: HomeComponent, canActivate: [AuthGuard] },
-  { path: 'transactions',  component: TransactionsComponent, canActivate: [AuthGuard] },
-  { path: 'budgets',  component: BudgetsComponent, canActivate: [AuthGuard] },
-  { path: 'goals', component: GoalsComponent, canActivate: [AuthGuard] },
+  { path: 'homepage',  component: HomeComponent, canActivate: [AuthGuard] },
+  { path: 'transactionspage',  component: TransactionsComponent, canActivate: [AuthGuard] },
+  { path: 'budgetspage',  component: BudgetsComponent, canActivate: [AuthGuard] },
+  { path: 'goalspage', component: GoalsComponent, canActivate: [AuthGuard] },
   // { path: 'sharing',  component: SharingComponent, canActivate: [AuthGuard] },
   // { path: 'advice',  component: AdviceComponent, canActivate: [AuthGuard] },
-  { path: 'linkAccount',  component: LinkAccountComponent },
-  { path: 'createAccount',  component: CreateAccountComponent },
-  { path: '', redirectTo: '/home', pathMatch: 'full' }
+  { path: 'linkAccountpage',  component: LinkAccountComponent },
+  { path: 'createAccountpage',  component: CreateAccountComponent },
+  { path: '', redirectTo: '/homepage', pathMatch: 'full' }
 ];
