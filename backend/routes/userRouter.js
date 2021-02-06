@@ -130,7 +130,7 @@ router.post('/login', cors.corsWithOptions, (req, res, next) => {
       res.statusCode = 200;
       res.setHeader('Content-Type', 'application/json');
       return res.json({success: true, status: 'Login Successful!', admin: user.admin, 
-        token: token, userId: user._id, lastUpdated: user.lastUpdated, exp: 80});
+        token: token, userId: user._id, lastUpdated: user.lastUpdated, exp: 3600});
     }); 
   }) (req, res, next);
 });
@@ -155,7 +155,7 @@ router.post('/facebook/token', cors.corsWithOptions, passport.authenticate('face
     res.setHeader('Content-Type', 'application/json');
     res.json({success: true, username: req.user.username, admin: req.user.admin, 
       token: token, userId: req.user._id, lastUpdated: req.user.lastUpdated,
-      status: 'You are successfully logged in!', exp: 80});
+      status: 'You are successfully logged in!', exp: 3600});
   }
 });
 
@@ -186,7 +186,7 @@ router.get('/newJWTtoken', cors.corsWithOptions, authenticate.verifyUser, (req, 
     res.setHeader('Content-Type', 'application/json');
     res.json({success: true, username: req.user.username, token: token, 
       userId: req.user._id, lastUpdated: req.user.lastUpdated, 
-      status: 'New token gathered!', exp: 80});
+      status: 'New token gathered!', exp: 3600});
   }
   else {
     // console.log(res)
