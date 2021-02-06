@@ -23,6 +23,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   hidden: boolean;
   numNotifications: number;
   newlyCompletedGoals: UserGoal[];
+  currentRoute: string = ""
 
   constructor(private router: Router,
     private activatedRoute: ActivatedRoute, 
@@ -32,6 +33,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.router.events.subscribe((event:Event) => {
       if(event instanceof NavigationEnd ){
         console.log(event.url);
+        this.currentRoute = event.url;
         if (event.url === '/login') {
           this.loggingIn = true;
           this.bgColor = 'f7fbff'

@@ -6,11 +6,12 @@ import { timer } from 'rxjs';
 
 import { baseURL } from '../shared/baseurl';
 import { ProcessHTTPMsgService } from './process-httpmsg.service';
-import { Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, Event } from '@angular/router';
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { TokenExpiredComponent } from '../token-expired/token-expired.component';
 import { User } from '../shared/user';
 import { UserGoal } from '../shared/usergoal';
+import {filter} from 'rxjs/operators';
 
 interface AuthResponse {
   status: string;
@@ -57,6 +58,7 @@ export class AuthService {
   authToken: string = undefined;
   tokenExpiredRef: MatDialogRef<TokenExpiredComponent>;
   abc: any;
+  currentRoute: string = ""
   onNewGoals = new EventEmitter();
   // newlyCompletedGoals: Subject<UserGoal[]> = new Subject<UserGoal[]>();
   newlyCompletedGoals: Subject<UserGoal[]> = new BehaviorSubject<UserGoal[]>([]);
@@ -64,7 +66,17 @@ export class AuthService {
    constructor(private http: HttpClient,
      private processHTTPMsgService: ProcessHTTPMsgService,
      private router: Router,
-     public dialog: MatDialog) {
+     public dialog: MatDialog,
+     private activeRoute: ActivatedRoute) {
+      // this.router.events.subscribe((event:Event) => {
+      //   if(event instanceof NavigationEnd ){
+      //     this.currentRoute = event.url;
+      //   }
+      // })
+      // router.events.pipe(filter(event => event instanceof NavigationEnd))
+      //     .subscribe(event => {
+      //         this.currentRoute = event.url
+      //     });
    }
 
    checkJWTtoken() {
@@ -84,18 +96,32 @@ export class AuthService {
      const expiration = new Date(localStorage.getItem('expiration'))
      console.log('loadUserCredentials ', credentials);
      console.log(expiration)
-     if (credentials && credentials.username !== undefined) {
-       this.useCredentials(credentials);
-       if (this.authToken) {
-        this.checkJWTtoken();
-        const now = new Date();
-        console.log(expiration.getTime())
-        console.log(now.getTime())
-        console.log(expiration)
-        console.log(now)
-        const expiresIn = (expiration.getTime() - now.getTime()) / 1000;
-        this.startTimer(expiresIn)
+     const now = new Date();
+     const expiresIn = (expiration.getTime() - now.getTime()) / 1000;
+     let currentUrl = window.location.href
+     let i;
+     for (i = currentUrl.length-1; i >= 0; i--) {
+       if (currentUrl[i] === "/") {
+         break
        }
+     }
+     let urlPath = currentUrl.substring(i)
+     console.log("Router url: ", urlPath)
+     if (expiresIn > 0 && !(urlPath === "/login")) {
+      if (credentials && credentials.username !== undefined) {
+        this.useCredentials(credentials);
+        if (this.authToken) {
+          this.checkJWTtoken();
+          console.log(expiration.getTime())
+          console.log(now.getTime())
+          console.log(expiration)
+          console.log(now)
+          this.startTimer(expiresIn)
+        }
+      }
+     }
+     else {
+       this.logOut()
      }
    }
 
@@ -218,7 +244,9 @@ export class AuthService {
     this.router.navigate(['/login']);
     clearTimeout(this.nodeTimer)
     this.clearTokenTimer();
-    this.abc.unsubscribe();
+    if (this.abc) {
+      this.abc.unsubscribe();
+    }
    }
 
    update() {
