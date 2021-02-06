@@ -159,7 +159,7 @@
                   <div *ngIf="component.name === 'Budgets' && card.name === 'Top Budgets'" style="width: 100%; height: 100%;">
                     <mat-spinner *ngIf="isLoading" style="margin: auto"></mat-spinner>
                     <div *ngIf="!isLoading"> 
-                      <div *ngIf="top3Budgets.length === 0">
+                      <div *ngIf="top3Budgets.length === 0" style="text-align: center;">
                         <p>No recent budgets in the last 30 days!</p>
                       </div>
                       <div *ngFor="let budget of top3Budgets" fxLayoutAlign="space-between center" style="max-width: 374px; height: 100%; margin: auto; margin-bottom: 30px">
